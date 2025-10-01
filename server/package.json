@@ -1,0 +1,12 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Mindcode la plataforma correcta enfocada en el desarrollo y la educacion.",
+  "license": "ISC",
+  "author": "Wogcas, Hisamy, Melle, Taquito",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
