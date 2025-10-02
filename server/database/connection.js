@@ -1,11 +1,9 @@
-import { MongoClient } from "mongodb";
+import { mongoose } from "mongoose";
 import { uri } from "./atlas_uri.js";
-
-const client = new MongoClient(uri);
 
 async function connectToDatabase() {
     try {
-        await client.connect();
+        await mongoose.connect(uri);
         console.log(`Connected to the database`);
     } catch (err) {
         console.error(`Error connecting to the database: ${err}`);
@@ -19,7 +17,7 @@ async function main() {
     } catch (err) {
         console.error(`Error connecting to the database: ${err}`);
     } finally {
-        await client.close();
+        await mongoose.disconnect();
     }
 
 }
