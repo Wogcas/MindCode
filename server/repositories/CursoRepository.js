@@ -13,6 +13,22 @@ class CursoRepository {
         return await Curso.find({});
     }
 
+    async obtenerCursoPorNombre(tituloCurso) {
+        return await Curso.findOne({ titulo: tituloCurso });
+    }
+
+    async obtenerCursoPorId(idCurso) {
+        return await Curso.findById(idCurso);
+    }
+
+    async actualizarCurso(idCurso, cursoModificado) {
+        return await Curso.findByIdAndUpdate(idCurso, cursoModificado, { new: true });
+    }
+
+    async eliminarCurso(idCurso) {
+        return await Curso.findByIdAndDelete(idCurso);
+    }
+
 }
 
 export default CursoRepository;
