@@ -11,15 +11,4 @@ async function connectToDatabase() {
 
 };
 
-async function main() {
-    try {
-        await connectToDatabase();
-    } catch (err) {
-        console.error(`Error connecting to the database: ${err}`);
-    } finally {
-        await mongoose.disconnect();
-    }
-
-}
-
-main();
+export { connectToDatabase };
