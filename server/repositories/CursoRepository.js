@@ -1,7 +1,7 @@
 import { Curso } from "../entities/Curso.js";
 
+export default class CursoRepository {
 
-class CursoRepository {
     constructor() { }
 
     async agregarCurso(curso) {
@@ -30,5 +30,3 @@ class CursoRepository {
     }
 
 }
-
-export default CursoRepository;

@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import { connectToDatabase } from "./database/connection.js";
 import { Curso } from "./entities/Curso.js";
-import CursoRepository from "./repositories/CursoRepository.js";
+import CursoService from "./services/CursoService.js";
 
 async function runTest() {
     await connectToDatabase();
 
-    const cursoRepo = new CursoRepository();
+    const cursoServicio = new CursoService();
 
     const curso1 = new Curso({
         titulo: 'Curso de principios de React',
@@ -15,6 +15,8 @@ async function runTest() {
     });
 
     try {
+
+        // AHORA TODOS LOS TEST SON CON LOS SERVICIOS
 
         // TEST CON CREAR UN CURSO
         // const resultado = await cursoRepo.agregarCurso(curso1);
