@@ -5,11 +5,12 @@ const respuestaSchema = new Schema({
     contenido: {
         type: String,
         required: true,
-        // trim: true - - - no estoy seguro si es necesario, si alguien me corrige
+        trim: true
     },
     es_correcta: {
         type: Boolean,
         required: true,
+        default: false
     }
 });
 
@@ -17,7 +18,6 @@ export const preguntaSchema = new Schema({
     contenido: {
         type: String,
         required: true,
-        unique: true
     },
     tipo: {
         type: String,
