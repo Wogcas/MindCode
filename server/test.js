@@ -24,7 +24,7 @@ async function runTest() {
     const curso1 = new Curso({
         titulo: 'Curso de principios de Chema',
         descripcion: 'Este curso esta hecho con la finalidad de dar las oportunidades y herramientas de la libreria de React js...',
-        id_maestro: '65147a75c13e61883b23e1aA',
+        id_maestro: '68e374d6f741c2d5903d7cdf',
     });
 
     // IDs de ejemplo para las pruebas
@@ -106,7 +106,7 @@ async function runTest() {
 
         // TEST CON CREAR UN CURSO
         const resultadoCurso = await cursoServicio.agregarCurso(curso1);
-        console.log('Se ha agregado correctamente el curso:', resultado);
+        console.log('Se ha agregado correctamente el curso');
 
         // TEST CON OBTENER CURSOS
         // const resultadoCurso = await cursoServicio.obtenerCursos();
@@ -162,7 +162,7 @@ async function runTest() {
 
         // TEST 7: MARCAR LECCIÓN COMPLETADA
         //const leccionCompletada = await usuarioService.marcarLeccionCompletada(usuarioPorCorreo._id, idCursoPrueba, idLeccionPrueba);
-       // console.log('Lección completada:', leccionCompletada);
+        // console.log('Lección completada:', leccionCompletada);
 
         // TEST 8: ACTUALIZAR PORCENTAJE DE PROGRESO
         //const progresoActualizado = await usuarioService.actualizarPorcentajeProgreso(usuarioPorCorreo._id, idCursoPrueba, 75);
@@ -255,7 +255,7 @@ async function runTest() {
             }
         });
         */
-       
+
         /**  
         // TEST 4: MOSTRAR RETOS POR LECCIONES
         const retosLecciones = await retoService.obtenerRetosPorLeccion(resultado._id);

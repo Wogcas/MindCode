@@ -11,12 +11,16 @@ import { uri } from "./atlas_uri.js";
  */
 async function connectToDatabase() {
     try {
-        await mongoose.connect(uri);
+        await mongoose.connect(uri, {
+            serverSelectionTimeoutMS: 15000,
+            socketTimeoutMS: 45000,
+            bufferCommands: false
+        });
         console.log(`Connected to the database`);
     } catch (err) {
         console.error(`Error connecting to the database: ${err}`);
+        throw err;
     }
-
 };
 
 export { connectToDatabase };
