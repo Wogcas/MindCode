@@ -28,15 +28,6 @@ async function runTest() {
         id_curso: '65147a75c13e61883b23e1aa',
     });
 
-    const leccionActualizada = {
-        "titulo": 'Leccion 2',
-        "descripcion": 'Por que usar React',
-        "multimedia": [{
-            "titulo": 'Video leccion para aprender que es REACT',
-            "URL": "https://youtu.be/kEMr0rFjB7E?si=RjuIRiHUgQJMOA-x"
-        }],
-        "id_curso": '65147a75c13e61883b23e1aa',
-    }
 
     try {
         // ------  TEST PARA LECCION ------
@@ -52,8 +43,8 @@ async function runTest() {
         // const resultado = await leccionService.obtenerLeccionPorId('68e3629e9e2b734df0a2c2a4');
         // console.log(`La leccion con el id es: ${resultado}`);
 
-        const resultado = await leccionService.actualizarLeccion('68e369f07d58de85583aa1f8', leccionActualizada);
-        console.log(`La leccion modificada: ${resultado}`);
+        // const resultado = await leccionService.actualizarLeccion('68e369f07d58de85583aa1f8', leccionActualizada);
+        // console.log(`La leccion modificada: ${resultado}`);
 
         // const resultado = await leccionService.eliminarLeccion('68e367ce06822685686fca13');
         // console.log(`La leccion eliminada: ${resultado}`);
