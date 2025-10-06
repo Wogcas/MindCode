@@ -3,10 +3,6 @@ import path from 'path';
 
 dotenv.config();
 
-// Por el momento no es necesario usar el path asi que lo comente chavales!
-// const envPath = path.resolve(process.cwd(), '..', '.env');
-// dotenv.config({ path: envPath });
-
 const DB_USERNAME = process.env.DB_USERNAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_CLUSTER = process.env.DB_CLUSTER;
