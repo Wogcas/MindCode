@@ -85,8 +85,8 @@ async function runTest() {
         // AHORA TODOS LOS TEST SON CON LOS SERVICIOS
 
         // TEST CON CREAR UN CURSO
-         const resultado = await cursoRepo.agregarCurso(curso1);
-         console.log('Se ha agregado correctamente el curso:', resultado);
+        //const resultado = await cursoRepo.agregarCurso(curso1);
+        //console.log('Se ha agregado correctamente el curso:', resultado);
 
         // TEST CON OBTENER CURSOS
         // const resultadoCurso = await cursoRepo.obtenerCursos();
@@ -115,8 +115,8 @@ async function runTest() {
          console.log('Alumno agregado:', resultadoAlumno);
  
          // TEST 2: AGREGAR UN MAESTRO
-         //const resultadoMaestro = await usuarioRepo.agregarUsuario(maestro1);
-         //console.log('Maestro agregado:', resultadoMaestro);
+         const resultadoMaestro = await usuarioRepo.agregarUsuario(maestro1);
+         console.log('Maestro agregado:', resultadoMaestro);
  
          // TEST 3: OBTENER TODOS LOS USUARIOS 
           //const resultado = await usuarioRepo.obtenerAlumnos();
@@ -159,22 +159,7 @@ async function runTest() {
          // TEST 12: OBTENER SOLO MAESTROS
          // const resultado = await usuarioRepo.obtenerMaestros();
          // console.log('Maestros registrados:', resultado);
- 
-         // TEST 13: CONTAR USUARIOS POR TIPO
-         // const resultado = await usuarioRepo.contarPorTipo();
-         // console.log('Estadísticas de usuarios:', resultado);
- 
-         // TEST 14: OBTENER PROGRESO DE CURSOS
-         // const resultado = await usuarioRepo.obtenerProgresoCursos('ID_ALUMNO');
-         // console.log('Progreso de cursos:', resultado);
- 
-         // TEST 15: OBTENER CURSOS IMPARTIDOS
-         // const resultado = await usuarioRepo.obtenerCursosImpartidos('ID_MAESTRO');
-         // console.log('Cursos impartidos:', resultado);
- 
-         // TEST 16: ELIMINAR USUARIO
-         // await usuarioRepo.eliminarUsuario('AQUI_TU_ID');
-         // console.log('Usuario eliminado correctamente');
+    
     } catch (error) {
         console.error('Error durante la operacion', error);
     } finally {
