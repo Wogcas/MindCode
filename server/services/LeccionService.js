@@ -14,9 +14,9 @@ export default class LeccionService {
         }
     }
 
-    async obtenerLeccions() {
+    async obtenerLecciones() {
         try {
-            return await this.leccionRepo.obtenerLeccions();
+            return await this.leccionRepo.obtenerLecciones();
         } catch (error) {
             console.log('Service Error: While obtaining all the Lecciones from the database');
         }

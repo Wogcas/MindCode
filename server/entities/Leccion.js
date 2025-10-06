@@ -7,7 +7,6 @@ const LeccionSchema = new mongoose.Schema({
     },
     descripcion: {
         type: String,
-        required: true
     },
     fecha_creacion: {
         type: Date,
@@ -29,4 +28,4 @@ const LeccionSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
-export const Leccion = mongoose.model('Leccion', LeccionSchema);
+export const Leccion = mongoose.model('Lecciones', LeccionSchema);

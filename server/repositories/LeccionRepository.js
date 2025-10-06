@@ -9,7 +9,7 @@ export default class LeccionRepository {
         return await nuevaLeccion.save();
     }
 
-    async obtenerLeccions() {
+    async obtenerLecciones() {
         return await Leccion.find({});
     }
 
@@ -21,8 +21,8 @@ export default class LeccionRepository {
         return await Leccion.findById(idLeccion);
     }
 
-    async actualizarLeccion(idLeccion, leccionModificado) {
-        return await Leccion.findByIdAndUpdate(idLeccion, leccionModificado, { new: true });
+    async actualizarLeccion(idLeccion, leccionModificada) {
+        return await Leccion.findByIdAndUpdate(idLeccion, leccionModificada, { new: true });
     }
 
     async eliminarLeccion(idLeccion) {
