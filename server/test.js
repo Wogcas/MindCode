@@ -4,6 +4,7 @@ import { Curso } from "./entities/Curso.js";
 import { Leccion } from "./entities/Leccion.js";
 import CursoService from "./services/CursoService.js";
 import { Usuario } from "./entities/Usuario.js";
+import UsuarioService from "./services/UsuarioService.js";
 import UsuarioReporsitory from "./repositories/UsuarioRepository.js";
 import LeccionService from "./services/LeccionService.js";
 
@@ -11,39 +12,37 @@ import LeccionService from "./services/LeccionService.js";
 async function runTest() {
     await connectToDatabase();
 
-    const usuarioRepo = new UsuarioReporsitory();
+    const usuarioService = new UsuarioService();
     const cursoServicio = new CursoService();
     const leccionService = new LeccionService();
 
 
     //const cursoServicio = new CursoService();
 
-     const curso1 = new Curso({
-         titulo: 'Curso de principios de React',
-         descripcion: 'Este curso esta hecho con la finalidad de dar las oportunidades y herramientas de la libreria de React js...',
-         id_maestro: '65147a75c13e61883b23e1aA',
-     });
+    const curso1 = new Curso({
+        titulo: 'Curso de principios de React',
+        descripcion: 'Este curso esta hecho con la finalidad de dar las oportunidades y herramientas de la libreria de React js...',
+        id_maestro: '65147a75c13e61883b23e1aA',
+    });
 
     // IDs de ejemplo para las pruebas
     const idCursoPrueba = new mongoose.Types.ObjectId();
     const idLeccionPrueba = new mongoose.Types.ObjectId();
 
     // Datos de ejemplo
-    const alumno1 = new Usuario({
+    const alumno1 = {
         nombre: 'Juan Pérez García',
         correo: 'juan.perez@ejemplo.com',
         contrasena: 'password123',
         tipo: 'Alumno'
-    });
+    };
 
-
-    const maestro1 = new Usuario({
+    const maestro1 = {
         nombre: 'María López Hernández',
         correo: 'maria.lopez@ejemplo.com',
         contrasena: 'password456',
         tipo: 'Maestro'
-    });
-
+    };
 
 
 
@@ -108,58 +107,51 @@ async function runTest() {
         // await cursoRepo.eliminarCurso('68df73b2d18c34da2e6954bb');
         // console.log('Se ha eliminado el curso correctamente');
 
-/*========= Pruebas de Usuario ==========*/
+        /*========= Pruebas de Usuario ==========*/
 
-         // TEST 1: AGREGAR UN ALUMNO
-         const resultadoAlumno = await usuarioRepo.agregarUsuario(alumno1);
-         console.log('Alumno agregado:', resultadoAlumno);
- 
-         // TEST 2: AGREGAR UN MAESTRO
-         const resultadoMaestro = await usuarioRepo.agregarUsuario(maestro1);
-         console.log('Maestro agregado:', resultadoMaestro);
- 
-         // TEST 3: OBTENER TODOS LOS USUARIOS 
-          //const resultado = await usuarioRepo.obtenerAlumnos();
-          //console.log('Usuarios registrados:', resultado);
- 
-         // TEST 4: OBTENER USUARIO POR ID
-         //const resultado = await usuarioRepo.obtenerUsuarioPorId('68e374d6f741c2d5903d7cdf');
+        // TEST 1: AGREGAR UN ALUMNO
+        // const resultadoAlumno = await usuarioRepo.agregarUsuario(alumno1);
+        //console.log('Alumno agregado:', resultadoAlumno);
 
-         //console.log('Usuario encontrado:', resultado);
- 
-         // TEST 5: OBTENER USUARIO POR CORREO
-         //const resultado = await usuarioRepo.obtenerUsuarioPorCorreo('juan.perez@ejemplo.com');
-         //console.log('Usuario encontrado por correo:', resultado);
- 
-         // TEST 6: ACTUALIZAR USUARIO
-         //const usuarioModificado = { nombre: 'Juan Pérez García (Actualizado)' };
-         //const resultado = await usuarioRepo.actualizarUsuario('68e374d6f741c2d5903d7cde', usuarioModificado);
-         //console.log('Usuario actualizado:', resultado);
- 
-         // TEST 7: AGREGAR CURSO A PROGRESO (ALUMNO)
-          //const resultadoUsuario = await usuarioRepo.agregarCursoAProgreso('68e374d6f741c2d5903d7cde', curso1);
-          //console.log('Curso agregado al progreso:', resultadoUsuario);
- 
-         // TEST 8: MARCAR LECCIÓN COMPLETADA
-         // const resultado = await usuarioRepo.marcarLeccionCompletada('68e374d6f741c2d5903d7cde', idCursoPrueba, idLeccionPrueba);
-         // console.log('Lección marcada como completada:', resultado);
- 
-         // TEST 9: ACTUALIZAR PORCENTAJE DE PROGRESO
-         // const resultado = await usuarioRepo.actualizarPorcentajeProgreso('68e374d6f741c2d5903d7cde', idCursoPrueba, 35);
-         // console.log('Porcentaje actualizado:', resultado);
- 
-         // TEST 10: AGREGAR CURSO IMPARTIDO (MAESTRO)
-         // const resultado = await usuarioRepo.agregarCursoImpartido('ID_MAESTRO', idCursoPrueba, 'Introducción a JavaScript');
-         // console.log('Curso impartido agregado:', resultado);
- 
-         // TEST 11: OBTENER SOLO ALUMNOS
-         // const resultado = await usuarioRepo.obtenerAlumnos();
-         // console.log('Alumnos registrados:', resultado);
- 
-         // TEST 12: OBTENER SOLO MAESTROS
-         // const resultado = await usuarioRepo.obtenerMaestros();
-         // console.log('Maestros registrados:', resultado);
-    
+        // TEST 2: AGREGAR UN MAESTRO
+        //const resultadoMaestro = await usuarioRepo.agregarUsuario(maestro1);
+        //console.log('Maestro agregado:', resultadoMaestro);
+
+        // TEST 3: OBTENER TODOS LOS USUARIOS 
+        //const resultado = await usuarioRepo.obtenerAlumnos();
+        //console.log('Usuarios registrados:', resultado);
+
+        // TEST 4: OBTENER USUARIO POR CORREO
+        const usuarioPorCorreo = await usuarioService.obtenerUsuarioPorCorreo('juan.perez@ejemplo.com');
+        console.log('Usuario encontrado por correo:', usuarioPorCorreo);
+
+        // TEST 5: ACTUALIZAR USUARIO
+        //const usuarioModificado = { nombre: 'Juan Pérez García (Actualizado)' };
+        //const usuarioActualizado = await usuarioService.actualizarUsuario(usuarioPorCorreo._id, usuarioModificado);
+        //console.log('Usuario actualizado:', usuarioActualizado);
+
+        // TEST 6: AGREGAR CURSO A PROGRESO (solo si es alumno)
+        //const usuarioConProgreso = await usuarioService.agregarCursoAProgreso(usuarioPorCorreo._id, idCursoPrueba);
+        //console.log('Curso agregado al progreso:', usuarioConProgreso);
+
+        // TEST 7: MARCAR LECCIÓN COMPLETADA
+        //const leccionCompletada = await usuarioService.marcarLeccionCompletada(usuarioPorCorreo._id, idCursoPrueba, idLeccionPrueba);
+       // console.log('Lección completada:', leccionCompletada);
+
+        // TEST 8: ACTUALIZAR PORCENTAJE DE PROGRESO
+        //const progresoActualizado = await usuarioService.actualizarPorcentajeProgreso(usuarioPorCorreo._id, idCursoPrueba, 75);
+        //console.log('Porcentaje actualizado:', progresoActualizado);
+
+        // TEST 9: AGREGAR CURSO IMPARTIDO (solo si es maestro)
+        //const maestro = await usuarioService.obtenerUsuarioPorCorreo('maria.lopez@ejemplo.com');
+        //const cursoImpartido = await usuarioService.agregarCursoImpartido(maestro._id, idCursoPrueba, 'Curso de Introducción a React');
+        //console.log('Curso impartido agregado:', cursoImpartido);
+
+        // TEST 10: CONTAR USUARIOS POR TIPO
+        //const conteo = await usuarioService.contarPorTipo();
+        //console.log('Conteo de usuarios por tipo:', conteo);
+
+
     } catch (error) {
         console.error('Error durante la operacion', error);
     } finally {
