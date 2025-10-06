@@ -22,7 +22,7 @@ async function runTest() {
     //const cursoServicio = new CursoService();
 
     const curso1 = new Curso({
-        titulo: 'Curso de principios de React',
+        titulo: 'Curso de principios de Chema',
         descripcion: 'Este curso esta hecho con la finalidad de dar las oportunidades y herramientas de la libreria de React js...',
         id_maestro: '65147a75c13e61883b23e1aA',
     });
@@ -77,7 +77,7 @@ async function runTest() {
 
     try {
         /*========= Pruebas de Leccion ==========*/
-        const resultado = await leccionService.agregarLeccion(leccion1);
+        // const resultado = await leccionService.agregarLeccion(leccion1);
         // console.log(`Se agrego correctamente la leccion ${resultado}`);
 
         // const resultados = await leccionService.obtenerLecciones();
@@ -105,8 +105,8 @@ async function runTest() {
         /*========= Pruebas de Curso ==========*/
 
         // TEST CON CREAR UN CURSO
-        //const resultadoCurso = await cursoServicio.agregarCurso(curso1);
-        //console.log('Se ha agregado correctamente el curso:', resultado);
+        const resultadoCurso = await cursoServicio.agregarCurso(curso1);
+        console.log('Se ha agregado correctamente el curso:', resultado);
 
         // TEST CON OBTENER CURSOS
         // const resultadoCurso = await cursoServicio.obtenerCursos();
@@ -148,8 +148,8 @@ async function runTest() {
         //console.log('Usuarios registrados:', resultado);
 
         // TEST 4: OBTENER USUARIO POR CORREO
-        const usuarioPorCorreo = await usuarioService.obtenerUsuarioPorCorreo('juan.perez@ejemplo.com');
-        console.log('Usuario encontrado por correo:', usuarioPorCorreo);
+        // const usuarioPorCorreo = await usuarioService.obtenerUsuarioPorCorreo('juan.perez@ejemplo.com');
+        // console.log('Usuario encontrado por correo:', usuarioPorCorreo);
 
         // TEST 5: ACTUALIZAR USUARIO
         //const usuarioModificado = { nombre: 'Juan Pérez García (Actualizado)' };
@@ -220,7 +220,7 @@ async function runTest() {
 
         /*========= Pruebas de Reto ==========*/
         // TEST 1: CREAR UN RETO
-        const resultaReto = await retoService.crearReto(retoData);
+        // const resultaReto = await retoService.crearReto(retoData);
         //console.log('Reto registrado:', resultaReto);
 
         /**  TEST 2: MODIFICAR UN RETO
