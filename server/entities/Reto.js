@@ -13,7 +13,7 @@ const retoSchema = new Schema({
         required: true
 
     },
-    fechaCreacion: {
+    fecha_creacion: {
         type: Date,
         default: Date.now
     },

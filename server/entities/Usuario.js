@@ -5,7 +5,7 @@ const progresoCursoSchema = new mongoose.Schema({
     id_curso: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Curso',
-        require: true
+        required: true
     },
     porcentaje: {
         type: Number,
@@ -17,67 +17,67 @@ const progresoCursoSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Lecciones'
     }]
-}, {_id: false});
+}, { _id: false });
 
 
 const cursoImpartidoSchema = new mongoose.Schema({
     id_curso: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Curso',
-        require: true
+        required: true
     },
     titulo_curso: {
         type: String,
-        require: true
+        required: true
     }
-}, {_id: false});
+}, { _id: false });
 
 
 const usuarioSchema = new mongoose.Schema({
     nombre: {
         type: String,
-        require: true,
+        required: true,
         trim: true //Elimina espacios vacios
     },
-   correo: {
-    type: String,
-    require: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-   },
-   contrasena: {
-    type: String,
-    require: true
-   },
-   tipo: {
-    type: String,
-    require: true,
-    enum: ['Alumno', 'Maestro'],
-    default: 'Alumno'
-   },
-   progreso_Cursos:{
-    type: [progresoCursoSchema],
-    default: undefined
-   },
-   cursos_Impartidos:{
-    type: [cursoImpartidoSchema],
-    default: undefined
-   }
-}, { timestamps: true});
+    correo: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+    contrasena: {
+        type: String,
+        required: true
+    },
+    tipo: {
+        type: String,
+        required: true,
+        enum: ['Alumno', 'Maestro'],
+        default: 'Alumno'
+    },
+    progreso_cursos: {
+        type: [progresoCursoSchema],
+        default: undefined
+    },
+    cursos_impartidos: {
+        type: [cursoImpartidoSchema],
+        default: undefined
+    }
+}, { timestamps: true });
 
 
-usuarioSchema.pre('save', function(next){
-    if(this.tipo == 'Alumno'){
-        if(!this.progreso_Cursos){
-            this.progreso_Cursos = [];
+usuarioSchema.pre('save', function (next) {
+    if (this.tipo == 'Alumno') {
+        if (!this.progreso_cursos) {
+            this.progreso_cursos = [];
         }
-        this.cursos_Impartidos = undefined;
-    }else if (this.tipo == 'Maestro'){
-        if(!this.cursos_Impartidos){
-            this.cursos_Impartidos = [];
+        this.cursos_impartidos = undefined;
+    } else if (this.tipo == 'Maestro') {
+        if (!this.cursos_impartidos) {
+            this.cursos_impartidos = [];
         }
-        this.progreso_Cursos = undefined;
+        this.progreso_cursos = undefined;
     }
     next();
 });

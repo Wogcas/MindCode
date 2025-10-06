@@ -12,6 +12,7 @@ const CursoSchema = new mongoose.Schema({
     },
     id_maestro: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario',
         required: true
     },
 }, { timestamps: true });

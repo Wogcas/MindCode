@@ -2,8 +2,15 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const respuestaSchema = new Schema({
-    contenido: String,
-    esCorrecta: Boolean
+    contenido: {
+        type: String,
+        required: true,
+        // trim: true - - - no estoy seguro si es necesario, si alguien me corrige
+    },
+    es_correcta: {
+        type: Boolean,
+        required: true,
+    }
 });
 
 export const preguntaSchema = new Schema({
@@ -14,7 +21,7 @@ export const preguntaSchema = new Schema({
     },
     tipo: {
         type: String,
-        required: true, 
+        required: true,
         enum: ['opcion_multiple', 'verdadero_falso', 'codigo']
     },
     respuestas: [respuestaSchema]
