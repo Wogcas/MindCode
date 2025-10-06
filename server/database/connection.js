@@ -11,7 +11,7 @@ import { uri } from "./atlas_uri.js";
  */
 async function connectToDatabase() {
     try {
-        await mongoose.connect('mongodb+srv://jesusmorales245335:Hl5hnSbHVTFs10j7@cluster.fs2csfa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster');
+        await mongoose.connect('uri');
         console.log(`Connected to the database`);
     } catch (err) {
         console.error(`Error connecting to the database: ${err}`);
