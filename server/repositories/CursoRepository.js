@@ -14,7 +14,9 @@ export default class CursoRepository {
     }
 
     async obtenerCursoPorNombre(tituloCurso) {
-        return await Curso.findOne({ titulo: tituloCurso });
+        return await Curso.find({ 
+            titulo: { $regex: tituloCurso, $options: 'i' } 
+        });
     }
 
     async obtenerCursoPorId(idCurso) {

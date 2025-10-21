@@ -3,6 +3,7 @@ import { connectToDatabase } from './database/connection.js';
 import cursoRouter from './routes/CursoRoute.js';
 
 const app = express();
+const PORT = 3000;
 
 app.use(express.json());
 
@@ -17,6 +18,6 @@ app.use('/cursos', cursoRouter);
 
 
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(PORT, () => {
+    console.log('Server is running on port', PORT);
 });
