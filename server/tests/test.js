@@ -1,15 +1,5 @@
 import mongoose from "mongoose";
-<<<<<<<< HEAD:tests/test.js
-import { connectToDatabase } from "../server/database/connection.js";
-import { Curso } from "../server/entities/Curso.js";
-import { Leccion } from "../server/entities/Leccion.js";
-import CursoService from "../server/services/CursoService.js";
-import { Usuario } from "../server/entities/Usuario.js";
-import UsuarioService from "../server/services/UsuarioService.js";
-import UsuarioReporsitory from "../server/repositories/UsuarioRepository.js";
-import LeccionService from "../server/services/LeccionService.js";
-import RetoService from "../server/services/RetoService.js";
-========
+
 import { connectToDatabase } from "../database/connection.js";
 import { Curso } from "../entities/Curso.js";
 import { Leccion } from "../entities/Leccion.js";
@@ -19,7 +9,7 @@ import UsuarioService from "../services/UsuarioService.js";
 import UsuarioReporsitory from "../repositories/UsuarioRepository.js";
 import LeccionService from "../services/LeccionService.js";
 import RetoService from "../services/RetoService.js";
->>>>>>>> feature/dtos-addition:server/tests/test.js
+
 
 
 async function runTest() {
