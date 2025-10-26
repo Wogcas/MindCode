@@ -10,7 +10,8 @@ export default class LeccionService {
         try {
             return await this.leccionRepo.agregarLeccion(leccion);
         } catch (error) {
-            console.log('Service Error: While adding new Leccion to the database');
+            console.error('Service Error: While adding new Leccion to the database:', error.message);
+            throw error;
         }
     }
 
@@ -18,15 +19,17 @@ export default class LeccionService {
         try {
             return await this.leccionRepo.obtenerLecciones();
         } catch (error) {
-            console.log('Service Error: While obtaining all the Lecciones from the database');
+            console.log('Service Error: While obtaining all the Lecciones from the database', error.message);
+            throw error;
         }
     }
 
-    async obtenerLeccionPorNombre(tituloLeccion) {
+    async obtenerLeccionPorTitulo(tituloLeccion) {
         try {
-            return await this.leccionRepo.obtenerLeccionPorNombre(tituloLeccion);
+            return await this.leccionRepo.obtenerLeccionPorTitulo(tituloLeccion);
         } catch (error) {
-            console.log('Service Error: While obtaining a Leccion by name from the database');
+            console.log('Service Error: While obtaining a Leccion by name from the database', error.message);
+            throw error;
         }
     }
 
@@ -34,7 +37,8 @@ export default class LeccionService {
         try {
             return await this.leccionRepo.obtenerLeccionPorId(idLeccion);
         } catch (error) {
-            console.log('Service Error: While obtaining a Leccion by Id from the database');
+            console.log('Service Error: While obtaining a Leccion by Id from the database', error.message);
+            throw error;
         }
     }
 
@@ -42,7 +46,8 @@ export default class LeccionService {
         try {
             return await this.leccionRepo.actualizarLeccion(idLeccion, leccionModificado)
         } catch (error) {
-            console.log('Service Error: While updating a Leccion from the database');
+            console.log('Service Error: While updating a Leccion from the database', error.message);
+            throw error;
         }
     }
 
@@ -50,7 +55,8 @@ export default class LeccionService {
         try {
             return await this.leccionRepo.eliminarLeccion(idLeccion);
         } catch (error) {
-            console.log('Service Error: While deleting a Leccion from the database');
+            console.log('Service Error: While deleting a Leccion from the database', error.message);
+            throw error;
         }
     }
 }

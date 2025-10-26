@@ -53,18 +53,18 @@ export default class LeccionController {
         }
     }
 
-    obtenerLeccionesPorNombre = async (req, res) => {
-        const nombre = req.params.nombre;
+    obtenerLeccionesPorTitulo = async (req, res) => {
+        const titulo = req.params.titulo;
         try {
-            const leccionesPorNombreObtendida = await leccionService.obtenerLeccionPorNombre(nombre);
-            if (!leccionesPorNombreObtendida || leccionesPorNombreObtendida.length === 0) {
-                return res.status(404).json({ message: 'No se encontraron lecciones con ese nombre' });
+            const leccionesPorTituloObtendida = await leccionService.obtenerLeccionPorTitulo(titulo);
+            if (!leccionesPorTituloObtendida || leccionesPorTituloObtendida.length === 0) {
+                return res.status(404).json({ message: 'No se encontraron lecciones con ese titulo' });
             }
-            return res.status(200).json(leccionesPorNombreObtendida);
+            return res.status(200).json(leccionesPorTituloObtendida);
         } catch (error) {
             console.error('Controller Error:', error);
             res.status(500).json({
-                message: 'Controller Error: Al intentar obtener lecciones por nombre',
+                message: 'Controller Error: Al intentar obtener lecciones por titulo',
                 error: error.message
             });
         }

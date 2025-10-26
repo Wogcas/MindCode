@@ -13,8 +13,8 @@ export default class LeccionRepository {
         return await Leccion.find({});
     }
 
-    async obtenerLeccionPorNombre(tituloLeccion) {
-        return await Leccion.findOne({ titulo: tituloLeccion });
+    async obtenerLeccionPorTitulo(tituloLeccion) {
+        return await Leccion.find({ titulo: tituloLeccion });
     }
 
     async obtenerLeccionPorId(idLeccion) {
