@@ -26,5 +26,3 @@ export const preguntaSchema = new Schema({
     },
     respuestas: [respuestaSchema]
 });
-
-export const Pregunta = mongoose.model('Pregunta', preguntaSchema);

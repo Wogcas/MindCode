@@ -15,10 +15,6 @@ await connectToDatabase();
 app.use('/api/cursos', cursoRouter);
 
 
-
-
-
-
 app.listen(PORT, () => {
     console.log('Server is running on port', PORT);
 });

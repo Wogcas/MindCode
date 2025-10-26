@@ -105,8 +105,8 @@ async function runTest() {
         /*========= Pruebas de Curso ==========*/
 
         // TEST CON CREAR UN CURSO
-        const resultadoCurso = await cursoServicio.agregarCurso(curso1);
-        console.log('Se ha agregado correctamente el curso');
+        //const resultadoCurso = await cursoServicio.agregarCurso(curso1);
+        //console.log('Se ha agregado correctamente el curso');
 
         // TEST CON OBTENER CURSOS
         // const resultadoCurso = await cursoServicio.obtenerCursos();
@@ -220,8 +220,8 @@ async function runTest() {
 
         /*========= Pruebas de Reto ==========*/
         // TEST 1: CREAR UN RETO
-        // const resultaReto = await retoService.crearReto(retoData);
-        //console.log('Reto registrado:', resultaReto);
+        const resultaReto = await retoService.crearReto(retoData);
+        console.log('Reto registrado:', resultaReto);
 
         /**  TEST 2: MODIFICAR UN RETO
         const datosModificados = {
