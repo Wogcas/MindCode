@@ -1,4 +1,4 @@
-import { RetoDTO, PreguntaDTO, RespuestaDTO } from "../dtos/reto.dto.js";
+import { RetoDTO, PreguntaDTO, RespuestaDTO } from "../dtos/RetoDTO.js";
 
 export const RetoAdapter = {
   toDTO: (document) => {

@@ -1,5 +1,6 @@
-// Aquí no supe que pedo, es que no tiene id, lo dejo así como le hacemos?
-
+// Nota: ProgresoCursoDTO no tiene campo 'id' porque en el schema
+// se definió con { _id: false }, por lo tanto no se genera ID automático
+// para estos subdocumentos embebidos.
 export class ProgresoCursoDTO {
   constructor({ id_curso, porcentaje, lecciones_completadas }) {
     this.id_curso = id_curso;

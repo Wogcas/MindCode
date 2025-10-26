@@ -1,4 +1,4 @@
-import { CursoDTO } from "../dtos/curso.dto.js";
+import { CursoDTO } from "../dtos/CursoDTO.js";
 
 export const CursoAdapter = {
   toDTO: (document) => {

@@ -12,7 +12,7 @@ export class PreguntaDTO {
     this.id = id;
     this.contenido = contenido;
     this.tipo = tipo;
-    // Esto es un array como ya saben
+    // Array de objetos RespuestaDTO
     this.respuestas = respuestas;
   }
 }
@@ -23,9 +23,9 @@ export class RetoDTO {
     this.titulo = titulo;
     this.descripcion = descripcion;
     this.fecha_creacion = fecha_creacion;
-    // Esto es un array como ya saben
+    // Array de objetos PreguntaDTO
     this.preguntas = preguntas;
-    // Esto es un array como ya saben
+    // Array de IDs de lecciones relacionadas
     this.lecciones = lecciones;
   }
 }

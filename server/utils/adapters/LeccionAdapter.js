@@ -1,4 +1,4 @@
-import { LeccionDTO, MultimediaDTO } from "../dtos/leccion.dto.js";
+import { LeccionDTO, MultimediaDTO } from "../dtos/LeccionDTO.js";
 
 export const LeccionAdapter = {
   toDTO: (document) => {

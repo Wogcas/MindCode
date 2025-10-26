@@ -12,7 +12,7 @@ export class LeccionDTO {
     this.titulo = titulo;
     this.descripcion = descripcion;
     this.fecha_creacion = fecha_creacion;
-    // multimedia es un array ojo jsjss
+    // Array de objetos MultimediaDTO
     this.multimedia = multimedia; 
     this.id_curso = id_curso;
     this.createdAt = createdAt;

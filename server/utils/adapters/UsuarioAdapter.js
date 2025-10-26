@@ -1,4 +1,4 @@
-import { UsuarioDTO, ProgresoCursoDTO, CursoImpartidoDTO } from "../dtos/usuario.dto.js";
+import { UsuarioDTO, ProgresoCursoDTO, CursoImpartidoDTO } from "../dtos/UsuarioDTO.js";
 
 export const UsuarioAdapter = {
   toDTO: (document) => {
