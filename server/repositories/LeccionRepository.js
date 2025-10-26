@@ -14,7 +14,9 @@ export default class LeccionRepository {
     }
 
     async obtenerLeccionPorTitulo(tituloLeccion) {
-        return await Leccion.find({ titulo: tituloLeccion });
+        return await Leccion.find({
+            titulo: { $regex: tituloLeccion, $options: 'i' }
+        });
     }
 
     async obtenerLeccionPorId(idLeccion) {
