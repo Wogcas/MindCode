@@ -1,5 +1,6 @@
 import RetoRepository from "../repositories/RetoRepository.js";
 import LeccionRepository from "../repositories/LeccionRepository.js";
+import { RetoAdapter } from "../utils/adapters/RetoAdapter.js";
 
 export default class RetoService {
     constructor() {
@@ -12,7 +13,10 @@ export default class RetoService {
         if (retoExistente) {
             throw new Error(`Service Error: Already exists one reto with this title ${reto.titulo}.`);
         }
-        return await this.repository.agregarReto(reto);
+        
+        const retoCreado = await this.repository.agregarReto(reto);
+
+        return RetoAdapter.toDTO(retoCreado);
     }
 
     async modificarReto(idReto, retoModificado) {
@@ -20,7 +24,8 @@ export default class RetoService {
         if (!reto) {
             throw new Error(`Service Error: No found the reto with Id ${idReto}.`);
         }
-        return await this.repository.actualizarReto(idReto, retoModificado);
+        const retoActualizado = await this.repository.actualizarReto(idReto, retoModificado);
+        return RetoAdapter.toDTO(retoActualizado);
     }
 
     async eliminarReto(idReto) {
@@ -32,7 +37,10 @@ export default class RetoService {
     }
 
     async obtenerTodosLosRetos() {
-        return await this.repository.obtenerRetos();
+
+        const retos = await this.repository.obtenerRetos();
+
+        return retos.map(RetoAdapter.toDTO);
     }
 
     async obtenerReto(idReto) {
@@ -40,7 +48,7 @@ export default class RetoService {
         if (!reto) {
             throw new Error(`Service Error: No found the reto with Id  ${idReto}.`);
         }
-        return reto;
+        return RetoAdapter.toDTO(reto);
     }
 
     async obtenerRetoPorTitulo(tituloReto) {
@@ -48,7 +56,7 @@ export default class RetoService {
         if (!reto) {
             throw new Error(`Service Error: No found the reto with title ${tituloReto}.`);
         }
-        return reto;
+        return RetoAdapter.toDTO(reto);
     }
 
     async obtenerRetosPorLeccion(idLeccion) {
@@ -56,6 +64,7 @@ export default class RetoService {
         if (!leccionExiste) {
             throw new Error(`Service Error: No found the Leccion with Id ${idLeccion}.`);
         }
-        return await this.repository.obtenerRetosPorLeccion(idLeccion);
+        const retos = await this.repository.obtenerRetosPorLeccion(idLeccion);
+        return retos.map(RetoAdapter.toDTO);
     }
 }
