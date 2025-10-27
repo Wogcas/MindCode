@@ -37,9 +37,7 @@ export const verifyToken = (req, res, next) => {
     }
 };
 
-/**
- * Middleware para verificar que el usuario sea un Alumno
- */
+// Middleware para verificar que el usuario sea un Alumno
 export const esAlumno = (req, res, next) => {
     if (req.usuario && req.usuario.tipo === 'Alumno') {
         next();
@@ -51,9 +49,7 @@ export const esAlumno = (req, res, next) => {
     }
 };
 
-/**
- * Middleware para verificar que el usuario sea un Mentor (Maestro)
- */
+// Middleware para verificar que el usuario sea un Mentor (Maestro)
 export const esMentor = (req, res, next) => {
     if (req.usuario && req.usuario.tipo === 'Maestro') {
         next();
