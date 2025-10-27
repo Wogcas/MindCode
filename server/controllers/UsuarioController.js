@@ -3,7 +3,7 @@
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import { UsuarioAdapter } from '../utils/adapters/UsuarioAdapter.js';
 import { NotFoundError, ValidationError, ConflictError } from '../auth/errorHandler.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const usuarioRepository = new UsuarioRepository();
 
