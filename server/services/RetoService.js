@@ -1,10 +1,9 @@
 import RetoRepository from "../repositories/RetoRepository.js";
 import LeccionRepository from "../repositories/LeccionRepository.js";
-<<<<<<< HEAD
+
 import { RetoAdapter } from "../utils/adapters/RetoAdapter.js";
-=======
+
 import { NotFoundError, ConflictError } from "../auth/errorHandler.js";
->>>>>>> Rama-Esmeralda
 
 export default class RetoService {
     constructor() {
