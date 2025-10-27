@@ -1,5 +1,6 @@
 import LeccionRepository from "../repositories/LeccionRepository.js";
 import { leccionAdapter } from "../utils/adapters/LeccionAdapter.js";
+import { NotFoundError } from "../auth/errorHandler.js";
 
 export default class LeccionService {
 
@@ -8,63 +9,46 @@ export default class LeccionService {
     }
 
     async agregarLeccion(leccion) {
-        try {
-            const leccionGuardado = await this.leccionRepo.agregarLeccion(leccion);
-            return leccionAdapter.toDTO(leccionGuardado);
-        } catch (error) {
-            console.error('Service Error: While adding new Leccion to the database:', error.message);
-            throw error;
-        }
+        const leccionGuardado = await this.leccionRepo.agregarLeccion(leccion);
+        return leccionAdapter.toDTO(leccionGuardado);
     }
 
     async obtenerLecciones() {
-        try {
-            const leccionesObtenidas = await this.leccionRepo.obtenerLecciones();
-            return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
-        } catch (error) {
-            console.log('Service Error: While obtaining all the Lecciones from the database', error.message);
-            throw error;
-        }
+        const leccionesObtenidas = await this.leccionRepo.obtenerLecciones();
+        return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
     }
 
     async obtenerLeccionPorTitulo(tituloLeccion) {
-        try {
-            const leccionesObtenidas = await this.leccionRepo.obtenerLeccionPorTitulo(tituloLeccion);
-            return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
-        } catch (error) {
-            console.log('Service Error: While obtaining a Leccion by name from the database', error.message);
-            throw error;
+        const leccionesObtenidas = await this.leccionRepo.obtenerLeccionPorTitulo(tituloLeccion);
+        if (!leccionesObtenidas || leccionesObtenidas.length === 0) {
+            throw new NotFoundError(`No se encontraron lecciones con el título: ${tituloLeccion}`);
         }
+        return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
     }
 
     async obtenerLeccionPorId(idLeccion) {
-        try {
-            const leccionObtenidas = await this.leccionRepo.obtenerLeccionPorId(idLeccion);
-            return leccionAdapter.toDTO(leccionObtenidas);
-
-        } catch (error) {
-            console.log('Service Error: While obtaining a Leccion by Id from the database', error.message);
-            throw error;
+        const leccionObtenidas = await this.leccionRepo.obtenerLeccionPorId(idLeccion);
+        if (!leccionObtenidas) {
+            throw new NotFoundError(`Lección con ID ${idLeccion} no encontrada`);
         }
+        return leccionAdapter.toDTO(leccionObtenidas);
     }
 
     async actualizarLeccion(idLeccion, leccionModificado) {
-        try {
-            const leccionActualizada = await this.leccionRepo.actualizarLeccion(idLeccion, leccionModificado);
-            return leccionAdapter.toDTO(leccionActualizada);
-        } catch (error) {
-            console.log('Service Error: While updating a Leccion from the database', error.message);
-            throw error;
+        const leccion = await this.leccionRepo.obtenerLeccionPorId(idLeccion);
+        if (!leccion) {
+            throw new NotFoundError(`Lección con ID ${idLeccion} no encontrada`);
         }
+        const leccionActualizada = await this.leccionRepo.actualizarLeccion(idLeccion, leccionModificado);
+        return leccionAdapter.toDTO(leccionActualizada);
     }
 
     async eliminarLeccion(idLeccion) {
-        try {
-            const leccionEliminada = await this.leccionRepo.eliminarLeccion(idLeccion);
-            return leccionAdapter.toDTO(leccionEliminada);
-        } catch (error) {
-            console.log('Service Error: While deleting a Leccion from the database', error.message);
-            throw error;
+        const leccion = await this.leccionRepo.obtenerLeccionPorId(idLeccion);
+        if (!leccion) {
+            throw new NotFoundError(`Lección con ID ${idLeccion} no encontrada`);
         }
+        const leccionEliminada = await this.leccionRepo.eliminarLeccion(idLeccion);
+        return leccionAdapter.toDTO(leccionEliminada);
     }
 }

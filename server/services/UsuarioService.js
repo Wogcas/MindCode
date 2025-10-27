@@ -1,4 +1,5 @@
 import UsuarioRepository from "../repositories/UsuarioRepository.js";
+import { NotFoundError, ConflictError } from "../auth/errorHandler.js";
 
 export default class UsuarioService {
 
@@ -7,130 +8,106 @@ export default class UsuarioService {
     }
 
     async agregarUsuario(usuario) {
-        try {
-            return await this.usuarioRepo.agregarUsuario(usuario);
-        } catch (error) {
-            console.log('Service Error: While adding a new Usuario to the database', error);
-        }
+        return await this.usuarioRepo.agregarUsuario(usuario);
     }
 
     async obtenerUsuario() {
-        try {
-            return await this.usuarioRepo.obtenerUsuario();
-        } catch (error) {
-            console.log('Service Error: While obtaining all Usuarios from the database', error);
-        }
+        return await this.usuarioRepo.obtenerUsuario();
     }
 
     async obtenerUsuarioPorId(idUsuario) {
-        try {
-            return await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
-        } catch (error) {
-            console.log('Service Error: While obtaining a Usuario by ID from the database', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return usuario;
     }
 
     async obtenerUsuarioPorCorreo(correo) {
-        try {
-            return await this.usuarioRepo.obtenerUsuarioPorCorreo(correo);
-        } catch (error) {
-            console.log('Service Error: While obtaining a Usuario by email from the database', error);
-        }
+        return await this.usuarioRepo.obtenerUsuarioPorCorreo(correo);
     }
 
     async actualizarUsuario(idUsuario, usuarioModificado) {
-        try {
-            return await this.usuarioRepo.actualizarUsuario(idUsuario, usuarioModificado);
-        } catch (error) {
-            console.log('Service Error: While updating a Usuario in the database', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.actualizarUsuario(idUsuario, usuarioModificado);
     }
 
     async eliminarUsuario(idUsuario) {
-        try {
-            return await this.usuarioRepo.eliminarUsuario(idUsuario);
-        } catch (error) {
-            console.log('Service Error: While deleting a Usuario from the database', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.eliminarUsuario(idUsuario);
     }
 
     async agregarCursoAProgreso(idUsuario, idCurso) {
-        try {
-            return await this.usuarioRepo.agregarCursoAProgreso(idUsuario, idCurso);
-        } catch (error) {
-            console.log('Service Error: While adding a course to a student’s progress', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.agregarCursoAProgreso(idUsuario, idCurso);
     }
 
     async marcarLeccionCompletada(idUsuario, idCurso, idLeccion) {
-        try {
-            return await this.usuarioRepo.marcarLeccionCompletada(idUsuario, idCurso, idLeccion);
-        } catch (error) {
-            console.log('Service Error: While marking a lesson as completed', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.marcarLeccionCompletada(idUsuario, idCurso, idLeccion);
     }
 
     async actualizarPorcentajeProgreso(idUsuario, idCurso, porcentaje) {
-        try {
-            return await this.usuarioRepo.actualizarPorcentajeProgreso(idUsuario, idCurso, porcentaje);
-        } catch (error) {
-            console.log('Service Error: While updating progress percentage', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.actualizarPorcentajeProgreso(idUsuario, idCurso, porcentaje);
     }
 
     async obtenerProgresoCursos(idUsuario) {
-        try {
-            return await this.usuarioRepo.obtenerProgresoCursos(idUsuario);
-        } catch (error) {
-            console.log('Service Error: While obtaining student’s course progress', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.obtenerProgresoCursos(idUsuario);
     }
 
     async agregarCursoImpartido(idUsuario, idCurso, tituloCurso) {
-        try {
-            return await this.usuarioRepo.agregarCursoImpartido(idUsuario, idCurso, tituloCurso);
-        } catch (error) {
-            console.log('Service Error: While assigning a course to a teacher', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.agregarCursoImpartido(idUsuario, idCurso, tituloCurso);
     }
 
     async eliminarCursoImpartido(idUsuario, idCurso) {
-        try {
-            return await this.usuarioRepo.eliminarCursoImpartido(idUsuario, idCurso);
-        } catch (error) {
-            console.log('Service Error: While removing a course from a teacher', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.eliminarCursoImpartido(idUsuario, idCurso);
     }
 
     async obtenerCursosImpartidos(idUsuario) {
-        try {
-            return await this.usuarioRepo.obtenerCursosImpartidos(idUsuario);
-        } catch (error) {
-            console.log('Service Error: While obtaining teacher’s courses', error);
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(idUsuario);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${idUsuario} no encontrado`);
         }
+        return await this.usuarioRepo.obtenerCursosImpartidos(idUsuario);
     }
 
     async obtenerAlumnos() {
-        try {
-            return await this.usuarioRepo.obtenerAlumnos();
-        } catch (error) {
-            console.log('Service Error: While obtaining students from the database', error);
-        }
+        return await this.usuarioRepo.obtenerAlumnos();
     }
 
     async obtenerMaestros() {
-        try {
-            return await this.usuarioRepo.obtenerMaestros();
-        } catch (error) {
-            console.log('Service Error: While obtaining teachers from the database', error);
-        }
+        return await this.usuarioRepo.obtenerMaestros();
     }
 
     async contarPorTipo() {
-        try {
-            return await this.usuarioRepo.contarPorTipo();
-        } catch (error) {
-            console.log('Service Error: While counting users by type', error);
-        }
+        return await this.usuarioRepo.contarPorTipo();
     }
 }

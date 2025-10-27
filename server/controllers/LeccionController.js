@@ -1,107 +1,45 @@
-import LeccionService from "../services/LeccionService.js"
-
-const leccionService = new LeccionService();
+import LeccionService from "../services/LeccionService.js";
 
 export default class LeccionController {
+    constructor() {
+        this.leccionService = new LeccionService();
+    }
 
     agregarLeccion = async (req, res) => {
-        const datosLeccion = req.body;
-        try {
-            const nuevaLeccion = await leccionService.agregarLeccion(datosLeccion);
-            if (!nuevaLeccion) {
-                return res.status(400).json({ message: 'Error: No hay leccion para registrar.' })
-            }
-            res.status(201).json(nuevaLeccion);
-
-        } catch (error) {
-            console.error('Controller Error:', error);
-            res.status(500).json({
-                message: 'Controller Error: While adding new Leccion to the database',
-                error: error.message
-            });
-
-        }
+        const leccion = await this.leccionService.agregarLeccion(req.body);
+        res.status(201).json({ success: true, data: leccion });
     }
 
     obtenerLecciones = async (req, res) => {
-        try {
-            const lecciones = await leccionService.obtenerLecciones();
-            return res.status(200).json(lecciones);
-        } catch (error) {
-            console.error('Controller Error:', error);
-            res.status(500).json({
-                message: 'Controller Error: Al intentar obtener lecciones',
-                error: error.message
-            });
-        }
-    }
-
-    obtenerLeccionesPorId = async (req, res) => {
-        const id = req.params.id;
-        try {
-            const leccionPorIdObtendida = await leccionService.obtenerLeccionPorId(id);
-            if (!leccionPorIdObtendida) {
-                return res.status(404).json({ message: 'Error: No se encontró la leccion' });
-            }
-            return res.status(200).json(leccionPorIdObtendida);
-        } catch (error) {
-            console.error('Controller Error:', error);
-            res.status(500).json({
-                message: 'Controller Error: Al intentar obtener leccion por id',
-                error: error.message
-            });
-        }
+        const lecciones = await this.leccionService.obtenerLecciones();
+        res.status(200).json({ success: true, data: lecciones });
     }
 
     obtenerLeccionesPorTitulo = async (req, res) => {
-        const titulo = req.params.titulo;
-        try {
-            const leccionesPorTituloObtendida = await leccionService.obtenerLeccionPorTitulo(titulo);
-            if (!leccionesPorTituloObtendida || leccionesPorTituloObtendida.length === 0) {
-                return res.status(404).json({ message: 'No se encontraron lecciones con ese titulo' });
-            }
-            return res.status(200).json(leccionesPorTituloObtendida);
-        } catch (error) {
-            console.error('Controller Error:', error);
-            res.status(500).json({
-                message: 'Controller Error: Al intentar obtener lecciones por titulo',
-                error: error.message
-            });
-        }
+        const lecciones = await this.leccionService.obtenerLeccionPorTitulo(req.params.titulo);
+        res.status(200).json({ success: true, data: lecciones });
+    }
+
+    obtenerLeccionesPorId = async (req, res) => {
+        const leccion = await this.leccionService.obtenerLeccionPorId(req.params.id);
+        res.status(200).json({ success: true, data: leccion });
     }
 
     actualizarLeccion = async (req, res) => {
-        const id = req.params.id;
-        const dataLeccion = req.body;
-        try {
-            const leccionActualizada = await leccionService.actualizarLeccion(id, dataLeccion);
-            if (!leccionActualizada) {
-                return res.status(404).json({ message: 'Error: No se encontró la leccion para actualizar' });
-            }
-            return res.status(200).json(leccionActualizada);
-        } catch (error) {
-            console.error('Controller Error:', error);
-            res.status(500).json({
-                message: 'Controller Error: Al intentar actualizar leccion',
-                error: error.message
-            });
-        }
+        const leccion = await this.leccionService.actualizarLeccion(req.params.id, req.body);
+        res.status(200).json({ 
+            success: true, 
+            message: 'Lección actualizada exitosamente', 
+            data: leccion 
+        });
     }
 
     eliminarLeccion = async (req, res) => {
-        const id = req.params.id;
-        try {
-            await leccionService.eliminarLeccion(id);
-            return res.status(200).json({ message: "Leccion eliminada exitosamente" });
-        } catch (error) {
-            console.error('Controller Error:', error);
-            res.status(500).json({
-                message: 'Controller Error: Al intentar eliminar leccion',
-                error: error.message
-            });
-        }
+        const leccion = await this.leccionService.eliminarLeccion(req.params.id);
+        res.status(200).json({ 
+            success: true, 
+            message: 'Lección eliminada exitosamente', 
+            data: leccion 
+        });
     }
-
-
-
 }

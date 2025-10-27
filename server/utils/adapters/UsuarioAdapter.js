@@ -3,7 +3,7 @@ import { UsuarioDTO, ProgresoCursoDTO, CursoImpartidoDTO } from "../dtos/Usuario
 export const UsuarioAdapter = {
   toDTO: (document) => {
     if (!document) return null;
-    
+
     const doc = document.toObject ? document.toObject() : document;
 
     let progreso_cursos = undefined;
@@ -33,5 +33,11 @@ export const UsuarioAdapter = {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });
+  },
+
+  // Convertir array de documentos a DTOs
+  toDTOArray: (documents) => {
+    if (!documents || documents.length === 0) return [];
+    return documents.map(doc => UsuarioAdapter.toDTO(doc));
   }
 };

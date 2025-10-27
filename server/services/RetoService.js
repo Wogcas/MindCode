@@ -1,6 +1,10 @@
 import RetoRepository from "../repositories/RetoRepository.js";
 import LeccionRepository from "../repositories/LeccionRepository.js";
+<<<<<<< HEAD
 import { RetoAdapter } from "../utils/adapters/RetoAdapter.js";
+=======
+import { NotFoundError, ConflictError } from "../auth/errorHandler.js";
+>>>>>>> Rama-Esmeralda
 
 export default class RetoService {
     constructor() {
@@ -11,7 +15,7 @@ export default class RetoService {
     async crearReto(reto) {
         const retoExistente = await this.repository.obtenerRetoPorTitulo(reto.titulo);
         if (retoExistente) {
-            throw new Error(`Service Error: Already exists one reto with this title ${reto.titulo}.`);
+            throw new ConflictError(`Ya existe un reto con el título: ${reto.titulo}`);
         }
         
         const retoCreado = await this.repository.agregarReto(reto);
@@ -22,7 +26,7 @@ export default class RetoService {
     async modificarReto(idReto, retoModificado) {
         const reto = await this.repository.obtenerRetoPorId(idReto);
         if (!reto) {
-            throw new Error(`Service Error: No found the reto with Id ${idReto}.`);
+            throw new NotFoundError(`Reto con ID ${idReto} no encontrado`);
         }
         const retoActualizado = await this.repository.actualizarReto(idReto, retoModificado);
         return RetoAdapter.toDTO(retoActualizado);
@@ -31,7 +35,7 @@ export default class RetoService {
     async eliminarReto(idReto) {
         const retoEliminado = await this.repository.eliminarReto(idReto);
         if (!retoEliminado) {
-            throw new Error(`Service Error: No found the reto with Id ${idReto} for eliminate.`);
+            throw new NotFoundError(`Reto con ID ${idReto} no encontrado`);
         }
         return { mensaje: `Reto '${retoEliminado.titulo}' eliminado exitosamente.` };
     }
@@ -46,7 +50,7 @@ export default class RetoService {
     async obtenerReto(idReto) {
         const reto = await this.repository.obtenerRetoPorId(idReto);
         if (!reto) {
-            throw new Error(`Service Error: No found the reto with Id  ${idReto}.`);
+            throw new NotFoundError(`Reto con ID ${idReto} no encontrado`);
         }
         return RetoAdapter.toDTO(reto);
     }
@@ -54,7 +58,7 @@ export default class RetoService {
     async obtenerRetoPorTitulo(tituloReto) {
         const reto = await this.repository.obtenerRetoPorTitulo(tituloReto);
         if (!reto) {
-            throw new Error(`Service Error: No found the reto with title ${tituloReto}.`);
+            throw new NotFoundError(`No se encontró un reto con el título: ${tituloReto}`);
         }
         return RetoAdapter.toDTO(reto);
     }
@@ -62,7 +66,7 @@ export default class RetoService {
     async obtenerRetosPorLeccion(idLeccion) {
         const leccionExiste = await this.leccionRepo.obtenerLeccionPorId(idLeccion);
         if (!leccionExiste) {
-            throw new Error(`Service Error: No found the Leccion with Id ${idLeccion}.`);
+            throw new NotFoundError(`Lección con ID ${idLeccion} no encontrada`);
         }
         const retos = await this.repository.obtenerRetosPorLeccion(idLeccion);
         return retos.map(RetoAdapter.toDTO);
