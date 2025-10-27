@@ -5,7 +5,7 @@ import leccionRouter from './routes/LeccionRoute.js';
 import authRouter from './routes/AuthRoute.js';
 
 import retoRouter from './routes/RetoRoute.js';
-import leccionRouter from './routes/LeccionRoute.js';
+
 
 import usuarioRouter from './routes/UsuarioRoute.js';
 import { errorHandler, notFound } from './auth/errorHandler.js';
