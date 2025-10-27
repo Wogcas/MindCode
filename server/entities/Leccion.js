@@ -8,10 +8,6 @@ const LeccionSchema = new mongoose.Schema({
     descripcion: {
         type: String,
     },
-    fecha_creacion: {
-        type: Date,
-        required: true
-    },
     multimedia: [{
         titulo: {
             type: String,

@@ -1,4 +1,5 @@
 import LeccionRepository from "../repositories/LeccionRepository.js";
+import { leccionAdapter } from "../utils/adapters/LeccionAdapter.js";
 
 export default class LeccionService {
 
@@ -8,49 +9,62 @@ export default class LeccionService {
 
     async agregarLeccion(leccion) {
         try {
-            return await this.leccionRepo.agregarLeccion(leccion);
+            const leccionGuardado = await this.leccionRepo.agregarLeccion(leccion);
+            return leccionAdapter.toDTO(leccionGuardado);
         } catch (error) {
-            console.log('Service Error: While adding new Leccion to the database');
+            console.error('Service Error: While adding new Leccion to the database:', error.message);
+            throw error;
         }
     }
 
     async obtenerLecciones() {
         try {
-            return await this.leccionRepo.obtenerLecciones();
+            const leccionesObtenidas = await this.leccionRepo.obtenerLecciones();
+            return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
         } catch (error) {
-            console.log('Service Error: While obtaining all the Lecciones from the database');
+            console.log('Service Error: While obtaining all the Lecciones from the database', error.message);
+            throw error;
         }
     }
 
-    async obtenerLeccionPorNombre(tituloLeccion) {
+    async obtenerLeccionPorTitulo(tituloLeccion) {
         try {
-            return await this.leccionRepo.obtenerLeccionPorNombre(tituloLeccion);
+            const leccionesObtenidas = await this.leccionRepo.obtenerLeccionPorTitulo(tituloLeccion);
+            return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
         } catch (error) {
-            console.log('Service Error: While obtaining a Leccion by name from the database');
+            console.log('Service Error: While obtaining a Leccion by name from the database', error.message);
+            throw error;
         }
     }
 
     async obtenerLeccionPorId(idLeccion) {
         try {
-            return await this.leccionRepo.obtenerLeccionPorId(idLeccion);
+            const leccionObtenidas = await this.leccionRepo.obtenerLeccionPorId(idLeccion);
+            return leccionAdapter.toDTO(leccionObtenidas);
+
         } catch (error) {
-            console.log('Service Error: While obtaining a Leccion by Id from the database');
+            console.log('Service Error: While obtaining a Leccion by Id from the database', error.message);
+            throw error;
         }
     }
 
     async actualizarLeccion(idLeccion, leccionModificado) {
         try {
-            return await this.leccionRepo.actualizarLeccion(idLeccion, leccionModificado)
+            const leccionActualizada = await this.leccionRepo.actualizarLeccion(idLeccion, leccionModificado);
+            return leccionAdapter.toDTO(leccionActualizada);
         } catch (error) {
-            console.log('Service Error: While updating a Leccion from the database');
+            console.log('Service Error: While updating a Leccion from the database', error.message);
+            throw error;
         }
     }
 
     async eliminarLeccion(idLeccion) {
         try {
-            return await this.leccionRepo.eliminarLeccion(idLeccion);
+            const leccionEliminada = await this.leccionRepo.eliminarLeccion(idLeccion);
+            return leccionAdapter.toDTO(leccionEliminada);
         } catch (error) {
-            console.log('Service Error: While deleting a Leccion from the database');
+            console.log('Service Error: While deleting a Leccion from the database', error.message);
+            throw error;
         }
     }
 }
