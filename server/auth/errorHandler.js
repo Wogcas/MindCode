@@ -58,11 +58,15 @@ export const errorHandler = (err, req, res, next) => {
     });
 
     // Error de validación de Mongoose
-    if (err.name === 'ValidationError') {
+    if (err.name === 'ValidationError' && err.errors) {
+        // Error de validación de Mongoose
         const message = Object.values(err.errors).map(val => val.message).join(', ');
         error = new ValidationError(message);
+    } else if (err instanceof ValidationError) {
+        // Error de validación personalizado
+        error = err;
     }
-
+    
     // Error de Cast de Mongoose
     if (err.name === 'CastError') {
         const message = `Formato de ID inválido: ${err.value}`;

@@ -1,4 +1,5 @@
 import { Usuario  } from "../entities/Usuario.js";
+import { ForbiddenError, ConflictError, ValidationError } from "../auth/errorHandler.js";
 
 export default class UsuarioReporsitory{
     constructor(){}
@@ -37,7 +38,7 @@ export default class UsuarioReporsitory{
         const usuario = await Usuario.findById(idUsuario);
         
         if (usuario.tipo !== 'Alumno') {
-            throw new Error('Esta operación es solo para alumnos');
+            throw new ForbiddenError('Esta operación es solo para alumnos');
         }
 
         const cursoExiste = usuario.progreso_cursos.some(
@@ -45,7 +46,7 @@ export default class UsuarioReporsitory{
         );
 
         if (cursoExiste) {
-            throw new Error('El curso ya está en progreso');
+            throw new ConflictError('El curso ya está en progreso');
         }
 
         usuario.progreso_cursos.push({
@@ -61,7 +62,7 @@ export default class UsuarioReporsitory{
         const usuario = await Usuario.findById(idUsuario);
 
         if (usuario.tipo !== 'Alumno') {
-            throw new Error('Esta operación es solo para alumnos');
+            throw new ForbiddenError('Esta operación es solo para alumnos');
         }
 
         const progresoCurso = usuario.progreso_cursos.find(
@@ -69,7 +70,7 @@ export default class UsuarioReporsitory{
         );
 
         if (!progresoCurso) {
-            throw new Error('El curso no está en progreso');
+            throw new ConflictError('El curso no está en progreso');
         }
 
         const leccionYaCompletada = progresoCurso.lecciones_completadas.some(
@@ -84,13 +85,13 @@ export default class UsuarioReporsitory{
     }
     async actualizarPorcentajeProgreso(idUsuario, idCurso, porcentaje) {
         if (porcentaje < 0 || porcentaje > 100) {
-            throw new Error('El porcentaje debe estar entre 0 y 100');
+            throw new ValidationError('El porcentaje debe estar entre 0 y 100');
         }
 
         const usuario = await Usuario.findById(idUsuario);
 
         if (usuario.tipo !== 'Alumno') {
-            throw new Error('Esta operación es solo para alumnos');
+            throw new ForbiddenError('Esta operación es solo para alumnos');
         }
 
         const progresoCurso = usuario.progreso_cursos.find(
@@ -98,9 +99,8 @@ export default class UsuarioReporsitory{
         );
 
         if (!progresoCurso) {
-            throw new Error('El curso no está en progreso');
+            throw new ConflictError('El curso no está en progreso'); 
         }
-
         progresoCurso.porcentaje = porcentaje;
         return await usuario.save();
     }
@@ -109,7 +109,7 @@ export default class UsuarioReporsitory{
         const usuario = await Usuario.findById(idUsuario);
 
         if (usuario.tipo !== 'Alumno') {
-            throw new Error('Esta operación es solo para alumnos');
+            throw new ForbiddenError('Esta operación es solo para alumnos');
         }
 
         return usuario.progreso_cursos;
@@ -120,7 +120,7 @@ export default class UsuarioReporsitory{
         const usuario = await Usuario.findById(idUsuario);
 
         if (usuario.tipo !== 'Maestro') {
-            throw new Error('Esta operación es solo para maestros');
+            throw new ForbiddenError('Esta operación es solo para maestros');
         }
 
         const cursoExiste = usuario.cursos_impartidos.some(
@@ -128,7 +128,7 @@ export default class UsuarioReporsitory{
         );
 
         if (cursoExiste) {
-            throw new Error('El curso ya está asignado a este maestro');
+            throw new ConflictError('El curso ya está asignado a este maestro');
         }
 
         usuario.cursos_impartidos.push({
@@ -143,9 +143,8 @@ export default class UsuarioReporsitory{
         const usuario = await Usuario.findById(idUsuario);
 
         if (usuario.tipo !== 'Maestro') {
-            throw new Error('Esta operación es solo para maestros');
+            throw new ForbiddenError('Esta operación es solo para maestros');
         }
-
         usuario.cursos_impartidos = usuario.cursos_impartidos.filter(
             curso => curso.id_curso.toString() !== idCurso
         );
@@ -157,7 +156,7 @@ export default class UsuarioReporsitory{
         const usuario = await Usuario.findById(idUsuario);
 
         if (usuario.tipo !== 'Maestro') {
-            throw new Error('Esta operación es solo para maestros');
+            throw new ForbiddenError('Esta operación es solo para maestros');
         }
 
         return usuario.cursos_impartidos;
