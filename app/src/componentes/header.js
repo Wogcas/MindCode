@@ -3,14 +3,10 @@ class AppHeader extends HTMLElement {
       this.innerHTML = `
       <header class="w-full bg-white px-4 py-3 shadow flex items-center justify-between">
 
-        <!-- Logo -->
-        <div class="flex items-center">
-          <img src="../../componentes/logoMindCode.png"
-     class="w-9 h-9 object-contain"
-     alt="MindCode Logo" />
-      <span class="font-semibold text-gray-800 text-[18px]">MindCode</span>
+        <div class="flex items-center gap-2">
+        <img src="../componentes/logoMindCode.png" class="w-9 h-9 object-contain" alt="MindCode Logo">
+        <span class="font-semibold text-gray-800 text-[18px] ml-1">MindCode</span>
         </div>
-
         <!-- Buscador centrado estilo MindCode -->
         <div class="flex items-center bg-[#DCE8F7] rounded-full px-4 py-2 w-40 mx-2">
           <input
