@@ -7,14 +7,11 @@ class AppHeader extends HTMLElement {
         <img src="../componentes/logoMindCode.png" class="w-9 h-9 object-contain" alt="MindCode Logo">
         <span class="font-semibold text-gray-800 text-[18px] ml-1">MindCode</span>
         </div>
-        <!-- Buscador centrado estilo MindCode -->
         <div class="flex items-center bg-[#DCE8F7] rounded-full px-4 py-2 w-40 mx-2">
           <input
             type="text"
             placeholder=" "
             class="bg-transparent w-full outline-none text-gray-700 placeholder-gray-400 text-sm" />
-
-          <!-- LUPA MÁS PEQUEÑA -->
           <svg xmlns="http://www.w3.org/2000/svg"
                fill="none" 
                viewBox="0 0 24 24"
@@ -48,8 +45,6 @@ class AppHeader extends HTMLElement {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-
-          <!-- Menú hamburguesa -->
           <svg xmlns="http://www.w3.org/2000/svg" 
             class="h-7 w-7 text-gray-700"
             fill="none"
@@ -58,11 +53,9 @@ class AppHeader extends HTMLElement {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-
         </div>
       </header>
     `;
   }
 }
-
 customElements.define("app-header", AppHeader);
