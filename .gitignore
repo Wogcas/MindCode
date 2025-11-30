@@ -1,3 +1,5 @@
 .env
 node_modules
-test-interactive.js.DS_Store
+.DS_Store
+**/.DS_Store
+test-interactive.js
