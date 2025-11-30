@@ -1,19 +1,20 @@
-class Bienvenida extends HTMLElement {
+class BienvenidaUsuario extends HTMLElement {
   connectedCallback() {
-    const text = this.getAttribute("text") || "Título";
-    const profile = this.getAttribute("profile")
-      || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+    const nombre = this.getAttribute('nombre') || 'Usuario';
+    const iniciales = nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
     this.innerHTML = `
-      <div class="flex items-center gap-4 p-4">
-        <img 
-          src="${profile}" 
-          class="w-20 h-20 object-cover rounded-full border"
-        />
-        <p class="text-lg font-semibold">${text}</p>
+      <div class="flex items-center gap-4 mb-8 mr-10 ">
+        <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-lg">
+          ${iniciales}
+        </div>
+        <div class="text-primary-text sm:flex sm:gap-1 font-light text-md ">
+          <p>Te damos la bienvenida,</p>
+          <p>${nombre}</p>
+        </div>
       </div>
     `;
   }
 }
 
-customElements.define("bienvenida-usuario", Bienvenida);
+customElements.define('bienvenida-usuario', BienvenidaUsuario);
