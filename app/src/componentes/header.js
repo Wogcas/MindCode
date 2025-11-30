@@ -24,7 +24,7 @@ class AppHeader extends HTMLElement {
 
         <!-- Iconos -->
         <div class="flex items-center gap-4">
-
+<!--prueba-->
           <!-- Usuario -->
           <svg xmlns="http://www.w3.org/2000/svg" 
           fill="none" 
