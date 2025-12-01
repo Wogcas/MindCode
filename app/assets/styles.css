@@ -26,6 +26,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Colmeak';
+    src: url('./fonts/Colmeak.otf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
 /* Variables CSS para colores */
 :root {
     --color-primary: #64A85F;

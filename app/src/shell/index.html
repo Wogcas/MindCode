@@ -27,17 +27,21 @@
                         }
                     },
                     fontFamily: {
-                        sans: ['Poppins', 'system-ui', 'sans-serif'],
+                        Colmeak: ['Colmeak', 'sans-serif'],
+                        sans: ['Quicksand', 'system-ui', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     <script type="module" src="../dashboard/DashboardAlumno.js"></script>
+    <script type="module" src="../componentes/header.js"></script>
+    <script type="module" src="../dashboard/DashboardMaestro.js"></script>
 </head>
 
 <body class="font-sans ">
-    <dashboard-alumno />
+    <app-header></app-header>
+    <dashboard-maestro></dashboard-maestro>
 </body>
 
 </html>

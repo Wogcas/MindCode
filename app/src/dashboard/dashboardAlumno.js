@@ -1,11 +1,11 @@
 import './componentes/bienvenida.js';
-import './componentes/cursoCarrousel.js';
-import './componentes/sugerenciasCard.js';
+import './componentes/CursoCarrousel.js';
+import './componentes/SugerenciasCard.js';
 
 class DashboardAlumno extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <div class="min-h-screen bg-gray-50 pl-10 p-10 font-sans sm:p-20">
+      <div class="min-h-screen bg-gray-50 pl-10 p-10 pt-5 font-sans sm:p-20 sm:pt-10">
         <bienvenida-usuario 
           nombre="Esmeralda Molina"
           class="flex items-center"
