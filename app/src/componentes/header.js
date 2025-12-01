@@ -1,6 +1,6 @@
 class AppHeader extends HTMLElement {
-  connectedCallback() {
-    this.innerHTML = `
+    connectedCallback() {
+        this.innerHTML = `
         <header class="bg-white shadow-sm sticky top-0 z-50 font-sans">
             <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
@@ -13,7 +13,7 @@ class AppHeader extends HTMLElement {
                     <div class="flex-1 flex items-center justify-end md:justify-between mx-2 md:mx-8">
                          <div class="flex-1 max-w-md mr-2 md:mr-0">
                             <div class="relative text-gray-500 focus-within:text-gray-600">
-                                <input type="text" name="search" id="search" placeholder="Explorar Cursos" class="font-sans block w-full h-10 pl-4 pr-10 py-2 leading-5 font-medium text-gray-700 placeholder-gray-500 bg-blue-100/50 border-transparent rounded-full focus:outline-none focus:bg-blue-100 focus:ring-0 sm:text-sm transition-colors duration-200">
+                                <input type="text" name="search" id="search" placeholder="Explorar Cursos" class="block w-full h-10 pl-4 pr-10 py-2 leading-5 font-medium text-gray-700 placeholder-gray-500 bg-blue-100/50 border-transparent rounded-full focus:outline-none focus:bg-blue-100 focus:ring-0 sm:text-sm transition-colors duration-200">
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -57,7 +57,7 @@ class AppHeader extends HTMLElement {
             </div>
         </header>
         `;
-  }
+    }
 }
 
 customElements.define('app-header', AppHeader);
