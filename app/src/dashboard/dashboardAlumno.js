@@ -1,19 +1,24 @@
 import './componentes/bienvenida.js';
-import '../componentes/cursoCard.js';
+import './componentes/CursoCarrousel.js';
+import './componentes/SugerenciasCard.js';
 
 class DashboardAlumno extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <div class="p-6">
+      <div class="min-h-screen bg-gray-50 pl-10 p-10 pt-5 font-sans sm:p-20 sm:pt-10">
         <bienvenida-usuario 
-          text="Te damos la bienvenida, Esmeralda Molina"
-          profile="https://definicion.de/wp-content/uploads/2010/11/curso-1.jpg">
+          nombre="Esmeralda Molina"
+          class="flex items-center"
+          >
         </bienvenida-usuario>
-
-        <curso-card
-          title="Curso de HTML"
-          image="https://definicion.de/wp-content/uploads/2010/11/curso-1.jpg">
-        </curso-card>
+        <h2 class="text-xl font-light text-primary-text mb-6">¿Qué aprender ahora?</h2>
+        <curso-carrousel></curso-carrousel>
+         <h2 class="text-xl font-light text-primary-text mb-6">Nuestras sugerencias para ti</h2>
+        <sugerencias-card 
+          title="Curso conceptos básicos de JavaScript"
+          image="https://assets.pluhe.com/blog/small/JqxsAtj7G5bc4D8vfE5LKrGjLhm2dgYi7aRtEXBd.jpg"
+          description="Ready to transform your digital dresence? Let's create magic together! book our services now!"
+        />
       </div>
     `;
   }
