@@ -5,10 +5,10 @@ class AppHeader extends HTMLElement {
             <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     
-                    <div class="flex-shrink-0 flex items-center cursor-pointer">
+                    <a href="#/" class="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity">
                             <img src="../../assets/images/logoMindCode.png" class="h-10"/>
                             <span class="font-Colmeak hidden md:block font-semibold text-xl tracking-tight text-gray-800 ml-2">MindCode</span>
-                    </div>
+                    </a>
 
                     <div class="flex-1 flex items-center justify-end md:justify-between mx-2 md:mx-8">
                          <div class="flex-1 max-w-md mr-2 md:mr-0">
@@ -23,10 +23,10 @@ class AppHeader extends HTMLElement {
                         </div>
 
                         <nav class="hidden md:flex space-x-4 lg:space-x-8 ml-4">
-                            <a href="#" class="text-gray-900 font-semibold px-3 py-2 text-sm hover:text-primary-600 transition-colors">Inicio</a>
-                            <a href="#" class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Cursos</a>
-                            <a href="#" class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Retos</a>
-                            <a href="#" class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Foros</a>
+                            <a href="#/" class="nav-link text-gray-900 font-semibold px-3 py-2 text-sm hover:text-primary-600 transition-colors">Inicio</a>
+                            <a href="#/mis-cursos" class="nav-link text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Mis Cursos</a>
+                            <a href="#/explorar" class="nav-link text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Explorar</a>
+                            <a href="#/foros" class="nav-link text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Foros</a>
                         </nav>
                     </div>
 

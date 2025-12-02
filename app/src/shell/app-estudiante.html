@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mindcode</title>
+    <title>MindCode - Plataforma de Aprendizaje</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../../assets/styles.css">
     <script>
@@ -34,41 +34,34 @@
             }
         }
     </script>
-    <!-- Componentes compartidos -->
-    <script type="module" src="../componentes/header.js"></script>
-    <script type="module" src="../componentes/Pagina404.js"></script>
-    
-    <!-- Componentes UI reutilizables -->
-    <script type="module" src="../componentes/ui/ProgressBar.js"></script>
-    <script type="module" src="../componentes/ui/LessonCard.js"></script>
-    <script type="module" src="../componentes/ui/QuizOption.js"></script>
-    <script type="module" src="../componentes/ui/VideoPlayer.js"></script>
-    
-    <!-- Vistas de Dashboard -->
-    <script type="module" src="../dashboard/dashboardAlumno.js"></script>
-    <script type="module" src="../dashboard/DashboardMaestro.js"></script>
-    
-    <!-- Vistas de Maestro -->
-    <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
-    
-    <!-- Vistas de Estudiante -->
-    <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
-    <script type="module" src="../mis-cursos/componentes/CursoCardAlumno.js"></script>
-    <script type="module" src="../ver-curso/VisorLeccion.js"></script>
-    <script type="module" src="../ver-curso/componentes/SidebarLecciones.js"></script>
-    <script type="module" src="../ver-curso/componentes/AreaContenido.js"></script>
-    <script type="module" src="../ver-curso/VistaReto.js"></script>
-    
-    <!-- Router -->
-    <script type="module" src="../utils/router.js"></script>
 </head>
 
 <body class="font-sans bg-gray-50">
+    <!-- Header -->
     <app-header></app-header>
-    
+
+    <!-- Contenedor principal para el router -->
     <div id="app-root">
-        <!-- Las vistas se cargarán aquí dinámicamente según la ruta -->
+        <!-- Las vistas se cargarán aquí dinámicamente -->
     </div>
+
+    <!-- Importar componentes -->
+    <script type="module" src="../componentes/header.js"></script>
+    
+    <!-- Componentes UI base -->
+    <script type="module" src="../estudiante/componentes/ui/ProgressBar.js"></script>
+    <script type="module" src="../estudiante/componentes/ui/LessonCard.js"></script>
+    <script type="module" src="../estudiante/componentes/ui/QuizOption.js"></script>
+    <script type="module" src="../estudiante/componentes/ui/VideoPlayer.js"></script>
+    
+    <!-- Vistas principales -->
+    <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
+    <script type="module" src="../ver-curso/VisorLeccion.js"></script>
+    <script type="module" src="../estudiante/vistas/VistaReto.js"></script>
+    <script type="module" src="../estudiante/componentes/Pagina404.js"></script>
+    
+    <!-- Router -->
+    <script type="module" src="../utils/router.js"></script>
 </body>
 
 </html>
