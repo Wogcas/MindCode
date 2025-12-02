@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mindcode</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foros – MindCode</title>
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../../assets/styles.css">
     <script>
         tailwind.config = {
             theme: {
@@ -23,24 +24,35 @@
                             600: '#508A4C',
                             700: '#3C6739',
                             800: '#284426',
-                            900: '#142213',
+                            900: '#142213'
                         }
                     },
                     fontFamily: {
-                        Colmeak: ['Colmeak', 'sans-serif'],  
-                        sans: ['Quicksand', 'system-ui', 'sans-serif'],
+                        Colmeak: ['Colmeak', 'sans-serif'],
+                        sans: ['Quicksand', 'system-ui', 'sans-serif']
                     }
                 }
             }
         }
     </script>
+
+    <link rel="stylesheet" href="../../assets/styles.css">
+
     <script type="module" src="../componentes/header.js"></script>
-    <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
+
+    <script type="module" src="../foros/crearForo.js"></script>
+
 </head>
 
-<body class=" font-sans ">
+<body class="font-sans bg-gray-50">
+
+    <!-- HEADER -->
     <app-header></app-header>
-    <mis-cursos-maestro></mis-cursos-maestro>
+
+    <main class="mt-6">
+        <crear-foro></crear-foro>
+    </main>
+
 </body>
 
 </html>
