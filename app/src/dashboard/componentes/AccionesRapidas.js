@@ -1,7 +1,6 @@
 class AccionesRapidas extends HTMLElement {
     connectedCallback() {
-        // Definimos los datos de los botones para generar el HTML dinámicamente
-        // y mantener el código limpio.
+
         const botones = [
             { texto: "Crear Curso" },
             { texto: "Crear Lección" },
