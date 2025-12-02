@@ -1,4 +1,4 @@
-// Router simple basado en hash para navegación SPA sin frameworks
+// Router para la aplicación de estudiantes
 
 class Router {
   constructor(routes) {
@@ -6,7 +6,6 @@ class Router {
     this.rootElement = null;
     this.currentComponent = null;
     
-    // Esperar a que el DOM esté listo
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
     } else {
@@ -25,7 +24,6 @@ class Router {
     window.addEventListener('hashchange', () => this.handleRoute());
     window.addEventListener('load', () => this.handleRoute());
     
-    // Manejar navegación inicial
     this.handleRoute();
   }
 
@@ -39,14 +37,11 @@ class Router {
     const route = this.routes[routePath] || this.routes['/404'];
     
     if (route) {
-      // Limpiar el contenedor
       this.rootElement.innerHTML = '';
       
-      // Crear el nuevo componente
       const component = route.component;
       const element = document.createElement(component);
       
-      // Pasar parámetros como atributos
       if (params.length > 0 && route.params) {
         route.params.forEach((paramName, index) => {
           if (params[index]) {
@@ -58,7 +53,6 @@ class Router {
       this.rootElement.appendChild(element);
       this.currentComponent = element;
 
-      // Scroll al top al cambiar de ruta
       window.scrollTo(0, 0);
     }
   }
@@ -68,24 +62,15 @@ class Router {
   }
 }
 
-// Configuración de rutas
+// Configuración de rutas para estudiantes
 export const router = new Router({
   '/': { 
-    component: 'dashboard-maestro' 
-  },
-  '/dashboard-maestro': { 
-    component: 'dashboard-maestro' 
-  },
-  '/mis-cursos': { 
-    component: 'mis-cursos-maestro' 
-  },
-  '/mis-cursos-maestro': { 
-    component: 'mis-cursos-maestro' 
-  },
-  '/dashboard-alumno': { 
     component: 'dashboard-alumno' 
   },
-  '/mis-cursos-alumno': { 
+  '/dashboard': { 
+    component: 'dashboard-alumno' 
+  },
+  '/mis-cursos': { 
     component: 'mis-cursos-alumno' 
   },
   '/curso': { 
@@ -101,7 +86,6 @@ export const router = new Router({
   }
 });
 
-// Helper para navegación programática
 export function navigateTo(path) {
   router.navigate(path);
 }
