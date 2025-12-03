@@ -21,7 +21,6 @@ class AppHeader extends HTMLElement {
                                 </div>
                             </div>
                         </div>
-
                         <nav class="hidden md:flex space-x-4 lg:space-x-8 ml-4">
                             <a href="#" class="text-gray-900 font-semibold px-3 py-2 text-sm hover:text-primary-600 transition-colors">Inicio</a>
                             <a href="#" class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Cursos</a>
@@ -29,7 +28,18 @@ class AppHeader extends HTMLElement {
                             <a href="#" class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">Foros</a>
                         </nav>
                     </div>
-
+        <!-- Iconos -->
+        <div class="flex items-center gap-4">
+          <!-- Usuario -->
+          <svg xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke-width="1.5" 
+          stroke="currentColor" 
+          class="h-6 w-6 text-gray-700">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
                     <div class="flex items-center space-x-1 sm:space-x-3">
                         
                         <button type="button" class="flex p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 focus:outline-none transition-colors">
