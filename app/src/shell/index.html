@@ -43,7 +43,7 @@
 
     <main id="vista" class="pt-6"></main>
 
-    <<script>
+    <script>
         const params = new URLSearchParams(location.search);
         const vista = params.get("vista");
         const tipo = params.get("tipo");
@@ -52,61 +52,63 @@
         const root = document.getElementById("vista");
 
         switch (vista) {
-        case "retos":
-        if (tipo === "codigo") {
-        root.innerHTML = "<reto-codigo></reto-codigo>";
-        } else if (tipo === "multiple") {
-        root.innerHTML = "<reto-multiple></reto-multiple>";
-        } else if (tipo === "abierto") {
-        root.innerHTML = "<reto-abierto></reto-abierto>";
-        } else {
-        root.innerHTML = "<crear-reto-menu></crear-reto-menu>";
+            case "retos":
+                if (tipo === "codigo") {
+                    root.innerHTML = "<reto-codigo></reto-codigo>";
+                } else if (tipo === "multiple") {
+                    root.innerHTML = "<reto-multiple></reto-multiple>";
+                } else if (tipo === "abierto") {
+                    root.innerHTML = "<reto-abierto></reto-abierto>";
+                } else {
+                    root.innerHTML = "<crear-reto-menu></crear-reto-menu>";
+                }
+                break;
+
+            case "cursos":
+                root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
+                break;
+
+            case "perfil":
+                root.innerHTML = `<editar-perfil tipo="alumno"></editar-perfil>`;
+                break;
+
+            case "unirseCurso":
+                root.innerHTML = "<unirse-cursos></unirse-cursos>";
+                break;
+
+            case "unirse":
+                contenido.innerHTML = `<unirse-cursos></unirse-cursos>`;
+                break;
+
+            case "progreso":
+                contenido.innerHTML = `<progreso-cursos></progreso-cursos>`;
+                break;
+
+            case "verLecciones":
+                contenido.innerHTML = `<ver-lecciones></ver-lecciones>`;
+                break;
+
+            case "foros":
+                if (accion === "crear") root.innerHTML = "<crear-foro></crear-foro>";
+                else root.innerHTML = "<mis-foros></mis-foros>";
+                break;
+
+            case "verForo":
+                root.innerHTML = `<ver-foro></ver-foro>`;
+                break;
+
+            case "dashboardAlumno":
+                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+                break;
+
+            case "dashboardMaestro":
+                root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
+                break;
+
+            default:
+                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
         }
-        break;
-
-        case "cursos":
-        root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
-        break;
-
-        case "perfil":
-        root.innerHTML = `<editar-perfil tipo="alumno"></editar-perfil>`;
-        break;
-
-        case "unirseCurso":
-        case "unirse":
-        root.innerHTML = "<unirse-cursos></unirse-cursos>";
-        break;
-
-        case "progreso":
-        root.innerHTML = "<progreso-cursos></progreso-cursos>";
-        break;
-
-        case "verLecciones":
-        root.innerHTML = "<ver-lecciones></ver-lecciones>";
-        break;
-
-        case "foros":
-        if (accion === "crear") root.innerHTML = "<crear-foro></crear-foro>";
-        else root.innerHTML = "<mis-foros></mis-foros>";
-        break;
-
-        case "verForo":
-        root.innerHTML = "<ver-foro></ver-foro>";
-        break;
-
-        case "dashboardAlumno":
-        root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-        break;
-
-        case "dashboardMaestro":
-        root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
-        break;
-
-        default:
-        root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-        }
-        </script>
-
+    </script>
 
 </body>
 
