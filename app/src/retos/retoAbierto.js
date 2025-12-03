@@ -1,10 +1,11 @@
 import "./componentes/campoNombre.js";
 import "./componentes/campoDescripcion.js";
-import "./componentes/botonPrimario.js";
 import "../componentes/modalAlerta.js";
+import "./componentes/botonPrimario.js";
+import RetoAPI from "../api/RetoAPI.js";  
 
 class RetoAbierto extends HTMLElement {
-  
+
   connectedCallback() {
     this.render();
     this.init();
@@ -21,12 +22,12 @@ class RetoAbierto extends HTMLElement {
           <campo-descripcion></campo-descripcion>
 
           <div>
-            <label class="text-sm text-black">Crea cuestionario de múltiples respuestas</label>
+            <label class="text-sm text-black">Preguntas del cuestionario</label>
 
             <div class="flex justify-between items-center mt-2">
               <input
                 id="preguntaInput"
-                placeholder="Pregunta"
+                placeholder="Escribe una pregunta..."
                 class="w-2/3 px-4 py-2 rounded-md bg-[#D9E8F5] outline-none"
               />
 
@@ -34,7 +35,7 @@ class RetoAbierto extends HTMLElement {
                 id="btnAgregarPregunta"
                 class="px-4 py-2 rounded-full text-white shadow-md ml-4"
                 style="background-color:#64A85F">
-                + Agregar pregunta
+                + Agregar
               </button>
             </div>
           </div>
@@ -77,9 +78,15 @@ class RetoAbierto extends HTMLElement {
       });
     });
 
-    guardar.addEventListener("click", () => {
+    guardar.addEventListener("click", () => this.guardarReto());  
+  }
+
+  async guardarReto() {
+    try {
       const nombre = this.querySelector("campo-nombre input")?.value.trim();
       const descripcion = this.querySelector("campo-descripcion textarea")?.value.trim();
+      const container = this.querySelector("#preguntasContainer");
+
       const preguntas = [...container.querySelectorAll("textarea")]
         .map(t => t.placeholder.trim())
         .filter(Boolean);
@@ -88,10 +95,31 @@ class RetoAbierto extends HTMLElement {
       if (!descripcion) return this.mostrarAlerta("Por favor ingresa la descripción del reto");
       if (preguntas.length === 0) return this.mostrarAlerta("Agrega al menos una pregunta");
 
+      const retoData = {
+        titulo: nombre,
+        descripcion,
+        preguntas: preguntas.map(p => ({
+          contenido: p,
+          tipo: "abierta",
+          respuestas: [] 
+        })),
+        lecciones: []
+      };
+
+      console.log("Enviando reto abierto:", retoData);
+
+      const respuesta = await RetoAPI.crearReto(retoData);
+
+      console.log("Respuesta del servidor:", respuesta);
+
       this.mostrarAlerta("¡Reto guardado correctamente!", () => {
         window.location.href = "index.html?vista=dashboardMaestro";
       });
-    });
+
+    } catch (error) {
+      console.error("Error guardando reto:", error);
+      this.mostrarAlerta(`Error: ${error.message}`);
+    }
   }
 
   mostrarAlerta(texto, callback) {

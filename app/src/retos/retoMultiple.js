@@ -1,8 +1,13 @@
+/**
+ * Reto de Opción Múltiple - ya con Integrado con Backend
+ */
+
 import "./componentes/campoNombre.js";
 import "./componentes/campoDescripcion.js";
 import "./componentes/listaOpciones.js";
 import "./componentes/botonPrimario.js";
 import "../componentes/modalAlerta.js";
+import RetoAPI from "../api/RetoAPI.js";
 
 class RetoMultiple extends HTMLElement {
   connectedCallback() {
@@ -20,6 +25,10 @@ class RetoMultiple extends HTMLElement {
           <campo-descripcion></campo-descripcion>
           <lista-opciones></lista-opciones>
 
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+             <strong></strong> Marca el checkbox para indicar la o las respuestas correctas
+          </div>
+
           <div class="flex justify-center gap-6 pt-6">
             <boton-primario id="btnCancelar" texto="Cancelar"></boton-primario>
             <boton-primario id="btnGuardar" texto="Agregar Reto"></boton-primario>
@@ -30,32 +39,84 @@ class RetoMultiple extends HTMLElement {
   }
 
   init() {
-    const cancelar = this.querySelector("#btnCancelar button");
-    const guardar = this.querySelector("#btnGuardar button");
-    const lista = this.querySelector("lista-opciones");
+    const btnCancelar = this.querySelector("#btnCancelar button");
+    const btnGuardar = this.querySelector("#btnGuardar button");
 
-    cancelar.addEventListener("click", () => {
+    btnCancelar.addEventListener("click", () => {
       this.mostrarConfirmacion("¿Seguro? Se perderán los cambios.", () => {
         window.location.href = "index.html?vista=retos";
       });
     });
 
-    guardar.addEventListener("click", () => {
-      const nombre = this.querySelector("campo-nombre input")?.value.trim();
-      const descripcion = this.querySelector("campo-descripcion textarea")?.value.trim();
+    btnGuardar.addEventListener("click", async () => {
+      await this.guardarReto();
+    });
+  }
 
-      const opciones = [...lista.querySelectorAll("input")]
-        .map(e => e.value.trim())
-        .filter(Boolean);
+  async guardarReto() {
+    const campoNombre = this.querySelector("campo-nombre");
+    const campoDescripcion = this.querySelector("campo-descripcion");
+    const listaOpciones = this.querySelector("lista-opciones");
 
-      if (!nombre) return this.mostrarAlerta("Por favor ingresa el nombre del reto");
-      if (!descripcion) return this.mostrarAlerta("Por favor ingresa la descripción del reto");
-      if (opciones.length === 0) return this.mostrarAlerta("Agrega al menos una opción");
+    const nombre = campoNombre.getValue();
+    const descripcion = campoDescripcion.getValue();
+    const opciones = listaOpciones.getOpciones();
+
+    // Validaciones
+    if (!nombre) {
+      return this.mostrarAlerta("Por favor ingresa el nombre del reto");
+    }
+    if (!descripcion) {
+      return this.mostrarAlerta("Por favor ingresa la descripción del reto");
+    }
+    if (opciones.length === 0) {
+      return this.mostrarAlerta("Agrega al menos una opción de respuesta");
+    }
+
+    const hayCorrecta = opciones.some(op => op.es_correcta);
+    if (!hayCorrecta) {
+      return this.mostrarAlerta("Debes marcar al menos una respuesta como correcta");
+    }
+
+    // Estructura del reto
+    const retoData = {
+      titulo: nombre,
+      descripcion: descripcion,
+      preguntas: [
+        {
+          contenido: descripcion,
+          tipo: "opcion_multiple",
+          respuestas: opciones
+        }
+      ],
+      lecciones: []
+    };
+
+    try {
+      this.mostrarCargando(true);
+      
+      const resultado = await RetoAPI.crearReto(retoData);
+      
+      console.log("Reto creado exitosamente:", resultado);
 
       this.mostrarAlerta("¡Reto guardado correctamente!", () => {
         window.location.href = "index.html?vista=dashboardMaestro";
       });
-    });
+
+    } catch (error) {
+      console.error("Error al guardar el reto:", error);
+      this.mostrarAlerta(`Error: ${error.message}`);
+    } finally {
+      this.mostrarCargando(false);
+    }
+  }
+
+  mostrarCargando(cargando) {
+    const btn = this.querySelector("#btnGuardar button");
+    if (!btn) return;
+
+    btn.disabled = cargando;
+    btn.textContent = cargando ? "Guardando..." : "Agregar Reto";
   }
 
   mostrarAlerta(texto, callback) {
@@ -63,7 +124,9 @@ class RetoMultiple extends HTMLElement {
     modal.setAttribute("mensaje", texto);
     document.body.appendChild(modal);
 
-    modal.addEventListener("aceptar", () => callback && callback());
+    modal.addEventListener("aceptar", () => {
+      if (callback) callback();
+    });
   }
 
   mostrarConfirmacion(texto, onConfirm) {
