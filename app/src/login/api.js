@@ -15,7 +15,7 @@ class ApiClient {
      * Obtiene el token del localStorage
      */
     getToken() {
-        return localStorage.getItem('authToken');
+        return localStorage.getItem('token');
     }
 
     /**
@@ -23,7 +23,7 @@ class ApiClient {
      */
     setToken(token) {
         if (token) {
-            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token);
             this.token = token;
         }
     }
@@ -32,7 +32,7 @@ class ApiClient {
      * Elimina el token del localStorage
      */
     clearToken() {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
         localStorage.removeItem('usuario');
         this.token = null;
     }
@@ -164,3 +164,10 @@ class ApiClient {
 }
 
 const apiClient = new ApiClient();
+
+// Exponer la instancia en `window` para que componentes no-modulares la consuman
+try {
+    window.apiClient = apiClient;
+} catch (e) {
+    // en entornos no-browser o con CSP restrictivo, ignorar
+}

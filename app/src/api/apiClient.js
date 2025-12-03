@@ -135,7 +135,7 @@ class ApiClient {
     }
 
     async obtenerCursosPorUsuario(usuarioId) {
-        return this.request(`/cursos/usuario/${usuarioId}`, {
+        return this.request(`/cursos/${usuarioId}`, {
             method: 'GET'
         });
     }
@@ -178,6 +178,4 @@ class ApiClient {
 }
 
 // Instancia global
-const apiClient = new ApiClient();
-
-export { ApiClient, apiClient };
+export const client = new ApiClient();

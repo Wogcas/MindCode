@@ -1,6 +1,6 @@
 class BienvenidaUsuario extends HTMLElement {
   connectedCallback() {
-    const nombre = this.getAttribute('nombre') || 'Usuario';
+    const nombre = this.getAttribute('nombre') || 'usuario';
     const iniciales = nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
     this.innerHTML = `
