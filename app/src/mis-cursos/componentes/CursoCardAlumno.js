@@ -1,5 +1,5 @@
 // Componente de Card de Curso para Alumnos
-import { navigateTo } from '../../utils/router.js';
+import { navigateTo } from '../../utils/router-estudiante.js';
 import '../../componentes/ui/ProgressBar.js';
 
 class CursoCardAlumno extends HTMLElement {

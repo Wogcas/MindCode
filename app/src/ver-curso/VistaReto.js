@@ -1,6 +1,6 @@
 // Vista de Reto/Quiz con validación de respuestas
 import { retos, cursosDetalles } from '../data/mockData.js';
-import { navigateTo } from '../utils/router.js';
+import { navigateTo } from '../utils/router-estudiante.js';
 import '../componentes/ui/QuizOption.js';
 
 class VistaReto extends HTMLElement {
