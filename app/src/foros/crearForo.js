@@ -65,7 +65,6 @@ class CrearForo extends HTMLElement {
     }, 50);
   }
 
-  // ⚡ misma lógica de RetoCodigo sin romper nada
   init() {
     const cancelar = this.querySelector("#btnCancelar button");
     const guardar = this.querySelector("#btnGuardar button");
@@ -82,14 +81,12 @@ class CrearForo extends HTMLElement {
       const descripcion = this.querySelector("foro-campo-descripcion textarea")?.value.trim();
       const lista = this.querySelector("#listaEtiquetas");
 
-      // ⭐ Leer etiquetas correctamente usando el método expuesto
       const etiquetas = lista?.obtenerEtiquetas?.() || [];
 
       if (!titulo) return this.mostrarAlerta("Por favor ingresa el título del foro");
       if (!descripcion) return this.mostrarAlerta("Por favor ingresa la descripción del foro");
       if (etiquetas.length === 0) return this.mostrarAlerta("Por favor agrega al menos una etiqueta");
 
-      // ⭐ Guardar y redirigir a menú de foros
       this.mostrarAlerta("¡Foro creado correctamente!", () => {
         window.location.href = "index.html?vista=foros";
       });

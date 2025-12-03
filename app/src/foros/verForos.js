@@ -1,8 +1,6 @@
 class VerForo extends HTMLElement {
 
   connectedCallback() {
-
-    // Foro hardcodeado por ahora
     this.foro = {
       titulo: "Introducción a JavaScript",
       descripcion: "Comparte dudas y aprendizajes del lenguaje.",
@@ -101,6 +99,5 @@ class VerForo extends HTMLElement {
     });
   }
 }
-
 customElements.define("ver-foro", VerForo);
 export default VerForo;

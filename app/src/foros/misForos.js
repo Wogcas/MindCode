@@ -74,12 +74,10 @@ class MisForos extends HTMLElement {
     }
   
     setupEvents() {
-      // Redirigir a crear foro
       this.querySelector("#btnCrear").addEventListener("click", () => {
         window.location.href = "index.html?vista=foros&accion=crear";
       });
 
-      // NUEVO - redirige correctamente al ver foro
       this.querySelectorAll(".btnAbrir").forEach(btn => {
         btn.addEventListener("click", () => {
           window.location.href = "index.html?vista=verForo";
