@@ -113,7 +113,7 @@ class RetoAbierto extends HTMLElement {
       console.log("Respuesta del servidor:", respuesta);
 
       this.mostrarAlerta("¡Reto guardado correctamente!", () => {
-        window.location.href = "index.html?vista=dashboardMaestro";
+        window.location.href = "index.html?vista=retos";
       });
 
     } catch (error) {

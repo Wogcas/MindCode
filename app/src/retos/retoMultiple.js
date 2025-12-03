@@ -100,7 +100,7 @@ class RetoMultiple extends HTMLElement {
       console.log("Reto creado exitosamente:", resultado);
 
       this.mostrarAlerta("¡Reto guardado correctamente!", () => {
-        window.location.href = "index.html?vista=dashboardMaestro";
+        window.location.href = "index.html?vista=retos";
       });
 
     } catch (error) {

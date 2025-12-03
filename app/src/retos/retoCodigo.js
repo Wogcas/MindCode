@@ -90,14 +90,15 @@ class RetoCodigo extends HTMLElement {
       
       const resultado = await RetoAPI.crearReto(retoData);
       
-      console.log("✅ Reto creado exitosamente:", resultado);
+      console.log("Reto creado exitosamente:", resultado);
 
       this.mostrarAlerta("¡Reto guardado correctamente!", () => {
-        window.location.href = "index.html?vista=dashboardMaestro";
-      });
+        window.location.href = "index.html?vista=retos";
+
+            });
 
     } catch (error) {
-      console.error("❌ Error al guardar el reto:", error);
+      console.error("Error al guardar el reto:", error);
       this.mostrarAlerta(`Error: ${error.message}`);
     } finally {
       this.mostrarCargando(false);
