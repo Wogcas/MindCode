@@ -712,25 +712,28 @@ class MfeAuth extends HTMLElement {
         this.setLoading(true);
 
         try {
-            const response = await apiClient.login(email, password);
+        const response = await apiClient.login(email, password);
 
-            if (response.success) {
-                const token = response.data?.token;
+        if (response.success) {
+            const token = response.data?.token;
+            const usuario = response.data?.usuario; 
 
-                if (token) {
-                    localStorage.setItem('token', token);
-                    console.log('Token guardado correctamente');
-                } else {
-                    console.warn('La respuesta fue exitosa pero no llegó el token');
-                }
+            if (token && usuario) {
+                localStorage.setItem('token', token);
+                localStorage.setItem('usuario', JSON.stringify(usuario));
 
-                this.showAlert('¡Inicio de sesión exitoso!', 'success');
-
-                setTimeout(() => {
-                    window.location.href = '/app/src/shell/index.html';
-                }, 1500);
+                console.log('Token y Usuario guardados correctamente');
+            } else {
+                console.warn('Login exitoso pero faltaron datos (token o usuario)');
             }
-        } catch (error) {
+
+            this.showAlert('¡Inicio de sesión exitoso!', 'success');
+
+            setTimeout(() => {
+                window.location.href = '/app/src/shell/index.html';
+            }, 1500);
+        }
+    } catch (error) {
             console.error('Login error:', error);
             const message = error.response?.data?.message || error.message || 'Error al iniciar sesión';
             this.showAlert(message, 'error');
@@ -745,7 +748,6 @@ class MfeAuth extends HTMLElement {
         const s = this.shadowRoot;
 
         if (this.signupStep === 1) {
-            // Validar Step 1: Nombre + Email
             const nombre = s.getElementById('nombre')?.value?.trim();
             const email = s.getElementById('email')?.value?.trim();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -818,7 +820,17 @@ class MfeAuth extends HTMLElement {
             const response = await apiClient.registrar(nombre, email, password, tipo);
 
             if (response.success) {
+                const token = response.data?.token;
+                const usuario = response.data?.usuario;
+
+                if (token && usuario) {
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('usuario', JSON.stringify(usuario));
+                    console.log('✅ Auto-login tras registro exitoso');
+                }
+
                 this.showAlert('¡Cuenta creada exitosamente!', 'success');
+
                 setTimeout(() => {
                     window.location.href = '/app/src/shell/index.html';
                 }, 1500);

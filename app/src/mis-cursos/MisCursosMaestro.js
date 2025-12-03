@@ -27,11 +27,13 @@ class MisCursosMaestro extends HTMLElement {
     async cargarCursos() {
         try {
             const token = localStorage.getItem('token');
+            const usuarioStorage = localStorage.getItem('usuario');
+            const idMaestro = usuarioStorage.id_maestro; 
             if (!token) {
                 throw new Error('No hay sesión activa');
             }
 
-            const response = await fetch('http://localhost:3000/api/cursos', {
+            const response = await fetch('http://localhost:3000/api/cursos/${idMaestro}', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -46,9 +48,9 @@ class MisCursosMaestro extends HTMLElement {
             this.cursos = data.cursos || [];
             this.loading = false;
 
-            console.log('✅ Cursos cargados:', this.cursos);
+            console.log('Cursos cargados:', this.cursos);
         } catch (error) {
-            console.error('❌ Error al cargar cursos:', error);
+            console.error('Error al cargar cursos:', error);
             this.loading = false;
             throw error;
         }
@@ -132,10 +134,106 @@ class MisCursosMaestro extends HTMLElement {
         document.body.appendChild(modal);
     }
 
-    agregarCurso(nuevoCurso) {
-        this.cursos.unshift(nuevoCurso);
-        const cursosGrid = this.querySelector('#cursosGrid');
-        cursosGrid.innerHTML = this.renderCursos();
+    async agregarCurso(datosDelFormulario) {
+        try {
+            const token = localStorage.getItem('token');
+
+            const usuarioGuardado = localStorage.getItem('usuario');
+            const usuarioObj = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
+
+            if (!usuarioObj || (!usuarioObj.id && !usuarioObj._id)) {
+                throw new Error('No se identificó al usuario maestro. Vuelve a iniciar sesión.');
+            }
+
+            let imagenFinal = '';
+
+            if (datosDelFormulario.imagen) {
+                console.log("Comprimiendo imagen...");
+                try {
+                    imagenFinal = await this.comprimirImagen(datosDelFormulario.imagen, 800, 0.7);
+                    console.log("Imagen comprimida.");
+                } catch (err) {
+                    console.error("Error al comprimir, se usará la original:", err);
+                    imagenFinal = datosDelFormulario.imagen;
+                }
+            }
+
+            const payloadParaBackend = {
+                titulo: datosDelFormulario.nombre || datosDelFormulario.titulo || "Curso sin nombre",
+                descripcion: datosDelFormulario.descripcion,
+                id_maestro: usuarioObj.id || usuarioObj._id,
+                imagen: imagenFinal, 
+                publico: true
+            };
+
+            console.log("Enviando payload corregido:", payloadParaBackend);
+
+            const response = await fetch('http://localhost:3000/api/cursos/agregar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payloadParaBackend)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al crear el curso');
+            }
+
+            const resultado = await response.json();
+            const cursoGuardado = resultado.data;
+
+            console.log(' Curso guardado en BD:', cursoGuardado);
+
+            this.cursos.unshift(cursoGuardado);
+
+            const cursosGrid = this.querySelector('#cursosGrid');
+            if (cursosGrid) {
+                cursosGrid.innerHTML = this.renderCursos();
+            }
+            alert('¡Curso creado con éxito!');
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Hubo un error al crear el curso: ' + error.message);
+        }
+    }
+
+    /**
+    * 
+    * @param {string} base64 
+    * @param {number} maxWidth 
+    * @param {number} quality 
+    */
+    async comprimirImagen(base64, maxWidth = 800, quality = 0.7) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = base64;
+
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(dataUrl);
+            };
+
+            img.onerror = (error) => reject(error);
+        });
     }
 }
 
