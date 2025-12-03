@@ -3,7 +3,7 @@ class ForoEtiquetaChip extends HTMLElement {
       const texto = this.getAttribute("texto") || "Etiqueta";
       const tipo = texto.toLowerCase();
   
-      let color = "#DCDCAA"; // default: código
+      let color = "#DCDCAA"; 
   
       if (tipo.includes("programa")) color = "#E7C0FF";
       if (tipo.includes("javascript")) color = "#EC740A";

@@ -18,21 +18,21 @@ class CrearRetoMenu extends HTMLElement {
             title="Reto de código"
             description="El alumno escribe y ejecuta código"
             color="#64A85F"
-            onclick="window.location.href='retos.html?tipo=codigo'"
+            data-tipo="codigo"
           ></reto-tipo-card>
 
           <reto-tipo-card
             title="Opción múltiple"
             description="Preguntas con varias opciones"
             color="#A0CDFE"
-            onclick="window.location.href='retos.html?tipo=multiple'"
+            data-tipo="multiple"
           ></reto-tipo-card>
 
           <reto-tipo-card
             title="Preguntas abiertas"
             description="Respuestas escritas por el estudiante"
             color="#E7C0FF"
-            onclick="window.location.href='retos.html?tipo=abierto'"
+            data-tipo="abierto"
           ></reto-tipo-card>
         
           <div class="flex justify-end mt-4">
@@ -42,6 +42,18 @@ class CrearRetoMenu extends HTMLElement {
         </section>
       </div>
     `;
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    const cards = this.querySelectorAll('reto-tipo-card');
+    
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const tipo = card.getAttribute('data-tipo');
+        window.location.href = `index.html?vista=retos&tipo=${tipo}`;
+      });
+    });
   }
 }
 
