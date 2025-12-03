@@ -22,7 +22,7 @@ export const preguntaSchema = new Schema({
     tipo: {
         type: String,
         required: true,
-        enum: ['abierta', 'opcion_multiple', 'codigo']
+        enum: ['opcion_multiple', 'verdadero_falso', 'codigo']
     },
     respuestas: [respuestaSchema]
 });

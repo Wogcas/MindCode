@@ -1,115 +1,74 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MindCode</title>
-
-    <link rel="stylesheet" href="../../assets/output.css" />
-
-    <link rel="stylesheet" href="../../assets/styles.css" />
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindcode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#64A85F',
+                            50: '#E8F5E6',
+                            100: '#D1EBC9',
+                            200: '#A3D894',
+                            300: '#8BCE7F',
+                            400: '#73C169',
+                            500: '#64A85F',
+                            600: '#508A4C',
+                            700: '#3C6739',
+                            800: '#284426',
+                            900: '#142213',
+                        }
+                    },
+                    fontFamily: {
+                        Colmeak: ['Colmeak', 'sans-serif'],
+                        sans: ['Quicksand', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Componentes compartidos -->
     <script type="module" src="../componentes/header.js"></script>
-
+    <script type="module" src="../componentes/Pagina404.js"></script>
+    
+    <!-- Componentes UI reutilizables -->
+    <script type="module" src="../componentes/ui/ProgressBar.js"></script>
+    <script type="module" src="../componentes/ui/LessonCard.js"></script>
+    <script type="module" src="../componentes/ui/QuizOption.js"></script>
+    <script type="module" src="../componentes/ui/VideoPlayer.js"></script>
+    
+    <!-- Vistas de Dashboard -->
     <script type="module" src="../dashboard/dashboardAlumno.js"></script>
     <script type="module" src="../dashboard/DashboardMaestro.js"></script>
-
-    <script type="module" src="../retos/crearRetoMenu.js"></script>
-    <script type="module" src="../retos/retoCodigo.js"></script>
-    <script type="module" src="../retos/retoMultiple.js"></script>
-    <script type="module" src="../retos/retoAbierto.js"></script>
-
+    
+    <!-- Vistas de Maestro -->
     <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
-
-    <script type="module" src="../foros/crearForo.js"></script>
-    <script type="module" src="../foros/foroMenu.js"></script>
-    <script type="module" src="../foros/misForos.js"></script>
-    <script type="module" src="../foros/verForos.js"></script>
-
-    <script type="module" src="../cursos/unirseCursos.js"></script>
-    <script type="module" src="../cursos/progresoCursos.js"></script>
-    <script type="module" src="../cursos/verLecciones.js"></script>
-
-
-
-    <script type="module" src="../perfil/editarPerfil.js"></script>
-
+    
+    <!-- Vistas de Estudiante -->
+    <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
+    <script type="module" src="../mis-cursos/componentes/CursoCardAlumno.js"></script>
+    <script type="module" src="../ver-curso/VisorLeccion.js"></script>
+    <script type="module" src="../ver-curso/componentes/SidebarLecciones.js"></script>
+    <script type="module" src="../ver-curso/componentes/AreaContenido.js"></script>
+    <script type="module" src="../ver-curso/VistaReto.js"></script>
+    
+    <!-- Router -->
+    <script type="module" src="../utils/router.js"></script>
 </head>
 
 <body class="font-sans bg-gray-50">
-
     <app-header></app-header>
-
-    <main id="vista" class="pt-6"></main>
-
-    <script>
-        const params = new URLSearchParams(location.search);
-        const vista = params.get("vista");
-        const tipo = params.get("tipo");
-        const accion = params.get("accion");
-
-        const root = document.getElementById("vista");
-
-        switch (vista) {
-            case "retos":
-                if (tipo === "codigo") {
-                    root.innerHTML = "<reto-codigo></reto-codigo>";
-                } else if (tipo === "multiple") {
-                    root.innerHTML = "<reto-multiple></reto-multiple>";
-                } else if (tipo === "abierto") {
-                    root.innerHTML = "<reto-abierto></reto-abierto>";
-                } else {
-                    root.innerHTML = "<crear-reto-menu></crear-reto-menu>";
-                }
-                break;
-
-            case "cursos":
-                root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
-                break;
-
-            case "perfil":
-                root.innerHTML = `<editar-perfil tipo="alumno"></editar-perfil>`;
-                break;
-
-            case "unirseCurso":
-                root.innerHTML = "<unirse-cursos></unirse-cursos>";
-                break;
-
-            case "unirse":
-                contenido.innerHTML = `<unirse-cursos></unirse-cursos>`;
-                break;
-
-            case "progreso":
-                contenido.innerHTML = `<progreso-cursos></progreso-cursos>`;
-                break;
-
-            case "verLecciones":
-                contenido.innerHTML = `<ver-lecciones></ver-lecciones>`;
-                break;
-
-            case "foros":
-                if (accion === "crear") root.innerHTML = "<crear-foro></crear-foro>";
-                else root.innerHTML = "<mis-foros></mis-foros>";
-                break;
-
-            case "verForo":
-                root.innerHTML = `<ver-foro></ver-foro>`;
-                break;
-
-            case "dashboardAlumno":
-                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-                break;
-
-            case "dashboardMaestro":
-                root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
-                break;
-
-            default:
-                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-        }
-    </script>
-
+    
+    <div id="app-root">
+        <!-- Las vistas se cargarán aquí dinámicamente según la ruta -->
+    </div>
 </body>
 
 </html>

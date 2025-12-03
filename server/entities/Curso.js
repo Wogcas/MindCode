@@ -9,14 +9,6 @@ const CursoSchema = new mongoose.Schema({
     descripcion: {
         type: String,
         required: true
-    }, 
-    imagen: {
-        type: String, 
-        default: ''
-    },
-    publico: {
-        type: Boolean,
-        default: true
     },
     id_maestro: {
         type: mongoose.Schema.Types.ObjectId,
