@@ -1,5 +1,33 @@
 class AppHeader extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
+        this.usuario = null;
+    }
+
+    async connectedCallback() {
+        // Esperar a que window.app esté disponible (fue asignado en shell.js)
+        let intentos = 0;
+        while (!window.app && intentos < 20) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            intentos++;
+        }
+
+        if (window.app) {
+            this.usuario = window.app.usuario;
+        }
+
+        this.render();
+        this.setupEventListeners();
+    }
+
+    render() {
+        const nombreUsuario = this.usuario?.nombre || 'Usuario';
+        const iniciales = this.usuario?.nombre 
+            ?.split(' ')
+            ?.map(n => n[0])
+            ?.join('')
+            ?.toUpperCase() || 'U';
+
         this.innerHTML = `
         <header class="bg-white shadow-sm sticky top-0 z-50 font-sans">
             <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,11 +60,25 @@ class AppHeader extends HTMLElement {
 
                     <div class="flex items-center space-x-1 sm:space-x-3">
                         
-                        <button type="button" class="flex p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 focus:outline-none transition-colors">
+                        <button id="perfilBtn" type="button" class="flex p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 focus:outline-none transition-colors relative group">
                              <span class="sr-only">Abrir perfil</span>
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 sm:w-8 sm:h-8">
-                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                             </svg>
+                             <div class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-semibold flex items-center justify-center">
+                                ${iniciales}
+                             </div>
+                             
+                             <!-- Dropdown Menu -->
+                             <div class="absolute right-0 mt-48 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                                <div class="px-4 py-2 border-b">
+                                    <p class="font-semibold text-gray-900">${nombreUsuario}</p>
+                                    <p class="text-xs text-gray-500">${this.usuario?.email || 'email@ejemplo.com'}</p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        ${this.usuario?.tipo === 'maestro' ? '👨‍🏫 Maestro' : '👨‍🎓 Alumno'}
+                                    </p>
+                                </div>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Mi Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Configuración</a>
+                                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 text-sm">Cerrar Sesión</button>
+                             </div>
                          </button>
 
                         <button type="button" class="p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 focus:outline-none transition-colors">
@@ -57,6 +99,26 @@ class AppHeader extends HTMLElement {
             </div>
         </header>
         `;
+    }
+
+    setupEventListeners() {
+        const logoutBtn = this.querySelector('#logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.logout();
+            });
+        }
+    }
+
+    logout() {
+        if (window.app && window.app.logout) {
+            window.app.logout();
+        } else {
+            // Fallback si window.app no está disponible
+            localStorage.removeItem('token');
+            window.location.href = '../../LogIn/SignIn/index.html';
+        }
     }
 }
 
