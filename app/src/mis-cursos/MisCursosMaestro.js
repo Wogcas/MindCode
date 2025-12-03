@@ -4,41 +4,81 @@ import '../crear-curso/CrearCurso.js'
 class MisCursosMaestro extends HTMLElement {
     constructor() {
         super();
-        this.cursos = [
-            {
-                titulo: "Todo lo que tienes que saber de iOS",
-                imagen: "https://img.uxcel.com/cdn-cgi/image/format=auto/tags/ios-1721717446446-2x.jpg",
-                participantes: "20",
-                estado: "Privado",
-                fechaPublicacion: "17/09/25"
-            },
-            {
-                titulo: "Todo lo que tienes que saber de React",
-                imagen: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=800&auto=format&fit=crop",
-                participantes: "10",
-                estado: "Público",
-                fechaPublicacion: "15/09/25"
-            },
-            {
-                titulo: "Todo lo que tienes que saber de Flutter",
-                imagen: "https://images.unsplash.com/photo-1617042375876-a13e36732a04?q=80&w=800&auto=format&fit=crop",
-                participantes: "10",
-                estado: "Público",
-                fechaPublicacion: "10/09/25"
-            },
-            {
-                titulo: "Todo lo que tienes que saber de Angular",
-                imagen: "https://images.unsplash.com/photo-1593720213428-28a5b9e94613?q=80&w=800&auto=format&fit=crop",
-                participantes: "22",
-                estado: "Privado",
-                fechaPublicacion: "01/08/25"
-            }
-        ];
+        this.cursos = [];
+        this.loading = true;
+        this.error = null;
     }
 
-    connectedCallback() {
-        this.render();
+    async connectedCallback() {
+        this.renderLoading();
+        try {
+            await this.cargarCursos();
+            this.render();
+        } catch (error) {
+            this.error = error.message;
+            this.renderError();
+        }
         this.setupEventListeners();
+    }
+
+    /**
+     * Cargar cursos del usuario desde la API
+     */
+    async cargarCursos() {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No hay sesión activa');
+            }
+
+            const response = await fetch('http://localhost:3000/api/cursos', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            this.cursos = data.cursos || [];
+            this.loading = false;
+
+            console.log('✅ Cursos cargados:', this.cursos);
+        } catch (error) {
+            console.error('❌ Error al cargar cursos:', error);
+            this.loading = false;
+            throw error;
+        }
+    }
+
+    renderLoading() {
+        this.innerHTML = `
+            <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="flex justify-center items-center h-64">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p class="text-gray-600">Cargando cursos...</p>
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
+    renderError() {
+        this.innerHTML = `
+            <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                    <p class="text-red-800 font-medium mb-2">Error al cargar los cursos</p>
+                    <p class="text-red-600 text-sm mb-4">${this.error}</p>
+                    <button onclick="window.location.reload()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                        Reintentar
+                    </button>
+                </div>
+            </section>
+        `;
     }
 
     render() {

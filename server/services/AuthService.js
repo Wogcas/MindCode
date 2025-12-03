@@ -38,6 +38,20 @@ class AuthService {
             throw new ValidationError('Tipo de usuario inválido. Debe ser "Alumno" o "Maestro"');
         }
 
+        // Validaciones de formato
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(correo)) {
+            throw new ValidationError('El correo electrónico no es válido');
+        }
+
+        if (nombre.trim().length < 3) {
+            throw new ValidationError('El nombre debe tener mínimo 3 caracteres');
+        }
+
+        if (contrasena.length < 8) {
+            throw new ValidationError('La contraseña debe tener mínimo 8 caracteres');
+        }
+
         // Verificar si el usuario ya existe
         const usuarioExistente = await this.usuarioService.obtenerUsuarioPorCorreo(correo);
         if (usuarioExistente) {
