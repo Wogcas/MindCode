@@ -1,54 +1,47 @@
 import './CursoCard.js';
 
 class CursoCarrousel extends HTMLElement {
-  connectedCallback() {
-    const cursos = [
-      {
-        title: 'Todo lo que tienes que saber de los Fundamentos',
-        image: 'https://s1.significados.com/foto/software-og.jpg',
-        type: 'general'
-      },
-      {
-        title: 'Todo lo que tienes que saber de React',
-        image: '',
-        type: 'react'
-      },
-      {
-        title: 'Todo lo que tienes que saber de CSS Moderno',
-        image: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?auto=format&fit=crop&q=80&w=1000',
-        type: 'css'
-      },
-      {
-        title: 'Todo lo que tienes que saber de Node.js',
-        image: 'https://antonio-richaud.com/blog/imagenes/archivo/14-node-js/nodejs.png',
-        type: 'backend'
-      },
-      {
-        title: 'Todo lo que tienes que saber de TypeScript',
-        image: 'https://www.rabitsolutions.com/wp-content/uploads/2023/09/typescript-cover-cropped-1300x600.jpeg',
-        type: 'typescript'
+  async connectedCallback() {
+    let cursos = [];
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/api/cursos', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+
+        const data = json.data || json;
+
+        cursos = data;
       }
-    ];
+    } catch (error) {
+      console.error("Error cargando cursos en dashboard:", error);
+    }
 
     this.innerHTML = `
-      <div class="mb-8">
-        <div id="slider" class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide cursor-grab select-none">
-          ${cursos.map(curso => `
-            <curso-card
-              class="pointer-events-none" 
-              title="${curso.title}"
-              image="${curso.image}"
-              type="${curso.type}">
-            </curso-card>
-          `).join('')}
+      <div class="relative w-full overflow-hidden">
+        <div 
+          id="slider" 
+          class="flex gap-6 overflow-x-auto scroll-smooth pb-8 w-full cursor-grab active:cursor-grabbing scrollbar-hide"
+        >
+          ${cursos.length > 0 ? cursos.map(curso => `
+    <curso-card
+      id="${curso._id}"  title="${curso.titulo}" 
+      image="${curso.imagen || ''}" 
+      type="general">
+      </curso-card>
+      `).join('') : '<p class="text-gray-500">No tienes cursos todavía.</p>'}
         </div>
       </div>
       
       <style>
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Estilos para cuando se está arrastrando */
         .cursor-grab { cursor: grab; }
         .cursor-grabbing { cursor: grabbing !important; }
       </style>
@@ -59,6 +52,8 @@ class CursoCarrousel extends HTMLElement {
 
   initDragScroll() {
     const slider = this.querySelector('#slider');
+    if (!slider) return;
+
     let isDown = false;
     let startX;
     let scrollLeft;
@@ -83,7 +78,6 @@ class CursoCarrousel extends HTMLElement {
     slider.addEventListener('mousemove', (e) => {
       if (!isDown) return;
       e.preventDefault();
-
       const x = e.pageX - slider.offsetLeft;
       const walk = (x - startX) * 2;
       slider.scrollLeft = scrollLeft - walk;
