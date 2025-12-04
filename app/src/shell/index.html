@@ -7,21 +7,23 @@
     <title>MindCode</title>
 
     <link rel="stylesheet" href="../../assets/output.css" />
-
     <link rel="stylesheet" href="../../assets/styles.css" />
 
+    <!-- Headers -->
     <script type="module" src="../componentes/header.js"></script>
+    <script type="module" src="../componentes/headerAlumno.js"></script>
 
+    <!-- Pages -->
     <script type="module" src="../dashboard/dashboardAlumno.js"></script>
-    <script type="module" src="../dashboard/DashboardMaestro.js"></script>
+    <script type="module" src="../dashboard/dashboardMaestro.js"></script>
 
+    <!-- Otros módulos -->
     <script type="module" src="../retos/crearRetoMenu.js"></script>
     <script type="module" src="../retos/retoCodigo.js"></script>
     <script type="module" src="../retos/retoMultiple.js"></script>
     <script type="module" src="../retos/retoAbierto.js"></script>
 
     <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
-
     <script type="module" src="../foros/crearForo.js"></script>
     <script type="module" src="../foros/foroMenu.js"></script>
     <script type="module" src="../foros/misForos.js"></script>
@@ -31,84 +33,89 @@
     <script type="module" src="../cursos/progresoCursos.js"></script>
     <script type="module" src="../cursos/verLecciones.js"></script>
 
-
-
     <script type="module" src="../perfil/editarPerfil.js"></script>
-
 </head>
 
 <body class="font-sans bg-gray-50">
 
-    <app-header></app-header>
+    <!-- Aquí cargaremos el header DINÁMICO -->
+    <div id="header"></div>
 
+    <!-- Área donde se pintan las vistas -->
     <main id="vista" class="pt-6"></main>
 
-    <script>
-        const params = new URLSearchParams(location.search);
-        const vista = params.get("vista");
-        const tipo = params.get("tipo");
-        const accion = params.get("accion");
+<script>
+    // Cargar header según rol
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const headerRoot = document.getElementById("header");
 
-        const root = document.getElementById("vista");
+    if (usuario?.rol === "Maestro") {
+        headerRoot.innerHTML = "<app-header></app-header>";
+    } else {
+        headerRoot.innerHTML = "<header-alumno></header-alumno>";
+    }
 
-        switch (vista) {
-            case "retos":
-                if (tipo === "codigo") {
-                    root.innerHTML = "<reto-codigo></reto-codigo>";
-                } else if (tipo === "multiple") {
-                    root.innerHTML = "<reto-multiple></reto-multiple>";
-                } else if (tipo === "abierto") {
-                    root.innerHTML = "<reto-abierto></reto-abierto>";
-                } else {
-                    root.innerHTML = "<crear-reto-menu></crear-reto-menu>";
-                }
-                break;
+    // Router SPA
+    const params = new URLSearchParams(location.search);
+    const vista = params.get("vista");
+    const tipo = params.get("tipo");
+    const accion = params.get("accion");
 
-            case "cursos":
-                root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
-                break;
+    const root = document.getElementById("vista");
 
-            case "perfil":
-                root.innerHTML = `<editar-perfil tipo="alumno"></editar-perfil>`;
-                break;
+    switch (vista) {
+        case "retos":
+            if (tipo === "codigo") root.innerHTML = "<reto-codigo></reto-codigo>";
+            else if (tipo === "multiple") root.innerHTML = "<reto-multiple></reto-multiple>";
+            else if (tipo === "abierto") root.innerHTML = "<reto-abierto></reto-abierto>";
+            else root.innerHTML = "<crear-reto-menu></crear-reto-menu>";
+            break;
 
-            case "unirseCurso":
-                root.innerHTML = "<unirse-cursos></unirse-cursos>";
-                break;
+        case "cursos":
+            root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
+            break;
 
-            case "unirse":
-                contenido.innerHTML = `<unirse-cursos></unirse-cursos>`;
-                break;
+        case "perfil":
+            root.innerHTML = `<editar-perfil tipo="${usuario?.rol}"></editar-perfil>`;
+            break;
 
-            case "progreso":
-                contenido.innerHTML = `<progreso-cursos></progreso-cursos>`;
-                break;
+        case "unirseCurso":
+        case "unirse":
+            root.innerHTML = "<unirse-cursos></unirse-cursos>";
+            break;
 
-            case "verLecciones":
-                contenido.innerHTML = `<ver-lecciones></ver-lecciones>`;
-                break;
+        case "progreso":
+            root.innerHTML = "<progreso-cursos></progreso-cursos>";
+            break;
 
-            case "foros":
-                if (accion === "crear") root.innerHTML = "<crear-foro></crear-foro>";
-                else root.innerHTML = "<mis-foros></mis-foros>";
-                break;
+        case "verLecciones":
+            root.innerHTML = "<ver-lecciones></ver-lecciones>";
+            break;
 
-            case "verForo":
-                root.innerHTML = `<ver-foro></ver-foro>`;
-                break;
+        case "foros":
+            if (accion === "crear") root.innerHTML = "<crear-foro></crear-foro>";
+            else root.innerHTML = "<mis-foros></mis-foros>";
+            break;
 
-            case "dashboardAlumno":
-                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-                break;
+        case "verForo":
+            root.innerHTML = "<ver-foro></ver-foro>";
+            break;
 
-            case "dashboardMaestro":
+        case "dashboardAlumno":
+            root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+            break;
+
+        case "dashboardMaestro":
+            root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
+            break;
+
+        default:
+            if (usuario?.rol === "Maestro")
                 root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
-                break;
-
-            default:
+            else
                 root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-        }
-    </script>
+    }
+</script>
 
 </body>
 
