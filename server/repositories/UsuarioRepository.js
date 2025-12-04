@@ -180,4 +180,11 @@ export default class UsuarioReporsitory{
             total: totalAlumnos + totalMaestros
         };
     }
+
+    async contarAlumnosPorCurso(cursoId) {
+        return await Usuario.countDocuments({
+            tipo: 'Alumno',
+            'progreso_cursos.id_curso': cursoId
+        });
+    }
 }

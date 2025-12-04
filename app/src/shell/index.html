@@ -45,7 +45,6 @@
 
     <!-- Headers -->
     <script type="module" src="../componentes/header.js"></script>
-    <script type="module" src="../componentes/headerAlumno.js"></script>
     <script type="module" src="../componentes/Pagina404.js"></script>
     
     <!-- Componentes UI reutilizables -->
@@ -69,6 +68,9 @@
     <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
     <script type="module" src="../mis-cursos/componentes/CursoCardAlumno.js"></script>
 
+    <!-- Unirse a Cursos -->
+    <script type="module" src="../unirse-cursos/unirseACurso.js"></script>
+
     <!-- Visualización de Cursos -->
     <script type="module" src="../ver-curso/VisorLeccion.js"></script>
     <script type="module" src="../ver-curso/componentes/SidebarLecciones.js"></script>
@@ -78,16 +80,13 @@
     <!-- Perfil -->
     <script type="module" src="../perfil/editarPerfil.js"></script>
 
-    <script>
-        // Cargar header según tipo de usuario
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
-        const headerRoot = document.getElementById("header");
+    <!-- API Services -->
+    <script type="module" src="../api/CursoService.js"></script>
 
-        if (usuario?.tipo === "Maestro") {
-            headerRoot.innerHTML = "<app-header></app-header>";
-        } else {
-            headerRoot.innerHTML = "<header-alumno></header-alumno>";
-        }
+    <script>
+        // Cargar header unificado
+        const headerRoot = document.getElementById("header");
+        headerRoot.innerHTML = "<app-header></app-header>";
 
         // Router SPA
         const params = new URLSearchParams(location.search);
@@ -96,6 +95,7 @@
         const accion = params.get("accion");
 
         const root = document.getElementById("vista");
+        const usuario = JSON.parse(localStorage.getItem("usuario"));
 
         switch (vista) {
             case "retos":
@@ -107,6 +107,14 @@
 
             case "cursos":
                 root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
+                break;
+
+            case "cursosAlumno":
+                root.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
+                break;
+
+            case "unirseACurso":
+                root.innerHTML = "<unirse-a-curso></unirse-a-curso>";
                 break;
 
             case "perfil":

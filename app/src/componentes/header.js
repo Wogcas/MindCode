@@ -1,8 +1,9 @@
 class AppHeader extends HTMLElement {
   connectedCallback() {
-    // Detectar si estamos en app-estudiante.html o index.html
-    const esEstudiante = window.location.pathname.includes('app-estudiante.html');
-    const linkBase = esEstudiante ? '#/' : 'index.html';
+    // Obtener tipo de usuario desde localStorage
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const esMaestro = usuario?.tipo === 'Maestro';
+    const esAlumno = usuario?.tipo === 'Alumno';
     
     this.innerHTML = `
       <header class="bg-white shadow-sm sticky top-0 z-50 font-sans">
@@ -10,7 +11,7 @@ class AppHeader extends HTMLElement {
           <div class="flex justify-between items-center h-16">
 
             <!-- Logo -->
-            <a href="${esEstudiante ? '#/' : 'index.html'}" 
+            <a href="index.html${esMaestro ? '?vista=dashboardMaestro' : '?vista=dashboardAlumno'}" 
                class="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity">
               <img src="../../assets/images/logoMindCode.png" class="h-10"/>
               <span class="font-Colmeak hidden md:block font-semibold text-xl tracking-tight text-gray-800 ml-2">
@@ -40,30 +41,30 @@ class AppHeader extends HTMLElement {
 
               <!-- Nav -->
               <nav class="hidden md:flex space-x-4 lg:space-x-8 ml-4">
-                <a href="${esEstudiante ? '#/' : 'index.html'}" 
+                <a href="index.html${esMaestro ? '?vista=dashboardMaestro' : '?vista=dashboardAlumno'}" 
                    class="text-gray-900 font-semibold px-3 py-2 text-sm hover:text-primary-600 transition-colors">
                    Inicio
                 </a>
 
-                <a href="${esEstudiante ? '#/mis-cursos' : 'index.html?vista=cursos'}"
-                   class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
-                   ${esEstudiante ? 'Mis Cursos' : 'Cursos'}
-                </a>
-
-                ${esEstudiante ? `
-                  <a href="#/explorar"
+                ${esMaestro ? `
+                  <a href="index.html?vista=cursos"
                      class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
-                     Explorar
+                     Mis Cursos
                   </a>
                   
-                  <a href="#/foros"
-                     class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
-                     Foros
-                  </a>
-                ` : `
                   <a href="index.html?vista=retos"
                      class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
                      Retos
+                  </a>
+                ` : `
+                  <a href="index.html?vista=cursosAlumno"
+                     class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
+                     Mis Cursos
+                  </a>
+                  
+                  <a href="index.html?vista=explorar"
+                     class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
+                     Explorar
                   </a>
                 `}
               </nav>
@@ -73,7 +74,7 @@ class AppHeader extends HTMLElement {
             <div class="flex items-center gap-4">
 
               <!-- Icono Perfil -->
-              <a href="${esEstudiante ? '#/perfil' : 'index.html?vista=perfil'}"
+              <a href="index.html?vista=perfil"
                 class="flex p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 transition-colors">
                 <span class="sr-only">Abrir perfil</span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -85,7 +86,7 @@ class AppHeader extends HTMLElement {
               </a>
 
               <!-- Notificaciones -->
-              <button class="p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100">
+              <button class="p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 transition-colors">
                 <span class="sr-only">Ver notificaciones</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                   stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
@@ -94,11 +95,31 @@ class AppHeader extends HTMLElement {
                     d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022m5.455 1.31a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
                 </svg>
               </button>
+
+              <!-- Cerrar Sesión -->
+              <button id="logout-btn" class="p-1 rounded-full text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors" title="Cerrar sesión">
+                <span class="sr-only">Cerrar sesión</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       </header>
     `;
+
+    // Agregar evento de cerrar sesión
+    const logoutBtn = this.querySelector('#logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('usuario');
+          window.location.href = '/app/src/login/index.html';
+        }
+      });
+    }
   }
 }
 

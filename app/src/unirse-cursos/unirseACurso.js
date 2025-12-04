@@ -1,20 +1,18 @@
-import "../componentes/headerAlumno.js";
 import "./componentes/cursoImagen.js";
 import "./componentes/cursoInfo.js";
 import "./componentes/botonUnirse.js";
 import "../componentes/modalAlerta.js";
+import { cursoService } from '../api/CursoService.js';
 
 class UnirseACurso extends HTMLElement {
   connectedCallback() {
-    this.cursoId = new URLSearchParams(window.location.search).get('curso');
+    this.cursoId = new URLSearchParams(window.location.search).get('id');
     this.render();
     this.init();
   }
 
   render() {
     this.innerHTML = `
-      <header-alumno></header-alumno>
-      
       <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
         <div class="max-w-4xl mx-auto">
           
@@ -59,29 +57,20 @@ class UnirseACurso extends HTMLElement {
 
   async cargarCurso() {
     if (!this.cursoId) {
-      console.warn('No se proporcionó ID de curso');
       this.mostrarAlerta('No se encontró el curso');
       return;
     }
 
     try {
-      // TODO: Conectar con API real
-      // const curso = await CursoAPI.obtenerCursoPorId(this.cursoId);
+      const resultado = await cursoService.fetchCourseWithParticipants(this.cursoId);
       
-      // Datos de ejemplo mientras conectas el backend
-      const cursoEjemplo = {
-        id: this.cursoId,
-        titulo: 'Curso conceptos básicos de JavaScript',
-        descripcion: '¡Hola! 👋 Soy Luke, tu profesor, y me emociona mucho que te unas a este curso. Si siempre has querido entender cómo funcionan las páginas web interactivas y estás listo para dar tus primeros pasos en el desarrollo, este es el lugar perfecto para empezar.',
-        fecha_creacion: '2025-09-17',
-        imagen: '../../assets/images/js-course.jpg'
-      };
-
-      this.renderizarCurso(cursoEjemplo);
+      if (resultado.success) {
+        this.renderizarCurso(resultado.curso);
+      }
       
     } catch (error) {
       console.error('Error al cargar curso:', error);
-      this.mostrarAlerta('Error al cargar el curso');
+      this.mostrarAlerta(error.message || 'Error al cargar el curso');
     }
   }
 
@@ -90,11 +79,31 @@ class UnirseACurso extends HTMLElement {
     const imagenCurso = this.querySelector('#imagenCurso');
     if (curso.imagen) {
       imagenCurso.setAttribute('src', curso.imagen);
+      imagenCurso.setAttribute('alt', curso.titulo);
     }
 
     // Actualizar info
     const infoCurso = this.querySelector('#infoCurso');
-    infoCurso.setData(curso);
+    const cursoData = {
+      id: curso.id,
+      titulo: curso.titulo,
+      descripcion: curso.descripcion,
+      fecha_creacion: curso.createdAt ? new Date(curso.createdAt).toLocaleDateString('es-ES') : 'N/A',
+      imagen: curso.imagen,
+      participantes: curso.participantes || 0,
+      visibilidad: curso.visibilidad
+    };
+    infoCurso.setData(cursoData);
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const botonUnirse = this.querySelector('#botonUnirse');
+    if (usuario && curso.id_maestro === usuario.id) {
+      botonUnirse.style.display = 'none';
+      const mensaje = document.createElement('p');
+      mensaje.className = 'text-center text-yellow-400 font-semibold mt-4';
+      mensaje.textContent = 'Este es tu curso';
+      this.querySelector('.max-w-4xl').appendChild(mensaje);
+    }
   }
 
   async unirseAlCurso() {
@@ -103,21 +112,18 @@ class UnirseACurso extends HTMLElement {
     try {
       botonUnirse.setLoading(true);
 
-      // TODO: Conectar con API real
-      // await CursoAPI.inscribirseACurso(this.cursoId);
+      const resultado = await cursoService.enrollInCourse(this.cursoId);
       
-      console.log('Uniéndose al curso:', this.cursoId);
-      
-      // Simular delay de red
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      this.mostrarAlerta('¡Te has unido al curso exitosamente!', () => {
-        window.location.href = 'index.html?vista=miAprendizaje';
-      });
+      if (resultado.success) {
+        this.mostrarAlerta('¡Te has inscrito exitosamente al curso!', () => {
+          window.location.href = '?vista=cursosAlumno';
+        });
+      }
       
     } catch (error) {
-      console.error('Error al unirse al curso:', error);
-      this.mostrarAlerta('Error al unirse al curso. Intenta nuevamente.');
+      console.error('Error al inscribirse al curso:', error);
+      const mensaje = error.message || 'Error al inscribirse al curso. Intenta nuevamente.';
+      this.mostrarAlerta(mensaje);
     } finally {
       botonUnirse.setLoading(false);
     }

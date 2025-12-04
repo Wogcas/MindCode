@@ -31,4 +31,28 @@ export default class CursoRepository {
         return await Curso.findByIdAndDelete(idCurso);
     }
 
+    /**
+     * Obtiene todos los cursos creados por un maestro
+     * @param {string} maestroId - ID del maestro
+     */
+    async obtenerCursosPorMaestro(maestroId) {
+        return await Curso.find({ id_maestro: maestroId });
+    }
+
+    /**
+     * Obtiene cursos por un array de IDs
+     * @param {Array} cursoIds - Array de IDs de cursos
+     */
+    async obtenerCursosPorIds(cursoIds) {
+        return await Curso.find({ _id: { $in: cursoIds } });
+    }
+
+    /**
+     * Obtiene todos los cursos disponibles (públicos y privados)
+     * @returns {Array} Lista de todos los cursos
+     */
+    async obtenerCursosDisponibles() {
+        return await Curso.find({});
+    }
+
 }

@@ -1,44 +1,70 @@
 import './CursoCard.js';
+import { cursoService } from '../../api/CursoService.js';
 
 class CursoCarrousel extends HTMLElement {
-  connectedCallback() {
-    const cursos = [
-      {
-        title: 'Todo lo que tienes que saber de los Fundamentos',
-        image: 'https://s1.significados.com/foto/software-og.jpg',
-        type: 'general'
-      },
-      {
-        title: 'Todo lo que tienes que saber de React',
-        image: '',
-        type: 'react'
-      },
-      {
-        title: 'Todo lo que tienes que saber de CSS Moderno',
-        image: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?auto=format&fit=crop&q=80&w=1000',
-        type: 'css'
-      },
-      {
-        title: 'Todo lo que tienes que saber de Node.js',
-        image: 'https://antonio-richaud.com/blog/imagenes/archivo/14-node-js/nodejs.png',
-        type: 'backend'
-      },
-      {
-        title: 'Todo lo que tienes que saber de TypeScript',
-        image: 'https://www.rabitsolutions.com/wp-content/uploads/2023/09/typescript-cover-cropped-1300x600.jpeg',
-        type: 'typescript'
+  constructor() {
+    super();
+    this.cursos = [];
+    this.loading = true;
+  }
+
+  async connectedCallback() {
+    await this.cargarCursosPublicos();
+    this.render();
+    this.initDragScroll();
+  }
+
+  async cargarCursosPublicos() {
+    try {
+      this.loading = true;
+      const resultado = await cursoService.fetchAvailableCourses({ limit: 10 });
+      
+      if (resultado.success) {
+        this.cursos = resultado.cursos;
       }
-    ];
+    } catch (error) {
+      console.error('Error al cargar cursos disponibles:', error);
+      this.cursos = [];
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  render() {
+    if (this.loading) {
+      this.innerHTML = `
+        <div class="mb-8">
+          <div class="flex gap-4 overflow-x-auto pb-4">
+            <div class="flex items-center justify-center w-full py-10">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (this.cursos.length === 0) {
+      this.innerHTML = `
+        <div class="mb-8">
+          <div class="flex items-center justify-center py-10 bg-gray-100 rounded-2xl">
+            <p class="text-gray-500">No hay cursos disponibles en este momento</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
 
     this.innerHTML = `
       <div class="mb-8">
         <div id="slider" class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide cursor-grab select-none">
-          ${cursos.map(curso => `
+          ${this.cursos.map(curso => `
             <curso-card
-              class="pointer-events-none" 
-              title="${curso.title}"
-              image="${curso.image}"
-              type="${curso.type}">
+              title="${curso.titulo || 'Sin título'}"
+              image="${curso.imagen || 'https://via.placeholder.com/400x300?text=Curso'}"
+              cursoId="${curso.id}"
+              visibilidad="${curso.visibilidad || 'Privado'}"
+              type="general">
             </curso-card>
           `).join('')}
         </div>
@@ -53,31 +79,39 @@ class CursoCarrousel extends HTMLElement {
         .cursor-grabbing { cursor: grabbing !important; }
       </style>
     `;
-
-    this.initDragScroll();
   }
 
   initDragScroll() {
     const slider = this.querySelector('#slider');
     let isDown = false;
+    let isDragging = false;
     let startX;
     let scrollLeft;
 
     slider.addEventListener('mousedown', (e) => {
-      isDown = true;
-      slider.classList.add('cursor-grabbing');
-      startX = e.pageX - slider.offsetLeft;
-      scrollLeft = slider.scrollLeft;
+      if (e.target.closest('curso-card')) {
+        isDown = true;
+        isDragging = false;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+      }
     });
 
     slider.addEventListener('mouseleave', () => {
       isDown = false;
+      isDragging = false;
       slider.classList.remove('cursor-grabbing');
     });
 
-    slider.addEventListener('mouseup', () => {
+    slider.addEventListener('mouseup', (e) => {
       isDown = false;
       slider.classList.remove('cursor-grabbing');
+      
+      if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = false;
+      }
     });
 
     slider.addEventListener('mousemove', (e) => {
@@ -85,8 +119,13 @@ class CursoCarrousel extends HTMLElement {
       e.preventDefault();
 
       const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 2;
-      slider.scrollLeft = scrollLeft - walk;
+      const walk = x - startX;
+      
+      if (Math.abs(walk) > 5) {
+        isDragging = true;
+        slider.classList.add('cursor-grabbing');
+        slider.scrollLeft = scrollLeft - walk;
+      }
     });
   }
 }

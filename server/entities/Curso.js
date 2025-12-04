@@ -15,6 +15,15 @@ const CursoSchema = new mongoose.Schema({
         ref: 'Usuarios',
         required: true
     },
+    visibilidad: {
+        type: String,
+        enum: ['Público', 'Privado'],
+        default: 'Privado'
+    },
+    imagen: {
+        type: String,
+        default: 'https://via.placeholder.com/800x450?text=Curso'
+    }
 }, { timestamps: true });
 
 export const Curso = mongoose.model('Curso', CursoSchema);

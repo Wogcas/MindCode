@@ -1,8 +1,11 @@
+import { cursoService } from '../api/CursoService.js';
+
 class CrearCurso extends HTMLElement {
     constructor() {
         super();
-        this.visibilidad = 'publico';
+        this.visibilidad = 'Público';
         this.imagenPreview = null;
+        this.isLoading = false;
     }
 
     connectedCallback() {
@@ -133,9 +136,13 @@ class CrearCurso extends HTMLElement {
                         </button>
                         <button 
                             id="crearBtn"
-                            class="flex-1 px-6 py-3 bg-[#4F75C2] text-white font-semibold rounded-full hover:bg-[#3d5a96] transition-all shadow-sm hover:shadow-md"
+                            class="flex-1 px-6 py-3 bg-[#4F75C2] text-white font-semibold rounded-full hover:bg-[#3d5a96] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            Crear
+                            <span id="btnText">Crear</span>
+                            <svg id="btnLoader" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -203,7 +210,7 @@ class CrearCurso extends HTMLElement {
             option.addEventListener('click', () => {
                 visibilidadOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
-                this.visibilidad = option.dataset.visibilidad;
+                this.visibilidad = option.dataset.visibilidad === 'publico' ? 'Público' : 'Privado';
             });
         });
 
@@ -239,42 +246,146 @@ class CrearCurso extends HTMLElement {
         });
     }
 
-    crearCurso() {
+    async crearCurso() {
+        if (this.isLoading) return;
+
         const nombre = this.querySelector('#nombreCurso').value.trim();
         const descripcion = this.querySelector('#descripcionCurso').value.trim();
 
+        // Validaciones
         if (!nombre) {
-            alert('Por favor ingresa el nombre del curso');
+            this.mostrarAlerta('Por favor ingresa el nombre del curso', 'error');
+            return;
+        }
+
+        if (nombre.length < 3) {
+            this.mostrarAlerta('El nombre del curso debe tener al menos 3 caracteres', 'error');
             return;
         }
 
         if (!descripcion) {
-            alert('Por favor ingresa la descripción del curso');
+            this.mostrarAlerta('Por favor ingresa la descripción del curso', 'error');
             return;
         }
 
-        const nuevoCurso = {
-            titulo: nombre,
-            descripcion: descripcion,
-            imagen: this.imagenPreview || 'https://via.placeholder.com/800x450?text=Sin+Imagen',
-            participantes: '0',
-            estado: this.visibilidad === 'publico' ? 'Público' : 'Privado',
-            fechaPublicacion: new Date().toLocaleDateString('es-MX', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit'
-            })
+        if (descripcion.length < 10) {
+            this.mostrarAlerta('La descripción debe tener al menos 10 caracteres', 'error');
+            return;
+        }
+
+        try {
+            this.setLoading(true);
+
+            // Obtener el ID del maestro del localStorage
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            
+            if (!usuario || !usuario.id) {
+                throw new Error('No se encontró información del usuario');
+            }
+
+            // Preparar datos del curso para el backend
+            const cursoData = {
+                titulo: nombre,
+                descripcion: descripcion,
+                id_maestro: usuario.id,
+                visibilidad: this.visibilidad,
+                imagen: this.imagenPreview || 'https://via.placeholder.com/800x450?text=Sin+Imagen'
+            };
+
+            // Crear curso en el backend
+            const resultado = await cursoService.createCourse(cursoData);
+
+            if (resultado.success) {
+                // Disparar evento con los datos del curso creado
+                const eventoDetalle = {
+                    ...resultado.curso,
+                    imagen: this.imagenPreview || 'https://via.placeholder.com/800x450?text=Sin+Imagen',
+                    participantes: 0,
+                    estado: this.visibilidad
+                };
+
+                this.dispatchEvent(new CustomEvent('curso-creado', {
+                    detail: eventoDetalle,
+                    bubbles: true,
+                    composed: true
+                }));
+
+                this.mostrarAlerta('¡Curso creado exitosamente!', 'success');
+                
+                // Cerrar modal después de un breve delay
+                setTimeout(() => {
+                    this.cerrarModal();
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Error al crear curso:', error);
+            this.mostrarAlerta(
+                error.message || 'Error al crear el curso. Por favor intenta nuevamente.',
+                'error'
+            );
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    setLoading(loading) {
+        this.isLoading = loading;
+        const crearBtn = this.querySelector('#crearBtn');
+        const btnText = this.querySelector('#btnText');
+        const btnLoader = this.querySelector('#btnLoader');
+        const nombreInput = this.querySelector('#nombreCurso');
+        const descripcionInput = this.querySelector('#descripcionCurso');
+
+        if (loading) {
+            crearBtn.disabled = true;
+            btnText.textContent = 'Creando...';
+            btnLoader.classList.remove('hidden');
+            nombreInput.disabled = true;
+            descripcionInput.disabled = true;
+        } else {
+            crearBtn.disabled = false;
+            btnText.textContent = 'Crear';
+            btnLoader.classList.add('hidden');
+            nombreInput.disabled = false;
+            descripcionInput.disabled = false;
+        }
+    }
+
+    mostrarAlerta(mensaje, tipo = 'info') {
+        // Eliminar alertas anteriores
+        const alertaAnterior = this.querySelector('.alerta-flotante');
+        if (alertaAnterior) alertaAnterior.remove();
+
+        const colores = {
+            success: 'bg-green-500',
+            error: 'bg-red-500',
+            info: 'bg-blue-500'
         };
 
-        // Disparar evento personalizado con los datos del curso
-        this.dispatchEvent(new CustomEvent('curso-creado', {
-            detail: nuevoCurso,
-            bubbles: true,
-            composed: true
-        }));
+        const iconos = {
+            success: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      </svg>`,
+            error: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>`,
+            info: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                   </svg>`
+        };
 
-        alert('Curso creado correctamente');
-        this.cerrarModal();
+        const alerta = document.createElement('div');
+        alerta.className = `alerta-flotante fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] ${colores[tipo]} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-slide-down`;
+        alerta.innerHTML = `
+            ${iconos[tipo]}
+            <span class="font-medium">${mensaje}</span>
+        `;
+
+        this.appendChild(alerta);
+
+        setTimeout(() => {
+            alerta.remove();
+        }, 4000);
     }
 
     cerrarModal() {

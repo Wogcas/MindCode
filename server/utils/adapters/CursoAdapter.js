@@ -4,8 +4,6 @@ export const CursoAdapter = {
   toDTO: (document) => {
     if (!document) return null;
     
-    // esto es para que si el documento es el resultado de .lean(), 
-    // el id no será un objectid
     const doc = document.toObject ? document.toObject() : document;
 
     return new CursoDTO({
@@ -13,6 +11,8 @@ export const CursoAdapter = {
       titulo: doc.titulo,
       descripcion: doc.descripcion,
       id_maestro: doc.id_maestro.toString(),
+      visibilidad: doc.visibilidad,
+      imagen: doc.imagen,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });

@@ -4,10 +4,13 @@ import './componentes/SugerenciasCard.js';
 
 class DashboardAlumno extends HTMLElement {
   connectedCallback() {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const nombreUsuario = usuario?.nombre || 'Estudiante';
+
     this.innerHTML = `
       <div class="min-h-screen bg-gray-50 pl-10 p-10 pt-5 font-sans sm:p-20 sm:pt-10">
         <bienvenida-usuario 
-          nombre="Esmeralda Molina"
+          nombre="${nombreUsuario}"
           class="flex items-center"
           >
         </bienvenida-usuario>

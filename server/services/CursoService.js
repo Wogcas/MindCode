@@ -1,4 +1,5 @@
 import CursoRepository from "../repositories/CursoRepository.js";
+import UsuarioRepository from "../repositories/UsuarioRepository.js";
 import { CursoAdapter } from "../utils/adapters/CursoAdapter.js";
 import { NotFoundError, ConflictError } from "../auth/errorHandler.js";
 
@@ -6,6 +7,7 @@ export default class CursoService {
 
     constructor() {
         this.cursoRepo = new CursoRepository();
+        this.usuarioRepo = new UsuarioRepository();
     }
 
     async agregarCurso(curso) {
@@ -50,5 +52,130 @@ export default class CursoService {
         }
         const cursoEliminado = await this.cursoRepo.eliminarCurso(idCurso);
         return CursoAdapter.toDTO(cursoEliminado);
+    }
+
+    /**
+     * Obtiene todos los cursos creados por un maestro específico
+     * @param {string} maestroId - ID del maestro
+     * @returns {Array} Lista de cursos del maestro con participantes
+     */
+    async obtenerCursosPorMaestro(maestroId) {
+        const cursos = await this.cursoRepo.obtenerCursosPorMaestro(maestroId);
+        
+        // Obtener participantes para cada curso
+        const cursosConParticipantes = await Promise.all(
+            cursos.map(async (curso) => {
+                const participantes = await this.usuarioRepo.contarAlumnosPorCurso(curso._id);
+                return {
+                    ...CursoAdapter.toDTO(curso),
+                    participantes
+                };
+            })
+        );
+        
+        return cursosConParticipantes;
+    }
+
+    /**
+     * Obtiene todos los cursos en los que está inscrito un alumno
+     * @param {string} alumnoId - ID del alumno
+     * @returns {Array} Lista de cursos del alumno con progreso y participantes
+     */
+    async obtenerCursosPorAlumno(alumnoId) {
+        const usuario = await this.usuarioRepo.obtenerUsuarioPorId(alumnoId);
+        if (!usuario) {
+            throw new NotFoundError(`Usuario con ID ${alumnoId} no encontrado`);
+        }
+
+        if (usuario.tipo !== 'Alumno') {
+            throw new ConflictError('El usuario no es un alumno');
+        }
+
+        // Obtener IDs de cursos del progreso del alumno
+        const cursoIds = usuario.progreso_cursos?.map(p => p.id_curso) || [];
+        
+        if (cursoIds.length === 0) {
+            return [];
+        }
+
+        // Obtener información completa de cada curso
+        const cursos = await this.cursoRepo.obtenerCursosPorIds(cursoIds);
+        
+        // Combinar información del curso con el progreso y participantes
+        const cursosConDatos = await Promise.all(
+            cursos.map(async (curso) => {
+                const progreso = usuario.progreso_cursos.find(
+                    p => p.id_curso.toString() === curso._id.toString()
+                );
+                
+                // Obtener número de participantes
+                const participantes = await this.usuarioRepo.contarAlumnosPorCurso(curso._id);
+                
+                return {
+                    ...CursoAdapter.toDTO(curso),
+                    participantes,
+                    progreso: {
+                        porcentaje: progreso?.porcentaje || 0,
+                        lecciones_completadas: progreso?.lecciones_completadas || []
+                    }
+                };
+            })
+        );
+        
+        return cursosConDatos;
+    }
+
+    /**
+     * Obtiene todos los cursos disponibles (públicos y privados)
+     * Los cursos privados requerirán código de acceso para inscribirse
+     * @returns {Array} Lista de todos los cursos
+     */
+    async obtenerCursosDisponibles() {
+        const cursos = await this.cursoRepo.obtenerCursosDisponibles();
+        return cursos.map(curso => CursoAdapter.toDTO(curso));
+    }
+
+    /**
+     * Inscribe un alumno a un curso
+     * @param {string} alumnoId - ID del alumno
+     * @param {string} cursoId - ID del curso
+     */
+    async inscribirAlumno(alumnoId, cursoId) {
+        // Verificar que el curso existe
+        const curso = await this.cursoRepo.obtenerCursoPorId(cursoId);
+        if (!curso) {
+            throw new NotFoundError(`Curso con ID ${cursoId} no encontrado`);
+        }
+
+        // Verificar que el alumno no sea el maestro del curso
+        if (curso.id_maestro.toString() === alumnoId.toString()) {
+            throw new Error('No puedes inscribirte en tu propio curso');
+        }
+
+        // Inscribir al alumno
+        const resultado = await this.usuarioRepo.agregarCursoAProgreso(alumnoId, cursoId);
+        
+        return {
+            inscrito: true,
+            curso: CursoAdapter.toDTO(curso)
+        };
+    }
+
+    /**
+     * Obtiene un curso con la cantidad de participantes
+     * @param {string} cursoId - ID del curso
+     */
+    async obtenerCursoConParticipantes(cursoId) {
+        const curso = await this.cursoRepo.obtenerCursoPorId(cursoId);
+        if (!curso) {
+            throw new NotFoundError(`Curso con ID ${cursoId} no encontrado`);
+        }
+
+        const participantes = await this.usuarioRepo.contarAlumnosPorCurso(cursoId);
+        
+        return {
+            ...CursoAdapter.toDTO(curso),
+            participantes
+        };
     }
 }

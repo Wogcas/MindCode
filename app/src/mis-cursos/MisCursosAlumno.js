@@ -1,10 +1,59 @@
-// Vista de Mis Cursos del Estudiante - Integrada con el diseño existente
-import { cursosEstudiante } from '../data/mockData.js';
+// Vista de Mis Cursos del Estudiante - Integrada con Backend
 import './componentes/CursoCardAlumno.js';
+import { cursoService } from '../api/CursoService.js';
 
 class MisCursosAlumno extends HTMLElement {
-  connectedCallback() {
+  constructor() {
+    super();
+    this.cursos = [];
+    this.loading = true;
+    this.error = null;
+  }
+
+  async connectedCallback() {
     this.render();
+    await this.cargarCursos();
+  }
+
+  async cargarCursos() {
+    try {
+      this.loading = true;
+      this.mostrarEstadoCarga();
+
+      const resultado = await cursoService.fetchStudentCourses();
+      
+      if (resultado.success) {
+        this.cursos = resultado.cursos;
+        this.error = null;
+      }
+    } catch (error) {
+      console.error('Error al cargar cursos:', error);
+      this.error = error.message || 'Error al cargar los cursos';
+    } finally {
+      this.loading = false;
+      this.actualizarVista();
+    }
+  }
+
+  mostrarEstadoCarga() {
+    const cursosGrid = this.querySelector('#cursosGrid');
+    if (cursosGrid) {
+      cursosGrid.innerHTML = `
+        <div class="col-span-full flex justify-center items-center py-20">
+          <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p class="mt-4 text-gray-600">Cargando tus cursos...</p>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  actualizarVista() {
+    const cursosGrid = this.querySelector('#cursosGrid');
+    if (cursosGrid) {
+      cursosGrid.innerHTML = this.renderCursos();
+    }
   }
 
   render() {
@@ -17,7 +66,7 @@ class MisCursosAlumno extends HTMLElement {
             Mis cursos
           </h1>
           
-          <a href="#/explorar" 
+          <a href="index.html?vista=explorar" 
              class="text-primary font-medium flex items-center gap-2 
                     hover:text-primary-600 transition-colors group">
             <span>Todos los cursos</span>
@@ -29,26 +78,58 @@ class MisCursosAlumno extends HTMLElement {
         </div>
         
         <!-- Grid de cursos -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="cursosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           ${this.renderCursos()}
         </div>
-
-        <!-- Mensaje si no hay cursos -->
-        ${cursosEstudiante.length === 0 ? this.renderMensajeVacio() : ''}
       </section>
     `;
   }
 
   renderCursos() {
-    return cursosEstudiante.map(curso => `
-      <curso-card-alumno
-        cursoId="${curso.id}"
-        titulo="${curso.titulo}"
-        imagen="${curso.imagen}"
-        progreso="${curso.progreso}"
-        participantes="${curso.participantes}"
-      ></curso-card-alumno>
-    `).join('');
+    if (this.loading) {
+      return `
+        <div class="col-span-full flex justify-center items-center py-20">
+          <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p class="mt-4 text-gray-600">Cargando tus cursos...</p>
+          </div>
+        </div>
+      `;
+    }
+
+    if (this.error) {
+      return `
+        <div class="col-span-full flex justify-center items-center py-20">
+          <div class="text-center">
+            <svg class="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <p class="mt-4 text-gray-700 font-medium">${this.error}</p>
+            <button onclick="location.reload()" class="mt-4 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-600">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (this.cursos.length === 0) {
+      return this.renderMensajeVacio();
+    }
+
+    return this.cursos.map(curso => {
+      const progreso = curso.progreso?.porcentaje || 0;
+      
+      return `
+        <curso-card-alumno
+          cursoId="${curso.id}"
+          titulo="${curso.titulo || 'Sin título'}"
+          imagen="${curso.imagen || 'https://via.placeholder.com/400x250?text=Curso'}"
+          progreso="${progreso}"
+          participantes="${curso.participantes || 0}"
+        ></curso-card-alumno>
+      `;
+    }).join('');
   }
 
   renderMensajeVacio() {
@@ -59,7 +140,7 @@ class MisCursosAlumno extends HTMLElement {
         </svg>
         <h3 class="text-xl font-medium text-gray-700 mb-2">No tienes cursos inscritos</h3>
         <p class="text-gray-500 mb-6">Explora nuestro catálogo y comienza a aprender</p>
-        <a href="#/explorar" 
+        <a href="index.html?vista=explorar" 
            class="bg-primary text-white px-8 py-3 rounded-full font-semibold 
                   hover:bg-primary-600 transition-colors">
           Explorar Cursos
