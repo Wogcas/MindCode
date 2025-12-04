@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { connectToDatabase } from './database/connection.js';
 import cursoRouter from './routes/CursoRoute.js';
 import leccionRouter from './routes/LeccionRoute.js';
@@ -13,6 +14,12 @@ import { errorHandler, notFound } from './auth/errorHandler.js';
 
 const app = express();
 const PORT = 3000;
+
+// Configuración de CORS
+app.use(cors({
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'],
+    credentials: true
+}));
 
 app.use(express.json());
 

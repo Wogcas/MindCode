@@ -16,6 +16,7 @@ class MfeAuth extends HTMLElement {
     connectedCallback() {
         this.render();
         this.addEvents();
+        this.toggleState('login'); // Inicializar en modo login
     }
 
     render() {
@@ -548,12 +549,8 @@ class MfeAuth extends HTMLElement {
                 this.showError('password', 'La contraseña no cumple los requisitos');
                 return false;
             }
-        } else {
-            if (password.length < 6) {
-                this.showError('password', 'Mínimo 6 caracteres');
-                return false;
-            }
         }
+        // En login no validamos requisitos, solo que no esté vacía
 
         this.hideError('password');
         return true;
@@ -718,29 +715,37 @@ class MfeAuth extends HTMLElement {
                 const token = response.data?.token;
                 const usuario = response.data?.usuario;
     
-                if (token && usuario) {
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('usuario', JSON.stringify(usuario));
-    
-                    console.log('Token y Usuario guardados correctamente');
+                if (!token || !usuario) {
+                    throw new Error('Respuesta del servidor incompleta');
                 }
+
+                // Guardar token y usuario
+                localStorage.setItem('token', token);
+                localStorage.setItem('usuario', JSON.stringify(usuario));
+                apiClient.setToken(token);
     
                 this.showAlert('¡Inicio de sesión exitoso!', 'success');
     
                 setTimeout(() => {
-                    const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
-    
-                    if (usuarioGuardado?.tipo === "Alumno") {
+                    if (usuario.tipo === "Alumno") {
                         window.location.href = "/app/src/shell/index.html?vista=dashboardAlumno";
-                    } else {
+                    } else if (usuario.tipo === "Maestro") {
                         window.location.href = "/app/src/shell/index.html?vista=dashboardMaestro";
+                    } else {
+                        window.location.href = "/app/src/shell/index.html";
                     }
-    
                 }, 1500);
             }
         } catch (error) {
             console.error('Login error:', error);
-            const message = error.response?.data?.message || error.message || 'Error al iniciar sesión';
+            let message = 'Error al iniciar sesión';
+            
+            if (error.message?.includes('Credenciales inválidas')) {
+                message = 'Correo o contraseña incorrectos';
+            } else if (error.message) {
+                message = error.message;
+            }
+            
             this.showAlert(message, 'error');
         } finally {
             this.setLoading(false);
@@ -824,31 +829,27 @@ class MfeAuth extends HTMLElement {
             const response = await apiClient.registrar(nombre, email, password, tipo);
 
             if (response.success) {
-                const token = response.data?.token;
-                const usuario = response.data?.usuario;
+                this.showAlert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión', 'success');
 
-                if (token && usuario) {
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('usuario', JSON.stringify(usuario));
-                    console.log('✅ Auto-login tras registro exitoso');
-                }
-
-                this.showAlert('¡Cuenta creada exitosamente!', 'success');
+                // Limpiar el formulario
+                this.clearForm();
+                this.clearAllErrors();
 
                 setTimeout(() => {
-                    const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
-
-                    if (usuarioGuardado?.tipo === "Alumno") {
-                        window.location.href = "/app/src/dashboard/dashboardAlumno.html";
-                    } else {
-                        window.location.href = "/app/src/dashboard/dashboardMaestro.html";
-                    }
-
-                }, 1200);
+                    // Cambiar a la pestaña de login en lugar de recargar la página
+                    this.toggleState('login');
+                }, 1500);
             }
         } catch (error) {
             console.error('Signup error:', error);
-            const message = error.data?.message || error.message || 'Error al crear la cuenta';
+            let message = 'Error al crear la cuenta';
+            
+            if (error.message?.includes('correo ya está registrado')) {
+                message = 'Este correo ya está registrado. Intenta iniciar sesión.';
+            } else if (error.message) {
+                message = error.message;
+            }
+            
             this.showAlert(message, 'error');
         } finally {
             this.setLoading(false);

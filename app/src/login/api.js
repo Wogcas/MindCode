@@ -91,7 +91,7 @@ class ApiClient {
      * @param {string} tipo - Tipo de usuario (Alumno o Maestro)
      */
     async registrar(nombre, correo, contrasena, tipo) {
-        const response = await this.request('/auth/registrar', {
+        return await this.request('/auth/registrar', {
             method: 'POST',
             body: JSON.stringify({
                 nombre,
@@ -100,13 +100,6 @@ class ApiClient {
                 tipo
             })
         });
-
-        if (response.success && response.data.token) {
-            this.setToken(response.data.token);
-            localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
-        }
-
-        return response;
     }
 
     /**
@@ -115,20 +108,13 @@ class ApiClient {
      * @param {string} contrasena - Contraseña
      */
     async login(correo, contrasena) {
-        const response = await this.request('/auth/login', {
+        return await this.request('/auth/login', {
             method: 'POST',
             body: JSON.stringify({
                 correo,
                 contrasena
             })
         });
-
-        if (response.success && response.data.token) {
-            this.setToken(response.data.token);
-            localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
-        }
-
-        return response;
     }
 
     /**
