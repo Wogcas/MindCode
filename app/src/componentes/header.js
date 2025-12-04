@@ -1,18 +1,22 @@
 class AppHeader extends HTMLElement {
   connectedCallback() {
+    // Detectar si estamos en app-estudiante.html o index.html
+    const esEstudiante = window.location.pathname.includes('app-estudiante.html');
+    const linkBase = esEstudiante ? '#/' : 'index.html';
+    
     this.innerHTML = `
       <header class="bg-white shadow-sm sticky top-0 z-50 font-sans">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
 
             <!-- Logo -->
-            <div onclick="location.href='index.html'" 
-                 class="flex-shrink-0 flex items-center cursor-pointer">
+            <a href="${esEstudiante ? '#/' : 'index.html'}" 
+               class="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity">
               <img src="../../assets/images/logoMindCode.png" class="h-10"/>
               <span class="font-Colmeak hidden md:block font-semibold text-xl tracking-tight text-gray-800 ml-2">
                 MindCode
               </span>
-            </div>
+            </a>
 
             <!-- Search + Nav -->
             <div class="flex-1 flex items-center justify-end md:justify-between mx-2 md:mx-8">
@@ -36,20 +40,32 @@ class AppHeader extends HTMLElement {
 
               <!-- Nav -->
               <nav class="hidden md:flex space-x-4 lg:space-x-8 ml-4">
-                <a href="index.html" 
-                   class="text-gray-900 font-semibold px-3 py-2 text-sm hover:text-primary-600">
+                <a href="${esEstudiante ? '#/' : 'index.html'}" 
+                   class="text-gray-900 font-semibold px-3 py-2 text-sm hover:text-primary-600 transition-colors">
                    Inicio
                 </a>
 
-                <a href="index.html?vista=cursos"
-                   class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600">
-                   Cursos
+                <a href="${esEstudiante ? '#/mis-cursos' : 'index.html?vista=cursos'}"
+                   class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
+                   ${esEstudiante ? 'Mis Cursos' : 'Cursos'}
                 </a>
 
-                <a href="index.html?vista=retos"
-                   class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600">
-                   Retos
-                </a>
+                ${esEstudiante ? `
+                  <a href="#/explorar"
+                     class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
+                     Explorar
+                  </a>
+                  
+                  <a href="#/foros"
+                     class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
+                     Foros
+                  </a>
+                ` : `
+                  <a href="index.html?vista=retos"
+                     class="text-gray-600 font-medium px-3 py-2 text-sm hover:text-primary-600 transition-colors">
+                     Retos
+                  </a>
+                `}
               </nav>
             </div>
 
@@ -57,8 +73,8 @@ class AppHeader extends HTMLElement {
             <div class="flex items-center gap-4">
 
               <!-- Icono Perfil -->
-              <button onclick="location.href='index.html?vista=perfil'"
-                class="flex p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100">
+              <a href="${esEstudiante ? '#/perfil' : 'index.html?vista=perfil'}"
+                class="flex p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100 transition-colors">
                 <span class="sr-only">Abrir perfil</span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                   stroke-width="1.5" fill="none" stroke="currentColor" 
@@ -66,7 +82,7 @@ class AppHeader extends HTMLElement {
                   <path stroke-linecap="round" stroke-linejoin="round"
                     d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
-              </button>
+              </a>
 
               <!-- Notificaciones -->
               <button class="p-1 rounded-full text-gray-600 hover:text-primary-600 hover:bg-gray-100">
