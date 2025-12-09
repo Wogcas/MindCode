@@ -1,6 +1,5 @@
-import './componentes/CursoCardDatos.js'
 import '../crear-curso/CrearCurso.js'
-import '../../dashboard/componentes/CursoCard.js';
+import '../dashboard/componentes/CursoCard.js';
 import { cursoService } from '../api/CursoService.js';
 
 class MisCursosMaestro extends HTMLElement {

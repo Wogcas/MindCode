@@ -17,6 +17,10 @@ export default class LeccionService {
         const leccionesObtenidas = await this.leccionRepo.obtenerLecciones();
         return leccionesObtenidas.map(leccion => leccionAdapter.toDTO(leccion));
     }
+    
+    async obtenerLeccionesPorCurso(idCurso) {
+        return await this.leccionRepo.obtenerLeccionesPorCurso({ curso: idCurso });
+    }
 
     async obtenerLeccionPorTitulo(tituloLeccion) {
         const leccionesObtenidas = await this.leccionRepo.obtenerLeccionPorTitulo(tituloLeccion);

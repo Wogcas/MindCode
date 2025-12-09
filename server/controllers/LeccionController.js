@@ -15,6 +15,12 @@ export default class LeccionController {
         res.status(200).json({ success: true, data: lecciones });
     }
 
+    obtenerLeccionesPorCurso = async (req, res) => {
+        const lecciones = await this.leccionService.obtenerLeccionesPorCurso(req.params.id);
+        
+        res.status(200).json({ success: true, data: lecciones });
+    }
+
     obtenerLeccionesPorTitulo = async (req, res) => {
         const lecciones = await this.leccionService.obtenerLeccionPorTitulo(req.params.titulo);
         res.status(200).json({ success: true, data: lecciones });

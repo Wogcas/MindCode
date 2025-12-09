@@ -1,66 +1,35 @@
-import { LeccionService } from '../api/LeccionService.js';
+import { loadDetalleCurso } from './DetalleCurso.js';
 
-export async function loadVistaLeccion(cursoId, leccionId) {
-  const mainContent = document.getElementById('main-content');
-  // ... lógica de loading ...
+export function loadVistaLeccion(cursoId, leccionId) {
+    // CAMBIO CLAVE: Buscamos 'vista'
+    const mainContent = document.getElementById('vista') || document.getElementById('app-root');
+    
+    if (!mainContent) return;
 
-  // Suponemos que tienes un endpoint que trae el detalle de la lección con su contenido
-  // const leccion = await LeccionService.getDetalleCompleto(leccionId); 
-  // Por ahora usaré datos simulados para la estructura visual
-  
-  const leccion = { titulo: "Introducción a React", descripcion: "Conceptos básicos", contenido: [], retos: [] }; 
+    mainContent.innerHTML = `
+        <div class="p-8 max-w-5xl mx-auto h-full flex flex-col font-sans">
+            <button id="btn-volver-detalle" class="text-gray-500 hover:text-purple-600 mb-6 flex items-center gap-2 self-start">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Volver al contenido del curso
+            </button>
 
-  mainContent.innerHTML = `
-    <div class="p-8 max-w-5xl mx-auto">
-      <button id="btn-volver" class="mb-4 text-purple-600 hover:underline">&larr; Volver al curso</button>
-      
-      <h1 class="text-3xl font-bold mb-2">${leccion.titulo}</h1>
-      <p class="text-gray-600 mb-8">${leccion.descripcion}</p>
+            <div class="bg-white rounded-2xl shadow-sm border p-8 flex-1">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">Detalle de la Lección</h1>
+                <p class="text-gray-600 mb-8">ID: ${leccionId}</p>
+                
+                <div class="bg-gray-100 rounded-xl h-64 flex items-center justify-center border-2 border-dashed border-gray-300">
+                    <p class="text-gray-400 font-medium">Aquí irá el Video o Imagen</p>
+                </div>
 
-      <div class="bg-gray-100 p-6 rounded-lg mb-8 border-2 border-dashed border-gray-300 text-center" id="area-contenido">
-         ${leccion.contenido.length > 0 
-            ? `<div class="bg-black h-64 w-full text-white flex items-center justify-center">Reproductor de Video Aquí</div>` 
-            : `
-              <p class="text-gray-500 mb-4">No hay contenido multimedia aún.</p>
-              <div class="flex justify-center gap-4">
-                <button id="btn-add-video" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Agregar Video (Link)</button>
-                <button id="btn-add-image" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Subir Imagen</button>
-              </div>
-            `}
-      </div>
-
-      <div class="mt-10">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-2xl font-bold">Retos de la Lección</h2>
-          <button id="btn-add-reto" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Crear Reto</button>
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold mb-4">Retos</h2>
+                    <p class="text-sm text-gray-500 italic">Próximamente...</p>
+                </div>
+            </div>
         </div>
-        
-        <div id="lista-retos" class="space-y-4">
-          ${leccion.retos.length === 0 ? '<p class="text-gray-400 italic">No hay retos configurados.</p>' : ''}
-        </div>
-      </div>
-    </div>
-  `;
+    `;
 
-  // Event Listeners
-  document.getElementById('btn-volver').addEventListener('click', () => {
-    import('./DetalleCurso.js').then(module => module.loadDetalleCurso(cursoId));
-  });
-
-  // Listener para agregar Reto (Debería abrir otro modal similar al de Lección)
-  document.getElementById('btn-add-reto').addEventListener('click', () => {
-      // Aquí llamas a una función renderModalCrearReto(leccionId)
-      alert("Aquí abriría el modal para crear un reto (Pregunta, opciones, respuesta correcta)");
-  });
-  
-  // Listeners para contenido
-  if(document.getElementById('btn-add-video')) {
-      document.getElementById('btn-add-video').addEventListener('click', () => {
-          const url = prompt("Ingresa la URL del video (YouTube/Vimeo):");
-          if(url) {
-              // Llamar a LeccionService.addContenido(...)
-              alert(`Guardando video: ${url}`);
-          }
-      });
-  }
+    document.getElementById('btn-volver-detalle').addEventListener('click', () => {
+        loadDetalleCurso(cursoId);
+    });
 }

@@ -22,6 +22,7 @@ export class LeccionService {
         method: 'POST',
         body: JSON.stringify(data)
     });
+  }
 
   // Si tienes endpoints para contenido multimedia, ajusta aquí también
   static async addContenido(leccionId, contenidoData) {
