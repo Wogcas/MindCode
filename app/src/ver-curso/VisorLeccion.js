@@ -1,6 +1,6 @@
 // Vista del Player de Lección con sidebar a la DERECHA
 import { cursosDetalles } from '../data/mockData.js';
-import { navigateTo } from '../utils/router-estudiante.js';
+//import { navigateTo } from '../utils/router-estudiante.js';
 import './componentes/SidebarLecciones.js';
 import './componentes/AreaContenido.js';
 

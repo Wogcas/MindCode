@@ -1,120 +1,82 @@
-import "./componentes/perfilFoto.js";
-import "./componentes/perfilCampoTexto.js";
-import "./componentes/perfilCampoParrafo.js";
-import "./componentes/iconoEditar.js";
-import "./componentes/iconoPassword.js";
-
-
 class EditarPerfil extends HTMLElement {
+    connectedCallback() {
+        // Obtenemos datos del usuario o usamos valores por defecto seguros
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{"nombre": "Estudiante", "email": "estudiante@mindcode.com", "ubicacion": "Ciudad Obregón, Sonora"}');
+        
+        this.innerHTML = `
+            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+                
+                <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                    <h2 class="text-2xl font-bold text-gray-800">Mi Perfil</h2>
+                    <p class="text-sm text-gray-500 mt-1">Administra tu información personal</p>
+                </div>
 
-  connectedCallback() {
-    this.tipo = this.getAttribute("tipo") || "alumno";
-    this.modoEdicion = false;
-    this.cargarDatos();
-    this.render();
-    this.init();
-  }
+                <div class="p-8 space-y-8">
+                    
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                        <div class="relative w-28 h-28 group cursor-pointer">
+                            <div class="w-full h-full rounded-full bg-gray-200 border-4 border-white shadow-md flex items-center justify-center overflow-hidden text-gray-400">
+                                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
+                            
+                            <div class="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary-600 transition-colors border-2 border-white">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                        </div>
 
-  cargarDatos() {
-    this.datos = this.tipo === "maestro"
-      ? {
-          nombre: "Antonio Nuevo Leon",
-          correo: "antonio@mindcode.com",
-          ubicacion: "Sonora, México",
-          perfil: "Mentor apasionado por enseñar programación."
-        }
-      : {
-          nombre: "Josefino Huerta Cabrera",
-          correo: "josefino@mindcode.com",
-          ubicacion: "Sonora, México",
-          perfil: "Estudiante interesado en desarrollo web."
-        };
-  }
+                        <div class="text-center sm:text-left">
+                            <h3 class="text-lg font-semibold text-gray-900">Foto de perfil</h3>
+                            <p class="text-sm text-gray-500 mb-3">Esta imagen será visible para tus instructores.</p>
+                            <button class="text-primary-600 hover:text-primary-700 text-sm font-medium hover:underline transition-colors">
+                                Subir nueva imagen
+                            </button>
+                        </div>
+                    </div>
 
-  render() {
-    const ed = this.modoEdicion ? "true" : "false";
+                    <div class="grid grid-cols-1 gap-6">
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                            <input type="text" value="${usuario.nombre}" 
+                                   class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                        </div>
 
-    this.innerHTML = `
-      <div class="min-h-screen px-6 py-10 sm:px-20 font-sans bg-white">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                            <input type="email" value="${usuario.email}" disabled
+                                   class="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed">
+                        </div>
 
-        <h1 class="text-3xl font-light text-black mb-10">Editar Perfil</h1>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+                            <input type="text" value="${usuario.ubicacion || ''}" 
+                                   class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                        </div>
 
-        <div class="flex flex-col md:flex-row gap-10">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sobre mí</label>
+                            <textarea rows="4" 
+                                      class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none">Estudiante apasionado por la tecnología y el desarrollo web.</textarea>
+                        </div>
 
-          <perfil-foto tipo="${this.tipo}"></perfil-foto>
+                    </div>
 
-          <div class="space-y-6">
+                    <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-100">
+                        <button class="px-6 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium text-sm">
+                            Cancelar
+                        </button>
+                        <button class="px-6 py-2.5 bg-primary text-white rounded-lg shadow-sm hover:bg-primary-600 transition-colors font-medium text-sm">
+                            Guardar Cambios
+                        </button>
+                    </div>
 
-            <perfil-campo-texto label="Nombre" valor="${this.datos.nombre}" editable="${ed}"></perfil-campo-texto>
-            <perfil-campo-texto label="Correo" valor="${this.datos.correo}" editable="${ed}"></perfil-campo-texto>
-            <perfil-campo-texto label="Ubicación" valor="${this.datos.ubicacion}" editable="${ed}"></perfil-campo-texto>
-
-            <div>
-  <p class="text-sm text-gray-700 mb-1">Contraseña</p>
-
-  <div class="flex items-center gap-2 bg-[#F5F7FA] rounded-lg px-3 py-2 w-fit">
-    <input id="passInput"
-           type="password"
-           value="*************"
-           class="bg-transparent outline-none text-gray-900" disabled>
-
-    <icono-password id="togglePass"></icono-password>
-  </div>
-</div>
-
-            <perfil-campo-parrafo label="Perfil" valor="${this.datos.perfil}" editable="${ed}"></perfil-campo-parrafo>
-
-          </div>
-        </div>
-
-        <!-- Botón de edición flotante -->
-        <button id="btnEdit"
-          class="fixed bottom-10 right-10 bg-[#2A6BBF] text-white rounded-full shadow-lg p-4">
-          <icono-editar></icono-editar>
-        </button>
-      </div>`;
-  }
-
-  init() {
-    this.querySelector("#btnEdit").addEventListener("click", () => {
-      if (!this.modoEdicion) {
-        this.modoEdicion = true;
-        this.render();
-        this.init();
-      } else {
-        this.guardarCambios();
-      }
-    });
-  }
-
-  guardarCambios() {
-    const campos = this.querySelectorAll("perfil-campo-texto input");
-    const perfilTxt = this.querySelector("perfil-campo-parrafo textarea");
-
-    this.datos.nombre = campos[0].value;
-    this.datos.correo = campos[1].value;
-    this.datos.ubicacion = campos[2].value;
-    this.datos.perfil = perfilTxt.value;
-
-    // Bloquear edición otra vez
-    this.modoEdicion = false;
-
-    this.mostrarToast("¡Perfil actualizado correctamente!");
-    this.render();
-    this.init();
-  }
-
-  mostrarToast(msg) {
-    const div = document.createElement("div");
-    div.className = `
-      fixed bottom-5 left-1/2 -translate-x-1/2 bg-[#2A6BBF]
-      text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in
-    `;
-    div.textContent = msg;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 2000);
-  }
+                </div>
+            </div>
+        `;
+    }
 }
 
-customElements.define("editar-perfil", EditarPerfil);
+customElements.define('editar-perfil', EditarPerfil);
 export default EditarPerfil;

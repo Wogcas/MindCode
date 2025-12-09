@@ -1,71 +1,84 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCode - Plataforma de Aprendizaje</title>
+    <title>MindCode - Estudiante</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../../assets/styles.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: {
-                            DEFAULT: '#64A85F',
-                            50: '#E8F5E6',
-                            100: '#D1EBC9',
-                            200: '#A3D894',
-                            300: '#8BCE7F',
-                            400: '#73C169',
-                            500: '#64A85F',
-                            600: '#508A4C',
-                            700: '#3C6739',
-                            800: '#284426',
-                            900: '#142213',
-                        }
-                    },
-                    fontFamily: {
-                        Colmeak: ['Colmeak', 'sans-serif'],
-                        sans: ['Quicksand', 'system-ui', 'sans-serif'],
-                    }
+                    colors: { primary: { DEFAULT: '#64A85F', 600: '#508A4C' } },
+                    fontFamily: { Colmeak: ['Colmeak', 'sans-serif'], sans: ['Quicksand', 'sans-serif'] }
                 }
             }
         }
     </script>
 </head>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-<body class="font-sans bg-gray-50">
-    <!-- Header -->
-    <app-header></app-header>
-
-    <!-- Contenedor principal para el router -->
-    <div id="app-root">
-        <!-- Las vistas se cargarán aquí dinámicamente -->
+    <div class="sticky top-0 z-50 w-full">
+        <app-header></app-header>
     </div>
 
-    <!-- Importar componentes -->
-    <script type="module" src="../componentes/header.js"></script>
-    <script type="module" src="../componentes/Pagina404.js"></script>
-    
-    <!-- Componentes UI base -->
-    <script type="module" src="../componentes/ui/ProgressBar.js"></script>
-    <script type="module" src="../componentes/ui/LessonCard.js"></script>
-    <script type="module" src="../componentes/ui/QuizOption.js"></script>
-    <script type="module" src="../componentes/ui/VideoPlayer.js"></script>
-    
-    <!-- Vistas principales -->
-    <script type="module" src="../dashboard/dashboardAlumno.js"></script>
-    <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
-    <script type="module" src="../mis-cursos/componentes/CursoCardAlumno.js"></script>
-    <script type="module" src="../ver-curso/VisorLeccion.js"></script>
-    <script type="module" src="../ver-curso/componentes/SidebarLecciones.js"></script>
-    <script type="module" src="../ver-curso/componentes/AreaContenido.js"></script>
-    <script type="module" src="../ver-curso/VistaReto.js"></script>
-    
-    <!-- Router -->
-    <script type="module" src="../utils/router-estudiante.js"></script>
-</body>
+    <div id="vista" class="min-h-screen pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-0">
+        <div class="flex justify-center items-center h-64">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+    </div>
 
+    <script type="module">
+        import '../componentes/header.js';
+        
+        // Importamos tus vistas
+        import '../perfil/editarPerfil.js'; 
+        import '../dashboard/dashboardAlumno.js';
+        import '../mis-cursos/MisCursosAlumno.js';
+
+        // Referencia al contenedor (Ahora sí coincide el ID)
+        const root = document.getElementById("vista");
+        
+        function render() {
+            const params = new URLSearchParams(window.location.search);
+            const vista = params.get("vista") || "dashboardAlumno"; 
+            const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+            console.log("Cargando vista:", vista);
+
+            // Limpiamos contenido previo
+            root.innerHTML = '';
+
+            switch (vista) {
+                case "perfil":
+                    root.innerHTML = "<editar-perfil></editar-perfil>";
+                    break;
+                
+                case "dashboardAlumno":
+                case "dashboard": 
+                    root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+                    break;
+
+                case "cursosAlumno":
+                    root.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
+                    break;
+                
+                case "explorar":
+                    root.innerHTML = "<div class='text-center mt-20 text-gray-500'>Sección Explorar (En construcción)</div>";
+                    break;
+
+                default:
+                    // Si no reconoce la vista, manda al dashboard
+                    root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+            }
+        }
+
+        // Detectar cambios en la navegación (atrás/adelante)
+        window.addEventListener('popstate', render);
+        
+        // Carga inicial
+        render();
+    </script>
+</body>
 </html>
