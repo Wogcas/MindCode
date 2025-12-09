@@ -22,8 +22,8 @@ export async function loadDetalleCurso(cursoId) {
 
   try {
     const [cursoResponse, lecciones] = await Promise.all([
-        cursoService.fetchCourseById(cursoId),
-        LeccionService.getByCursoId(cursoId)
+      cursoService.fetchCourseById(cursoId),
+      LeccionService.getByCursoId(cursoId)
     ]);
 
     const curso = cursoResponse.curso || cursoResponse;
@@ -63,32 +63,32 @@ export async function loadDetalleCurso(cursoId) {
 
     // Lógica Volver (Recargamos para volver al dashboard por defecto)
     document.getElementById('btn-volver').addEventListener('click', () => {
-        location.reload(); 
+      location.reload();
     });
 
     // Lógica Nueva Lección
     document.getElementById('btn-nueva-leccion').addEventListener('click', () => {
-        renderModalCrearLeccion(cursoId, () => {
-            loadDetalleCurso(cursoId);
-        });
+      renderModalCrearLeccion(cursoId, () => {
+        loadDetalleCurso(cursoId);
+      });
     });
 
     // Renderizado de Lista
     const contenedor = document.getElementById('contenedor-lecciones');
-    
+
     if (lecciones.length === 0) {
-        contenedor.innerHTML = `
+      contenedor.innerHTML = `
             <div class="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                 <p class="text-gray-500 text-lg mb-2">Este curso aún no tiene lecciones.</p>
                 <p class="text-gray-400 text-sm">Usa el botón "Nueva Lección" para comenzar.</p>
             </div>
         `;
     } else {
-        lecciones.forEach((leccion, index) => {
-            const card = document.createElement('div');
-            card.className = "bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer flex justify-between items-center group";
-            
-            card.innerHTML = `
+      lecciones.forEach((leccion, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer flex justify-between items-center group";
+
+        card.innerHTML = `
                 <div class="flex items-center gap-4">
                     <div class="bg-purple-100 text-purple-700 w-10 h-10 rounded-full flex items-center justify-center font-bold">
                         ${index + 1}
@@ -103,12 +103,12 @@ export async function loadDetalleCurso(cursoId) {
                 </div>
             `;
 
-            card.addEventListener('click', () => {
-                loadVistaLeccion(cursoId, leccion._id || leccion.id);
-            });
-
-            contenedor.appendChild(card);
+        card.addEventListener('click', () => {
+          loadVistaLeccion(cursoId, leccion._id || leccion.id);
         });
+
+        contenedor.appendChild(card);
+      });
     }
 
   } catch (error) {
