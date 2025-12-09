@@ -46,7 +46,7 @@
     <!-- Headers -->
     <script type="module" src="../componentes/header.js"></script>
     <script type="module" src="../componentes/Pagina404.js"></script>
-    
+
     <!-- Componentes UI reutilizables -->
     <script type="module" src="../componentes/ui/ProgressBar.js"></script>
     <script type="module" src="../componentes/ui/LessonCard.js"></script>
@@ -83,60 +83,86 @@
     <!-- API Services -->
     <script type="module" src="../api/CursoService.js"></script>
 
-    <script>
-        
-        // Cargar header unificado
-        const headerRoot = document.getElementById("header");
-        headerRoot.innerHTML = "<app-header></app-header>";
 
-        // Router SPA
-        const params = new URLSearchParams(location.search);
+
+    <script type="module">
+        // Verificación rápida: Si no hay usuario, mandar al login
+        if (!localStorage.getItem("usuario")) {
+            window.location.href = "../login/index.html";
+        }
+    </script>
+
+    <script type="module">
+        import Header from '../componentes/header.js';
+
+        // 1. Inyectar Header
+        // (Como ya es un web component en el código que me pasaste antes, esto es automático si está importado)
+        // Solo asegúrate de tener <app-header></app-header> en el body o inyectarlo así:
+        const headerDiv = document.getElementById("header");
+        if (headerDiv && !headerDiv.querySelector('app-header')) {
+            headerDiv.innerHTML = "<app-header></app-header>";
+        }
+
+        // 2. Lógica de Navegación (El Router)
+        const root = document.getElementById("vista"); // OJO: Tu div debe tener id="vista"
+        const params = new URLSearchParams(window.location.search);
         const vista = params.get("vista");
-        const tipo = params.get("tipo");
-        const accion = params.get("accion");
+        const usuario = JSON.parse(localStorage.getItem("usuario") || '{}');
 
-        const root = document.getElementById("vista");
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
-        /**
+        console.log("Navegando a:", vista); // Esto te ayudará a ver en consola si detecta el cambio
+
         switch (vista) {
-            case "retos":
-                if (tipo === "codigo") root.innerHTML = "<reto-codigo></reto-codigo>";
-                else if (tipo === "multiple") root.innerHTML = "<reto-multiple></reto-multiple>";
-                else if (tipo === "abierto") root.innerHTML = "<reto-abierto></reto-abierto>";
-                else root.innerHTML = "<crear-reto-menu></crear-reto-menu>";
-                break;
-
-            case "cursos":
-                root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
-                break;
-
-            case "cursosAlumno":
-                root.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
-                break;
-
-            case "unirseACurso":
-                root.innerHTML = "<unirse-a-curso></unirse-a-curso>";
-                break;
-
-            case "perfil":
-                root.innerHTML = `<editar-perfil tipo="${usuario?.tipo}"></editar-perfil>`;
-                break;
-
-            case "dashboardAlumno":
-                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-                break;
-
+            // --- RUTAS DE MAESTRO ---
             case "dashboardMaestro":
                 root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
                 break;
 
+            case "cursos": // href="?vista=cursos"
+                // Asegúrate que MisCursosMaestro.js tenga: customElements.define('mis-cursos-maestro', ...)
+                root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
+                break;
+
+            case "crear-curso":
+                root.innerHTML = "<crear-curso></crear-curso>";
+                break;
+
+            case "retos": // href="?vista=retos"
+                // Si aun no tienes componente de lista, pon un texto temporal para probar
+                root.innerHTML = "<h1 class='text-2xl p-4'>Aquí va la lista de retos</h1>";
+                // Cuando lo tengas: root.innerHTML = "<lista-retos-maestro></lista-retos-maestro>";
+                break;
+
+            // --- RUTAS DE ALUMNO ---
+            case "dashboardAlumno":
+                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+                break;
+
+            case "cursosAlumno": // href="?vista=cursosAlumno"
+                root.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
+                break;
+
+            case "explorar": // href="?vista=explorar"
+                // Revisa si usas unirseACurso.js u otro
+                root.innerHTML = "<unirse-a-curso></unirse-a-curso>";
+                break;
+
+            // --- COMUNES ---
+            case "perfil":
+                root.innerHTML = `<editar-perfil tipo="${usuario.tipo}"></editar-perfil>`;
+                break;
+
+            // --- DEFAULT (INICIO) ---
             default:
-                if (usuario?.tipo === "Maestro")
+                // Si no hay ?vista=... cargamos el dashboard correspondiente
+                if (usuario.tipo === "Maestro") {
                     root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
-                else
+                } else {
                     root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-        }*/
+                }
+                break;
+        }
     </script>
+
 </body>
 
 </html>

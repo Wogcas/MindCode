@@ -18,7 +18,7 @@ class CursoCarrousel extends HTMLElement {
     try {
       this.loading = true;
       const resultado = await cursoService.fetchAvailableCourses({ limit: 10 });
-      
+
       if (resultado.success) {
         this.cursos = resultado.cursos;
       }
@@ -82,7 +82,15 @@ class CursoCarrousel extends HTMLElement {
   }
 
   initDragScroll() {
-    const slider = this.querySelector('#slider');
+
+    const slider = this.querySelector('.curso-slider-container');
+
+    if (!slider) {
+      console.log("No hay cursos para hacer scroll todavía.");
+      return; // ¡Si no existe el slider, se detiene aquí y no da error!
+    }
+
+
     let isDown = false;
     let isDragging = false;
     let startX;
@@ -106,7 +114,7 @@ class CursoCarrousel extends HTMLElement {
     slider.addEventListener('mouseup', (e) => {
       isDown = false;
       slider.classList.remove('cursor-grabbing');
-      
+
       if (isDragging) {
         e.preventDefault();
         e.stopPropagation();
@@ -120,7 +128,7 @@ class CursoCarrousel extends HTMLElement {
 
       const x = e.pageX - slider.offsetLeft;
       const walk = x - startX;
-      
+
       if (Math.abs(walk) > 5) {
         isDragging = true;
         slider.classList.add('cursor-grabbing');
