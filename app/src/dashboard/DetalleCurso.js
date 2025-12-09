@@ -5,10 +5,10 @@ import { loadVistaLeccion } from './VistaLeccion.js';
 
 export async function loadDetalleCurso(cursoId) {
   // CAMBIO CLAVE: Ahora buscamos 'vista', que es el ID que usa tu Shell
-  const mainContent = document.getElementById('vista') || document.getElementById('app-root');
+  const mainContent = document.getElementById('vista');
 
   if (!mainContent) {
-    console.error("Error: No se encontró el contenedor principal 'vista'.");
+    console.error("Error: No se encontró el contenedor 'vista'");
     return;
   }
 

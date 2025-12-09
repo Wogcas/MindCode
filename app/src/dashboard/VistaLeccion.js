@@ -2,7 +2,7 @@ import { loadDetalleCurso } from './DetalleCurso.js';
 
 export function loadVistaLeccion(cursoId, leccionId) {
     // CAMBIO CLAVE: Buscamos 'vista'
-    const mainContent = document.getElementById('vista') || document.getElementById('app-root');
+    const mainContent = document.getElementById('vista');
     
     if (!mainContent) return;
 

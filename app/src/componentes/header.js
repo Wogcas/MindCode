@@ -5,6 +5,9 @@ class AppHeader extends HTMLElement {
     const esMaestro = usuario?.tipo === 'Maestro';
     const esAlumno = usuario?.tipo === 'Alumno';
     
+    this.style.display = "block";
+    this.style.height = "64px";
+
     this.innerHTML = `
       <header class="bg-white shadow-sm sticky top-0 z-50 font-sans">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">

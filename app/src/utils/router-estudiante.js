@@ -14,7 +14,7 @@ class Router {
   }
 
   init() {
-    this.rootElement = document.getElementById('app-root');
+    this.rootElement = document.getElementById('vista');
     
     if (!this.rootElement) {
       console.error('Element with id "app-root" not found');

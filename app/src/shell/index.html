@@ -84,6 +84,7 @@
     <script type="module" src="../api/CursoService.js"></script>
 
     <script>
+        
         // Cargar header unificado
         const headerRoot = document.getElementById("header");
         headerRoot.innerHTML = "<app-header></app-header>";
@@ -96,7 +97,7 @@
 
         const root = document.getElementById("vista");
         const usuario = JSON.parse(localStorage.getItem("usuario"));
-
+        /**
         switch (vista) {
             case "retos":
                 if (tipo === "codigo") root.innerHTML = "<reto-codigo></reto-codigo>";
@@ -134,7 +135,7 @@
                     root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
                 else
                     root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-        }
+        }*/
     </script>
 </body>
 
