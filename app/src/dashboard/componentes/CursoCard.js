@@ -35,9 +35,31 @@ class CursoCard extends HTMLElement {
 
   setupClickHandler(cursoId) {
     const card = this.querySelector('.curso-card-container');
+    
     if (card && cursoId) {
-      card.addEventListener('click', () => {
-        window.location.href = `?vista=unirseACurso&id=${cursoId}`;
+      card.addEventListener('click', async (e) => {
+        e.preventDefault(); // Evita comportamientos por defecto
+        
+        // 1. Efecto visual de carga (opcional)
+        card.style.opacity = "0.7"; 
+        card.style.cursor = "wait";
+
+        try {
+          // 2. Importamos dinámicamente la función para evitar errores de dependencia circular
+          // ASEGÚRATE DE QUE LA RUTA SEA CORRECTA (ej: subir un nivel con ../)
+          const module = await import('../DetalleCurso.js'); 
+          
+          // 3. Ejecutamos la función que carga la vista de detalle
+          module.loadDetalleCurso(cursoId);
+          
+        } catch (error) {
+          console.error("Error al cargar el detalle del curso:", error);
+          alert("No se pudo cargar el detalle del curso.");
+        } finally {
+          // Restaurar estilos
+          card.style.opacity = "1";
+          card.style.cursor = "pointer";
+        }
       });
     }
   }

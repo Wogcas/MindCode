@@ -1,5 +1,6 @@
 import './componentes/CursoCardDatos.js'
 import '../crear-curso/CrearCurso.js'
+import '../../dashboard/componentes/CursoCard.js';
 import { cursoService } from '../api/CursoService.js';
 
 class MisCursosMaestro extends HTMLElement {
@@ -22,7 +23,7 @@ class MisCursosMaestro extends HTMLElement {
             this.mostrarEstadoCarga();
 
             const resultado = await cursoService.fetchTeacherCourses();
-            
+
             if (resultado.success) {
                 this.cursos = resultado.cursos;
                 this.error = null;
@@ -148,16 +149,19 @@ class MisCursosMaestro extends HTMLElement {
                 month: '2-digit',
                 year: '2-digit'
             }) : 'N/A';
+            
+            const imagenSegura = (curso.imagen && curso.imagen.startsWith('http'))
+                ? curso.imagen
+                : 'https://via.placeholder.com/400x250?text=Curso';
 
             return `
-                <curso-card-datos 
-                    titulo="${curso.titulo || 'Sin título'}" 
-                    imagen="${curso.imagen || 'https://via.placeholder.com/400x250?text=Curso'}"
-                    participantes="${curso.participantes || 0}"
-                    estado="${curso.visibilidad || 'Privado'}"
-                    fechaPublicacion="${fechaFormateada}"
-                    cursoId="${curso.id}"
-                ></curso-card-datos>
+                <curso-card 
+                title="${curso.titulo || 'Sin título'}" 
+                image="${imagenSegura}"  <-- USA LA VARIABLE SEGURA AQUÍ
+                type="general"
+                visibilidad="${curso.visibilidad || 'Privado'}"
+                cursoId="${curso.id}"
+                ></curso-card>
             `;
         }).join('');
     }
