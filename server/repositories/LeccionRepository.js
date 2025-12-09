@@ -24,7 +24,7 @@ export default class LeccionRepository {
     }
 
     async obtenerLeccionesPorCurso(idCurso) {
-        return await Leccion.find({ curso: idCurso });
+        return await Leccion.find({ id_curso: idCurso });
     }
 
     async actualizarLeccion(idLeccion, leccionModificada) {

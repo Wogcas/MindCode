@@ -19,7 +19,7 @@ export default class LeccionService {
     }
     
     async obtenerLeccionesPorCurso(idCurso) {
-        return await this.leccionRepo.obtenerLeccionesPorCurso({ curso: idCurso });
+        return await this.leccionRepo.obtenerLeccionesPorCurso(idCurso);
     }
 
     async obtenerLeccionPorTitulo(tituloLeccion) {

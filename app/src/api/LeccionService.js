@@ -2,35 +2,37 @@ import { client } from './apiClient.js';
 
 export class LeccionService {
   
-  // Obtener lecciones (Tu backend parece usar /lecciones/curso/:id)
+  // 1. Obtener lecciones por curso
   static async getByCursoId(cursoId) {
     try {
-      // Pide al backend: GET /api/lecciones/curso/123
-      const response = await client.request(`/lecciones/curso/${cursoId}`, { method: 'GET' });
-      return response.data || [];
+      // Esta ruta coincide con tu 'LeccionRoute.js' -> router.get('/curso/:id_curso', ...)
+      const response = await client.request(`/lecciones/curso/${cursoId}`, { 
+          method: 'GET' 
+      });
+      
+      console.log("Lecciones obtenidas:", response);
+      // Tu backend parece devolver la respuesta directa o dentro de un objeto data.
+      // Esto maneja ambos casos para prevenir errores.
+      if (Array.isArray(response)) return response;
+      if (response.data && Array.isArray(response.data)) return response.data;
+      if (response.lecciones && Array.isArray(response.lecciones)) return response.lecciones;
+      
+      return [];
     } catch (error) {
-      // Si no hay lecciones, tu backend podría devolver 404, lo manejamos limpio
+      console.error("Error fetching lecciones:", error);
+      // Si no hay lecciones (404), devolvemos array vacío
       if (error.status === 404) return [];
       throw error;
     }
   }
 
-  // 2. Crear lección (Usa tu ruta existente POST /agregar)
+  // 2. Crear lección
   static async create(data) {
-    // Pide al backend: POST /api/lecciones/agregar
+    // Aseguramos que los nombres de los campos coincidan con lo que espera tu 'LeccionController.js'
+    // Tu backend espera: { id_curso, titulo, descripcion, ... }
     return await client.request('/lecciones/agregar', {
         method: 'POST',
         body: JSON.stringify(data)
-    });
-  }
-
-  // Si tienes endpoints para contenido multimedia, ajusta aquí también
-  static async addContenido(leccionId, contenidoData) {
-     // Verifica en tu LeccionRoute.js cómo se llama esta ruta
-     // Por ahora asumimos una estructura estándar:
-    return await client.request(`/lecciones/${leccionId}/contenido`, {
-        method: 'POST',
-        body: JSON.stringify(contenidoData)
     });
   }
 }
