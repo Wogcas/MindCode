@@ -149,14 +149,11 @@ class MisCursosMaestro extends HTMLElement {
                 year: '2-digit'
             }) : 'N/A';
             
-            const imagenSegura = (curso.imagen && curso.imagen.startsWith('http'))
-                ? curso.imagen
-                : 'https://via.placeholder.com/400x250?text=Curso';
 
             return `
                 <curso-card 
                 title="${curso.titulo || 'Sin título'}" 
-                image="${imagenSegura}"  <-- USA LA VARIABLE SEGURA AQUÍ
+                image="${curso.imagen}"  <-- USA LA VARIABLE SEGURA AQUÍ
                 type="general"
                 visibilidad="${curso.visibilidad || 'Privado'}"
                 cursoId="${curso.id}"
