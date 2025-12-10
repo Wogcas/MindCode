@@ -36,6 +36,7 @@
         import '../perfil/editarPerfil.js'; 
         import '../dashboard/dashboardAlumno.js';
         import '../mis-cursos/MisCursosAlumno.js';
+        import '../unirse-cursos/unirseACurso.js';
 
         // Referencia al contenedor (Ahora sí coincide el ID)
         const root = document.getElementById("vista");
@@ -62,6 +63,11 @@
 
                 case "cursosAlumno":
                     root.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
+                    break;
+                
+                case "unirseACurso":
+                    const cursoId = params.get("id");
+                    root.innerHTML = `<unirse-a-curso cursoId="${cursoId || ''}"></unirse-a-curso>`;
                     break;
                 
                 case "explorar":

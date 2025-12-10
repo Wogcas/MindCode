@@ -56,10 +56,13 @@ class VisorLeccion extends HTMLElement {
     }
 
     renderLayout() {
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        const vistaVolver = usuario.tipo === 'Maestro' ? 'dashboardMaestro' : 'cursosAlumno';
+        
         this.innerHTML = `
         <div class="font-sans min-h-screen bg-gray-100 pb-10">
             <div class="bg-white border-b px-6 py-4 flex items-center gap-4 sticky top-0 z-20 shadow-sm">
-                <button onclick="window.history.back()" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition">
+                <button id="btn-volver" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </button>
                 <div>
@@ -126,6 +129,16 @@ class VisorLeccion extends HTMLElement {
     }
 
     setupListeners() {
+        // Botón de volver
+        const btnVolver = this.querySelector('#btn-volver');
+        if (btnVolver) {
+            btnVolver.addEventListener('click', () => {
+                const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+                const vistaVolver = usuario.tipo === 'Maestro' ? 'dashboardMaestro' : 'cursosAlumno';
+                window.location.href = `?vista=${vistaVolver}`;
+            });
+        }
+
         this.querySelector('#btn-ver-video').addEventListener('click', () => this.cargarVideo());
 
         this.querySelectorAll('.btn-reto').forEach(btn => {

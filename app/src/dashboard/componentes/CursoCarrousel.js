@@ -6,27 +6,47 @@ class CursoCarrousel extends HTMLElement {
     super();
     this.cursos = [];
     this.loading = true;
+    this.tipo = 'maestro'; // Por defecto maestro
   }
 
-  async connectedCallback() {
-    await this.cargarCursosPublicos();
-    this.render();
-    this.initDragScroll();
+  connectedCallback() {
+    // Verificar si se pasaron cursos como atributo (modo alumno)
+    const cursosAttr = this.getAttribute('cursos');
+    if (cursosAttr) {
+      try {
+        this.cursos = JSON.parse(cursosAttr);
+        this.tipo = 'alumno';
+        this.loading = false;
+      } catch (e) {
+        console.error('Error parsing cursos:', e);
+        this.cursos = [];
+        this.loading = false;
+      }
+      this.render();
+      this.initDragScroll();
+    } else {
+      // Modo maestro: cargar cursos del maestro
+      this.cargarCursosMaestro();
+    }
   }
 
-  async cargarCursosPublicos() {
+  async cargarCursosMaestro() {
     try {
       this.loading = true;
-      const resultado = await cursoService.fetchAvailableCourses({ limit: 10 });
-
+      this.render(); // Mostrar loading
+      
+      const resultado = await cursoService.fetchTeacherCourses();
+      
       if (resultado.success) {
-        this.cursos = resultado.cursos;
+        this.cursos = resultado.cursos || [];
       }
     } catch (error) {
-      console.error('Error al cargar cursos disponibles:', error);
+      console.error('Error al cargar cursos del maestro:', error);
       this.cursos = [];
     } finally {
       this.loading = false;
+      this.render();
+      this.initDragScroll();
     }
   }
 
@@ -48,25 +68,33 @@ class CursoCarrousel extends HTMLElement {
       this.innerHTML = `
         <div class="mb-8">
           <div class="flex items-center justify-center py-10 bg-gray-100 rounded-2xl">
-            <p class="text-gray-500">No hay cursos disponibles en este momento</p>
+            <p class="text-gray-500">${this.tipo === 'alumno' ? 'No tienes cursos inscritos todavía' : 'No hay cursos disponibles en este momento'}</p>
           </div>
         </div>
       `;
       return;
     }
 
+    const esAlumno = this.tipo === 'alumno';
+
     this.innerHTML = `
       <div class="mb-8">
         <div id="slider" class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide cursor-grab select-none">
-          ${this.cursos.map(curso => `
-            <curso-card
-              title="${curso.titulo || 'Sin título'}"
-              image="${curso.imagen || 'https://via.placeholder.com/400x300?text=Curso'}"
-              cursoId="${curso.id}"
-              visibilidad="${curso.visibilidad || 'Privado'}"
-              type="general">
-            </curso-card>
-          `).join('')}
+          ${this.cursos.map(curso => {
+            const cursoId = curso.id || curso._id;
+            const progreso = esAlumno ? (curso.progreso?.porcentaje || 0) : 0;
+            const visibilidad = curso.visibilidad || 'Público';
+            
+            return `
+              <curso-card
+                title="${curso.titulo || 'Sin título'}"
+                image="${curso.imagen || 'https://via.placeholder.com/400x300?text=Curso'}"
+                cursoId="${cursoId}"
+                visibilidad="${visibilidad}"
+                ${esAlumno ? `progreso="${progreso}" type="alumno"` : 'type="maestro"'}>
+              </curso-card>
+            `;
+          }).join('')}
         </div>
       </div>
       
@@ -82,14 +110,11 @@ class CursoCarrousel extends HTMLElement {
   }
 
   initDragScroll() {
-
-    const slider = this.querySelector('.curso-slider-container');
+    const slider = this.querySelector('#slider');
 
     if (!slider) {
-      console.log("No hay cursos para hacer scroll todavía.");
-      return; // ¡Si no existe el slider, se detiene aquí y no da error!
+      return;
     }
-
 
     let isDown = false;
     let isDragging = false;

@@ -35,6 +35,9 @@
     
     <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
     <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
+    
+    <script type="module" src="../perfil/editarPerfil.js"></script>
+    <script type="module" src="../unirse-cursos/unirseACurso.js"></script>
 
     <script type="module" src="../ver-curso/VisorLeccion.js"></script>
     <script type="module" src="../utils/router.js"></script>
@@ -44,25 +47,73 @@
         // Este script solo corre una vez al cargar la página
         
         const usuario = JSON.parse(localStorage.getItem("usuario") || 'null');
+        const mainContent = document.getElementById('vista');
         
         // A. Protección: Si no hay usuario, mandar al login
         if (!usuario && !window.location.href.includes('login')) {
              window.location.href = "../login/index.html";
         }
 
-        // B. Redirección Inicial (Si la URL está vacía)
-        // Si no hay hash (ej: index.html a secas), decidimos a dónde ir
-        if (!window.location.hash || window.location.hash === '#/') {
+        // B. Sistema de vistas con ?vista=
+        function render() {
+            const params = new URLSearchParams(window.location.search);
+            const vista = params.get("vista");
             
-            if (usuario.tipo === "Maestro") {
-                // Cambiamos el hash, el Router detectará esto y cargará el componente
-                window.location.hash = "/dashboard-maestro";
-            } else {
-                window.location.hash = "/dashboard-alumno";
+            // Si hay parámetro vista, usarlo
+            if (vista) {
+                console.log("Cargando vista:", vista);
+                mainContent.innerHTML = '';
+                
+                switch (vista) {
+                    case "dashboardMaestro":
+                        mainContent.innerHTML = "<dashboard-maestro></dashboard-maestro>";
+                        break;
+                    
+                    case "dashboardAlumno":
+                        mainContent.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+                        break;
+                    
+                    case "cursosMaestro":
+                        mainContent.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
+                        break;
+                    
+                    case "cursosAlumno":
+                        mainContent.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
+                        break;
+                    
+                    case "perfil":
+                        mainContent.innerHTML = "<editar-perfil></editar-perfil>";
+                        break;
+                    
+                    case "unirseACurso":
+                        const cursoId = params.get("id");
+                        mainContent.innerHTML = `<unirse-a-curso cursoId="${cursoId || ''}"></unirse-a-curso>`;
+                        break;
+                    
+                    default:
+                        // Vista no reconocida, ir al dashboard según tipo
+                        const dashboardVista = usuario.tipo === "Maestro" ? "dashboardMaestro" : "dashboardAlumno";
+                        window.location.href = `?vista=${dashboardVista}`;
+                }
+                return;
             }
+            
+            // C. Si no hay parámetro vista, verificar hash routing para compatibilidad
+            if (window.location.hash && window.location.hash !== '#/') {
+                // Dejar que el router de hash maneje esto
+                return;
+            }
+            
+            // D. Si no hay ni vista ni hash, ir al dashboard por defecto
+            const dashboardVista = usuario.tipo === "Maestro" ? "dashboardMaestro" : "dashboardAlumno";
+            window.location.href = `?vista=${dashboardVista}`;
         }
         
-        // Si ya hay un hash (ej: #/leccion/...), el Router lo manejará solo.
+        // Detectar cambios en navegación
+        window.addEventListener('popstate', render);
+        
+        // Carga inicial
+        render();
     </script>
 
 </body>

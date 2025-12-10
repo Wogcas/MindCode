@@ -37,6 +37,13 @@ class Router {
   handleRoute() {
     if (!this.rootElement) return;
 
+    // IMPORTANTE: Si hay parámetro ?vista=, NO usar hash routing
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('vista')) {
+      console.log('Sistema de vistas activo, router hash desactivado');
+      return; // Dejar que el sistema de vistas maneje la navegación
+    }
+
     const hash = window.location.hash.slice(1) || '/';
 
 

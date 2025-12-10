@@ -1,5 +1,5 @@
 import '../crear-curso/CrearCurso.js'
-import '../dashboard/componentes/CursoCard.js';
+import './componentes/CursoCardDatos.js';
 import { cursoService } from '../api/CursoService.js';
 
 class MisCursosMaestro extends HTMLElement {
@@ -79,7 +79,7 @@ class MisCursosMaestro extends HTMLElement {
 
     render() {
         this.innerHTML = `
-        <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
+        <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 font-sans">
             
             <!-- Encabezado de la Sección -->
             <div class="flex justify-between items-end mb-10">
@@ -149,15 +149,18 @@ class MisCursosMaestro extends HTMLElement {
                 year: '2-digit'
             }) : 'N/A';
             
+            const cursoId = curso.id || curso._id;
+            const participantes = curso.participantes || 0;
 
             return `
-                <curso-card 
-                title="${curso.titulo || 'Sin título'}" 
-                image="${curso.imagen}"  <-- USA LA VARIABLE SEGURA AQUÍ
-                type="general"
-                visibilidad="${curso.visibilidad || 'Privado'}"
-                cursoId="${curso.id}"
-                ></curso-card>
+                <curso-card-datos 
+                    titulo="${curso.titulo || 'Sin título'}" 
+                    imagen="${curso.imagen || 'https://via.placeholder.com/400x300?text=Curso'}"
+                    participantes="${participantes}"
+                    estado="${curso.visibilidad || 'Privado'}"
+                    fechaPublicacion="${fechaFormateada}"
+                    cursoId="${cursoId}">
+                </curso-card-datos>
             `;
         }).join('');
     }

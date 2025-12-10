@@ -30,10 +30,10 @@ class SugerenciasCard extends HTMLElement {
              
              <div class="w-full flex sm:justify-start justify-center">
                <button 
-                  onclick="window.location.hash='#/curso/${id}'"
+                  onclick="window.location.href='?vista=unirseACurso&id=${id}'"
                   class="bg-white text-primary-text font-bold px-8 py-3 rounded-full hover:bg-gray-50 hover:scale-105 transition-all shadow-md cursor-pointer sm:w-auto w-full"
                >                
-                 Ir Al Curso
+                 Ver Curso
                </button>
              </div>
           </div>

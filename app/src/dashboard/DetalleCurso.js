@@ -116,8 +116,8 @@ export async function loadDetalleCurso(cursoId) {
         
         // Volver (siempre existe)
         document.getElementById('btn-volver').addEventListener('click', () => {
-            const ruta = esMaestro ? '/dashboard-maestro' : '/dashboard-alumno';
-            window.location.hash = ruta;
+            const vistaVolver = esMaestro ? 'dashboardMaestro' : 'dashboardAlumno';
+            window.location.href = `?vista=${vistaVolver}`;
         });
 
         // Nueva Lección (SOLO SI EXISTE EL BOTÓN)

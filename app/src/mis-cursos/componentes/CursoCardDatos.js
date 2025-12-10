@@ -10,7 +10,7 @@ class CursoCardDatos extends HTMLElement {
         const cursoId = this.getAttribute('cursoId') || '';
 
         this.innerHTML = `
-        <button class="curso-card-btn group flex flex-col h-full w-full max-w-[320px] bg-primary-100/60 p-3 rounded-[2rem] hover:bg-primary-200/60 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer text-left border border-transparent hover:border-primary-200">
+        <button class="curso-card-btn group flex flex-col h-full w-full max-w-[320px] bg-gradient-to-br from-blue-50 to-indigo-50 p-3 rounded-[2rem] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-left border border-blue-100 hover:border-blue-200">
             <div class="w-full h-40 rounded-2xl overflow-hidden mb-4 relative shadow-sm">
                 <img src="${imagen}" alt="${titulo}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
             </div>
@@ -27,8 +27,13 @@ class CursoCardDatos extends HTMLElement {
     setupClickHandler(cursoId) {
         const btn = this.querySelector('.curso-card-btn');
         if (btn && cursoId) {
-            btn.addEventListener('click', () => {
-                window.location.href = `?vista=verCurso&id=${cursoId}`;
+            btn.addEventListener('click', async () => {
+                try {
+                    const module = await import('../../dashboard/DetalleCurso.js');
+                    module.loadDetalleCurso(cursoId);
+                } catch (error) {
+                    console.error('Error al cargar detalle del curso:', error);
+                }
             });
         }
     }

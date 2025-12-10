@@ -12,7 +12,7 @@ class DashboardMaestro extends HTMLElement {
         const nombreUsuario = usuario.nombre || 'Maestro';
 
         this.innerHTML = `
-      <div class="min-h-screen bg-gray-50 pl-10 p-10 pt-5 font-sans sm:p-20 sm:pt-10 relative">
+      <div class="min-h-screen bg-gray-50 px-10 pt-8 pb-10 font-sans sm:px-20 sm:pt-10 relative">
         
         <bienvenida-usuario 
           nombre="${nombreUsuario}"

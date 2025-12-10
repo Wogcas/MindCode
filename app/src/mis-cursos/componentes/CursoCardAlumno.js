@@ -104,16 +104,19 @@ class CursoCardAlumno extends HTMLElement {
       </div>
     `;
 
-    // 3. Evento de Navegación (Sin router viejo)
-    this.querySelector('button').addEventListener('click', (e) => {
-        e.stopPropagation(); // Evitar doble click si el padre también escucha
-        window.location.href = `?vista=verCurso&id=${id}`;
-    });
+    // 3. Evento de Navegación - Usar DetalleCurso para alumnos
+    const handleClick = async (e) => {
+        e.stopPropagation();
+        try {
+          const module = await import('../../dashboard/DetalleCurso.js');
+          module.loadDetalleCurso(id);
+        } catch (error) {
+          console.error('Error al cargar detalle del curso:', error);
+        }
+    };
 
-    // Hacer click en toda la tarjeta también navega
-    this.addEventListener('click', () => {
-        window.location.href = `?vista=verCurso&id=${id}`;
-    });
+    this.querySelector('button').addEventListener('click', handleClick);
+    this.addEventListener('click', handleClick);
   }
 }
 

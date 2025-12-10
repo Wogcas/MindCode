@@ -6,7 +6,7 @@ import { cursoService } from '../api/CursoService.js';
 
 class UnirseACurso extends HTMLElement {
   connectedCallback() {
-    this.cursoId = new URLSearchParams(window.location.search).get('id');
+    this.cursoId = this.getAttribute('cursoId') || new URLSearchParams(window.location.search).get('id');
     this.render();
     this.init();
   }
