@@ -1,9 +1,11 @@
 import { LeccionService } from '../api/LeccionService.js';
+import RetoAPI from '../api/RetoAPI.js'; // <--- IMPORTANTE: Importar el servicio de retos
 
 class VistaLeccion extends HTMLElement {
     constructor() {
         super();
         this.leccionActual = null;
+        this.retos = []; // <--- Almacenamos los retos aquí
     }
 
     async connectedCallback() {
@@ -16,25 +18,37 @@ class VistaLeccion extends HTMLElement {
         this.innerHTML = `
             <div class="flex flex-col items-center justify-center h-screen bg-gray-50">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
-                <p class="text-gray-500">Cargando editor de lección...</p>
+                <p class="text-gray-500">Cargando contenido y retos...</p>
             </div>
         `;
 
         try {
-            // 1. Obtener datos
-            const respuesta = await LeccionService.getByCursoId(this.cursoId);
-            const listaLecciones = respuesta.data || respuesta || [];
+            // 1. Obtener LECCIONES del curso (para saber cuál es la actual y mostrar info básica)
+            // 2. Obtener RETOS de la lección específica (Integración con Back)
+            const [respuestaLecciones, respuestaRetos] = await Promise.all([
+                LeccionService.getByCursoId(this.cursoId),
+                RetoAPI.obtenerRetosPorLeccion(this.leccionId) // <--- Petición al Back
+            ]);
 
-            // 2. Buscar la lección específica
+            const listaLecciones = respuestaLecciones.data || respuestaLecciones || [];
+            
+            // Procesar retos: Asegurarnos de que sea un array
+            this.retos = respuestaRetos.data || respuestaRetos || [];
+            console.log(" > Retos cargados del backend:", this.retos);
+
+            // 3. Buscar la lección específica en la lista del curso
             if (Array.isArray(listaLecciones)) {
                 this.leccionActual = listaLecciones.find(
                     x => (x.id || x._id).toString() === this.leccionId.toString()
                 );
             }
 
-            // 3. Renderizar layout
+            // 4. Renderizar layout
             if (this.leccionActual) {
-                console.log("%c [EXITO] Editor cargado para:", "color: green", this.leccionActual.titulo);
+                // Inyectamos los retos frescos en el objeto lección para usarlos en el render
+                this.leccionActual.retos = this.retos; 
+                
+                console.log("%c [EXITO] Lección cargada:", "color: green", this.leccionActual.titulo);
                 this.renderLayout();
             } else {
                 this.innerHTML = `<div class="p-10 text-center text-red-500"><h1>Error 404: Lección no encontrada</h1><button onclick="window.history.back()">Regresar</button></div>`;
@@ -42,13 +56,20 @@ class VistaLeccion extends HTMLElement {
 
         } catch (error) {
             console.error("ERROR FATAL:", error);
-            this.innerHTML = `<h1 style="color:red">Error JS: ${error.message}</h1>`;
+            // Si falla la carga de retos pero carga la lección, intentamos mostrarla igual
+            if(this.leccionActual) {
+                 this.leccionActual.retos = [];
+                 this.renderLayout();
+                 alert("Ojo: No se pudieron cargar los retos: " + error.message);
+            } else {
+                this.innerHTML = `<h1 style="color:red">Error JS: ${error.message}</h1>`;
+            }
         }
     }
 
     renderLayout() {
         const leccion = this.leccionActual;
-        const retos = leccion.retos || [];
+        const retos = this.retos; // Usamos los retos que trajimos del back
 
         this.innerHTML = `
         <div class="font-sans min-h-screen bg-gray-50 pb-10">
@@ -66,10 +87,7 @@ class VistaLeccion extends HTMLElement {
                 </div>
                 
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                    // En renderLayout() dentro del HTML string:
-
-                    <button onclick="window.location.hash = '#/crear-reto/${this.cursoId}/${this.leccionId}'" 
-                        class="text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                    <button id="btn-add-reto" class="text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
                         <span>+ Reto</span>
                     </button>
 
@@ -134,49 +152,46 @@ class VistaLeccion extends HTMLElement {
                             <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wide">${reto.tipo || 'Práctico'}</p>
                         </div>
                     </div>
-                    <span class="text-gray-300 group-hover:text-primary-500 transition">✏️</span>
+                    <span class="text-gray-300 group-hover:text-primary-500 transition">👉</span>
                 </button>
             </div>
         `).join('');
     }
 
     setupListeners(retos) {
-        // 1. Botón "Guardar y Volver" (Lógica existente...)
+        // 1. Botón "Guardar y Volver"
         const btnGuardar = this.querySelector('#btn-guardar');
-        if (btnGuardar) { /* ... tu lógica de guardado ... */ }
+        if (btnGuardar) {
+            btnGuardar.addEventListener('click', () => {
+                // Aquí podrías guardar cambios generales de la lección si hubiera
+                window.history.back();
+            });
+        }
 
-        // 2. Botón "+ Reto" (NUEVO: Abre Modal sin cambiar URL)
-        // Buscamos el botón que tiene el texto "+ Reto" o su clase
-        const btnNuevoReto = this.querySelector('button[onclick*="Próximamente"]'); 
-        // O si ya lo cambiaste antes, busca por clase o agrega un ID al botón en el renderLayout: id="btn-add-reto"
-        
-        // Lo ideal es que en renderLayout le pongas id="btn-add-reto" al botón de "+ Reto"
-        // Si no, búscalo así:
-        const botones = this.querySelectorAll('button');
-        botones.forEach(btn => {
-            if (btn.innerText.includes('+ Reto')) {
-                // Quitamos el onclick antiguo para que no salga el alert
-                btn.removeAttribute('onclick'); 
-                
-                btn.addEventListener('click', () => {
-                    import('../retos/crearRetoMenu.js').then(() => {
-                        const modal = document.createElement('crear-reto-menu');
-                        // Pasamos los IDs como atributos HTML
-                        modal.setAttribute('cursoId', this.cursoId);
-                        modal.setAttribute('leccionId', this.leccionId);
-                        document.body.appendChild(modal);
-                        
-                        // Escuchar cuando se guarde un reto para refrescar la lista
-                        modal.addEventListener('reto-guardado', () => {
-                            // Recargar esta misma vista para ver el nuevo reto
-                            this.connectedCallback(); 
-                        });
+        // 2. Botón "+ Reto" (Abre el Modal)
+        const btnAddReto = this.querySelector('#btn-add-reto');
+        if (btnAddReto) {
+            btnAddReto.addEventListener('click', () => {
+                import('../retos/crearRetoMenu.js').then(() => {
+                    const modal = document.createElement('crear-reto-menu');
+                    modal.setAttribute('cursoId', this.cursoId);
+                    modal.setAttribute('leccionId', this.leccionId);
+                    document.body.appendChild(modal);
+                    
+                    // Al guardar un reto, RECARGAMOS todo para ver los cambios
+                    modal.addEventListener('reto-guardado', () => {
+                        this.connectedCallback(); 
                     });
                 });
-            }
+            });
+        }
+
+        // 3. Botón Ver Lección
+        this.querySelector('#btn-ver-leccion').addEventListener('click', () => {
+            this.mostrarInfoLeccion();
         });
 
-        // 3. Botones de Retos existentes
+        // 4. Botones de Retos (Clic en la lista lateral)
         retos.forEach((reto, index) => {
             const btn = this.querySelector(`#btn-reto-${index}`);
             if (btn) btn.addEventListener('click', () => this.mostrarInfoReto(reto, index));
@@ -186,7 +201,7 @@ class VistaLeccion extends HTMLElement {
     mostrarInfoLeccion() {
         const leccion = this.leccionActual;
         const displayArea = this.querySelector('#main-display-area');
-
+        
         const vidUrl = leccion.videoUrl || (leccion.multimedia && leccion.multimedia[0]?.URL);
         let contentHTML = '';
 
@@ -197,13 +212,13 @@ class VistaLeccion extends HTMLElement {
             contentHTML = `
                 <div class="flex flex-col items-center justify-center h-full bg-slate-900 text-white p-10 text-center min-h-[400px]">
                     <div class="text-6xl mb-4">📺</div>
-                    <h2 class="text-3xl font-bold mb-2">Configuración de Video</h2>
-                    <p class="opacity-60 max-w-md">Aquí se mostrará el video de la lección. Actualmente no hay video asignado o el formato no es compatible.</p>
+                    <h2 class="text-3xl font-bold mb-2">Video de la Lección</h2>
+                    <p class="opacity-60 max-w-md">Sin video asignado.</p>
                 </div>`;
         }
         displayArea.innerHTML = contentHTML;
 
-        this.querySelector('#titulo-activo').textContent = `Editando: ${leccion.titulo}`;
+        this.querySelector('#titulo-activo').textContent = `${leccion.titulo}`;
         this.querySelector('#desc-activa').innerHTML = leccion.descripcion || '<span class="italic text-gray-400">Sin descripción</span>';
     }
 
@@ -214,29 +229,44 @@ class VistaLeccion extends HTMLElement {
             <div class="flex flex-col items-center justify-center h-full bg-yellow-50 p-10 text-center min-h-[400px] animate-fade-in">
                 <div class="bg-yellow-100 p-6 rounded-full mb-6 text-5xl shadow-sm">🏆</div>
                 <h2 class="text-3xl font-bold text-gray-800 mb-2">Reto #${index + 1}: ${reto.titulo}</h2>
+                
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-yellow-100 max-w-lg w-full mt-4 text-left">
                     <p class="text-xs text-yellow-600 uppercase font-bold mb-2 tracking-wider">Instrucciones</p>
-                    <p class="text-gray-700 text-base leading-relaxed">${reto.instrucciones || 'Sin instrucciones definidas.'}</p>
+                    <p class="text-gray-700 text-base leading-relaxed">${reto.descripcion || reto.instrucciones || 'Sin instrucciones.'}</p>
+                    
+                    ${reto.tipo === 'opcion_multiple' ? 
+                        `<div class="mt-4 pt-4 border-t border-gray-100">
+                            <p class="text-xs text-gray-400 font-bold uppercase mb-2">Opciones:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                ${(reto.preguntas && reto.preguntas[0] && reto.preguntas[0].respuestas) 
+                                    ? reto.preguntas[0].respuestas.map(r => `<li>${r.contenido} ${r.es_correcta ? '✅' : ''}</li>`).join('') 
+                                    : '<li>Ver detalle para opciones</li>'}
+                            </ul>
+                         </div>` 
+                    : ''}
                 </div>
                 
                 <div class="flex gap-4 mt-8">
-                    <button class="px-6 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-medium transition shadow-sm" onclick="alert('Abrir modal editar reto')">
-                        ✏️ Editar Contenido
-                    </button>
-                    <button class="px-6 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 font-medium transition" onclick="alert('Confirmar borrar reto')">
+                    <button class="px-6 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 font-medium transition" onclick="this.getRootNode().host.eliminarReto('${reto._id || reto.id}')">
                         🗑️ Eliminar
                     </button>
                 </div>
             </div>
         `;
 
-        this.querySelector('#titulo-activo').textContent = `Detalles del Reto #${index + 1}`;
-        this.querySelector('#desc-activa').innerHTML = `
-            <div class="flex gap-4 mt-2">
-                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">Puntos: ${reto.puntos || 0} XP</span>
-                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Tipo: ${reto.tipo || 'General'}</span>
-            </div>
-        `;
+        this.querySelector('#titulo-activo').textContent = `Detalles del Reto`;
+        this.querySelector('#desc-activa').innerHTML = `Visualizando configuración del reto seleccionado.`;
+    }
+
+    async eliminarReto(retoId) {
+        if(!confirm("¿Eliminar este reto permanentemente?")) return;
+        try {
+            // Llamada al Back para borrar
+            await RetoAPI.eliminarReto(retoId);
+            this.connectedCallback(); // Recargar
+        } catch(e) {
+            alert("Error al eliminar: " + e.message);
+        }
     }
 }
 

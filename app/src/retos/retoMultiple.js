@@ -38,9 +38,9 @@ class RetoMultiple extends HTMLElement {
                         <button id="btnAgregarOp" class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700 font-bold">+</button>
                     </div>
 
-                    <div id="listaOpciones" class="space-y-2">
-                        <p id="msgVacio" class="text-xs text-blue-400 italic">Sin opciones aún</p>
-                    </div>
+                    <p id="msgVacio" class="text-xs text-blue-400 italic text-center mb-2">Sin opciones aún</p>
+                    
+                    <div id="listaOpciones" class="space-y-2"></div>
                 </div>
             </div>
 
@@ -55,20 +55,20 @@ class RetoMultiple extends HTMLElement {
 
   init() {
     this.opcionesList = this.querySelector('#listaOpciones');
-
+    
+    // Elementos DOM
     const cerrar = () => this.remove();
     this.querySelector('#btn-cerrar').addEventListener('click', cerrar);
     this.querySelector('#btn-cancelar').addEventListener('click', cerrar);
 
     this.querySelector('#btnAgregarOp').addEventListener('click', () => {
-      const input = this.querySelector('#inputOpcion');
-      const txt = input.value.trim();
-      if (!txt) return;
+        const input = this.querySelector('#inputOpcion');
+        const txt = input.value.trim();
+        if (!txt) return;
 
-      // Guardamos texto y estado de correcta
-      this.opciones.push({ texto: txt, es_correcta: false });
-      input.value = '';
-      this.renderOpciones();
+        this.opciones.push({ texto: txt, es_correcta: false });
+        input.value = '';
+        this.renderOpciones();
     });
 
     this.querySelector('#btn-guardar').addEventListener('click', () => this.guardar());
@@ -78,39 +78,43 @@ class RetoMultiple extends HTMLElement {
     const container = this.querySelector('#listaOpciones');
     const msg = this.querySelector('#msgVacio');
 
-    if (this.opciones.length > 0) msg.style.display = 'none';
-    else msg.style.display = 'block';
+    // Controlar visibilidad del mensaje
+    if (this.opciones.length > 0) {
+        if(msg) msg.style.display = 'none';
+    } else {
+        if(msg) msg.style.display = 'block';
+    }
 
     container.innerHTML = '';
 
     this.opciones.forEach((op, idx) => {
-      const div = document.createElement('div');
-      div.className = "flex items-center gap-2 bg-white p-2 rounded border border-blue-100";
-      div.innerHTML = `
+        const div = document.createElement('div');
+        div.className = "flex items-center gap-2 bg-white p-2 rounded border border-blue-100 animate-fade-in";
+        div.innerHTML = `
             <input type="radio" name="correcta" class="h-4 w-4 text-primary-600 cursor-pointer" ${op.es_correcta ? 'checked' : ''}>
             <span class="flex-1 text-sm text-gray-700">${op.texto}</span>
             <button class="text-red-400 hover:text-red-600 font-bold px-2">×</button>
         `;
 
-      // Seleccionar correcta
-      div.querySelector('input').addEventListener('change', () => {
-        this.opciones.forEach(o => o.es_correcta = false);
-        this.opciones[idx].es_correcta = true;
-      });
+        // Seleccionar correcta
+        div.querySelector('input').addEventListener('change', () => {
+            this.opciones.forEach(o => o.es_correcta = false);
+            this.opciones[idx].es_correcta = true;
+        });
 
-      // Borrar opción
-      div.querySelector('button').addEventListener('click', () => {
-        this.opciones.splice(idx, 1);
-        this.renderOpciones();
-      });
+        // Borrar opción
+        div.querySelector('button').addEventListener('click', () => {
+            this.opciones.splice(idx, 1);
+            this.renderOpciones();
+        });
 
-      container.appendChild(div);
+        container.appendChild(div);
     });
   }
 
   async guardar() {
-    const titulo = this.querySelector('#inputTitulo').value;
-    const desc = this.querySelector('#inputDesc').value;
+    const titulo = this.querySelector('#inputTitulo').value.trim();
+    const desc = this.querySelector('#inputDesc').value.trim();
 
     if (!titulo || !desc || this.opciones.length < 2) return alert("Faltan datos o opciones");
     if (!this.opciones.some(o => o.es_correcta)) return alert("Marca una respuesta correcta");
@@ -119,26 +123,29 @@ class RetoMultiple extends HTMLElement {
     btn.disabled = true;
     btn.innerHTML = "Guardando...";
 
-    
     const retoData = {
-      titulo: nombre,
-      descripcion: descripcion,
+      titulo: titulo,
+      descripcion: desc,
+      tipo: "opcion_multiple",
+      curso_id: this.cursoId,
+      leccion_id: this.leccionId,
+      lecciones: [ this.leccionId ], // ID limpio
       preguntas: [
         {
-          contenido: descripcion,
+          contenido: desc,
           tipo: "opcion_multiple",
-          respuestas: opciones
+          respuestas: this.opciones.map(o => ({ 
+              contenido: o.texto, // Mapeo correcto
+              es_correcta: o.es_correcta 
+          }))
         }
-      ],
-      lecciones: [
-        this.leccionId
       ]
     };
 
     try {
+      console.log("Enviando:", retoData);
       await RetoAPI.crearReto(retoData);
-      alert("Reto creado");
-
+      
       this.dispatchEvent(new CustomEvent('reto-guardado', { bubbles: true }));
       this.remove();
 
@@ -151,5 +158,7 @@ class RetoMultiple extends HTMLElement {
   }
 }
 
-customElements.define("reto-multiple", RetoMultiple);
+if (!customElements.get("reto-multiple")) {
+    customElements.define("reto-multiple", RetoMultiple);
+}
 export default RetoMultiple;
