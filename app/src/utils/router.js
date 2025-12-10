@@ -4,6 +4,7 @@ import '../perfil/editarPerfil.js';
 import '../retos/crearRetoMenu.js';
 import '../retos/retoMultiple.js';
 import '../retos/retoAbierto.js';
+import '../dashboard/DetalleCurso.js';
 class Router {
   constructor(routes) {
     this.routes = routes;

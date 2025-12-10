@@ -1,11 +1,11 @@
 import { LeccionService } from '../api/LeccionService.js';
-import RetoAPI from '../api/RetoAPI.js'; // <--- IMPORTANTE: Importar el servicio de retos
+import RetoAPI from '../api/RetoAPI.js'; 
 
 class VistaLeccion extends HTMLElement {
     constructor() {
         super();
         this.leccionActual = null;
-        this.retos = []; // <--- Almacenamos los retos aquí
+        this.retos = [];
     }
 
     async connectedCallback() {
@@ -18,37 +18,30 @@ class VistaLeccion extends HTMLElement {
         this.innerHTML = `
             <div class="flex flex-col items-center justify-center h-screen bg-gray-50">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
-                <p class="text-gray-500">Cargando contenido y retos...</p>
+                <p class="text-gray-500">Cargando contenido...</p>
             </div>
         `;
 
         try {
-            // 1. Obtener LECCIONES del curso (para saber cuál es la actual y mostrar info básica)
-            // 2. Obtener RETOS de la lección específica (Integración con Back)
+            // 1. Cargar Datos
             const [respuestaLecciones, respuestaRetos] = await Promise.all([
                 LeccionService.getByCursoId(this.cursoId),
-                RetoAPI.obtenerRetosPorLeccion(this.leccionId) // <--- Petición al Back
+                RetoAPI.obtenerRetosPorLeccion(this.leccionId)
             ]);
 
             const listaLecciones = respuestaLecciones.data || respuestaLecciones || [];
-            
-            // Procesar retos: Asegurarnos de que sea un array
             this.retos = respuestaRetos.data || respuestaRetos || [];
-            console.log(" > Retos cargados del backend:", this.retos);
 
-            // 3. Buscar la lección específica en la lista del curso
+            // 2. Buscar lección actual
             if (Array.isArray(listaLecciones)) {
                 this.leccionActual = listaLecciones.find(
                     x => (x.id || x._id).toString() === this.leccionId.toString()
                 );
             }
 
-            // 4. Renderizar layout
+            // 3. Renderizar
             if (this.leccionActual) {
-                // Inyectamos los retos frescos en el objeto lección para usarlos en el render
-                this.leccionActual.retos = this.retos; 
-                
-                console.log("%c [EXITO] Lección cargada:", "color: green", this.leccionActual.titulo);
+                this.leccionActual.retos = this.retos;
                 this.renderLayout();
             } else {
                 this.innerHTML = `<div class="p-10 text-center text-red-500"><h1>Error 404: Lección no encontrada</h1><button onclick="window.history.back()">Regresar</button></div>`;
@@ -56,11 +49,9 @@ class VistaLeccion extends HTMLElement {
 
         } catch (error) {
             console.error("ERROR FATAL:", error);
-            // Si falla la carga de retos pero carga la lección, intentamos mostrarla igual
             if(this.leccionActual) {
                  this.leccionActual.retos = [];
                  this.renderLayout();
-                 alert("Ojo: No se pudieron cargar los retos: " + error.message);
             } else {
                 this.innerHTML = `<h1 style="color:red">Error JS: ${error.message}</h1>`;
             }
@@ -69,15 +60,14 @@ class VistaLeccion extends HTMLElement {
 
     renderLayout() {
         const leccion = this.leccionActual;
-        const retos = this.retos; // Usamos los retos que trajimos del back
+        const retos = this.retos;
 
         this.innerHTML = `
         <div class="font-sans min-h-screen bg-gray-50 pb-10">
             
             <div class="bg-white border-b px-6 py-4 flex flex-col md:flex-row justify-between items-center sticky top-0 z-20 shadow-sm gap-4">
-                
                 <div class="flex items-center gap-3 w-full md:w-auto">
-                    <button onclick="window.history.back()" class="text-gray-500 hover:text-primary-600 transition p-2 rounded-full hover:bg-gray-100" title="Cancelar y Volver">
+                    <button onclick="window.history.back()" class="text-gray-500 hover:text-primary-600 transition p-2 rounded-full hover:bg-gray-100">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     </button>
                     <div>
@@ -87,13 +77,21 @@ class VistaLeccion extends HTMLElement {
                 </div>
                 
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                    
+                    <button id="btn-eliminar-leccion" class="text-red-500 hover:bg-red-50 border border-red-200 px-3 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2" title="Eliminar Lección">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <span class="hidden sm:inline">Eliminar</span>
+                    </button>
+
+                    <div class="w-px h-6 bg-gray-300 mx-1"></div>
+
                     <button id="btn-add-reto" class="text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
                         <span>+ Reto</span>
                     </button>
 
                     <button id="btn-guardar" class="bg-gray-800 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-lg hover:shadow-xl transform active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>Guardar y Volver</span>
+                        <span>Guardar</span>
                     </button>
                 </div>
             </div>
@@ -159,16 +157,19 @@ class VistaLeccion extends HTMLElement {
     }
 
     setupListeners(retos) {
-        // 1. Botón "Guardar y Volver"
-        const btnGuardar = this.querySelector('#btn-guardar');
-        if (btnGuardar) {
-            btnGuardar.addEventListener('click', () => {
-                // Aquí podrías guardar cambios generales de la lección si hubiera
-                window.history.back();
-            });
+        // 1. ELIMINAR LECCIÓN (NUEVO)
+        const btnEliminarLeccion = this.querySelector('#btn-eliminar-leccion');
+        if (btnEliminarLeccion) {
+            btnEliminarLeccion.addEventListener('click', () => this.eliminarLeccion());
         }
 
-        // 2. Botón "+ Reto" (Abre el Modal)
+        // 2. Guardar y Volver
+        const btnGuardar = this.querySelector('#btn-guardar');
+        if (btnGuardar) {
+            btnGuardar.addEventListener('click', () => window.history.back());
+        }
+
+        // 3. Agregar Reto
         const btnAddReto = this.querySelector('#btn-add-reto');
         if (btnAddReto) {
             btnAddReto.addEventListener('click', () => {
@@ -178,7 +179,6 @@ class VistaLeccion extends HTMLElement {
                     modal.setAttribute('leccionId', this.leccionId);
                     document.body.appendChild(modal);
                     
-                    // Al guardar un reto, RECARGAMOS todo para ver los cambios
                     modal.addEventListener('reto-guardado', () => {
                         this.connectedCallback(); 
                     });
@@ -186,16 +186,44 @@ class VistaLeccion extends HTMLElement {
             });
         }
 
-        // 3. Botón Ver Lección
+        // 4. Ver Lección
         this.querySelector('#btn-ver-leccion').addEventListener('click', () => {
             this.mostrarInfoLeccion();
         });
 
-        // 4. Botones de Retos (Clic en la lista lateral)
+        // 5. Lista de Retos
         retos.forEach((reto, index) => {
             const btn = this.querySelector(`#btn-reto-${index}`);
             if (btn) btn.addEventListener('click', () => this.mostrarInfoReto(reto, index));
         });
+    }
+
+    // --- LÓGICA DE ELIMINAR LECCIÓN ---
+    async eliminarLeccion() {
+        if (!confirm("⚠️ ¿Estás seguro de que quieres eliminar esta lección?\n\nEsta acción borrará todos los retos asociados y no se puede deshacer.")) {
+            return;
+        }
+
+        const btn = this.querySelector('#btn-eliminar-leccion');
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="animate-spin h-4 w-4 border-2 border-red-500 border-t-transparent rounded-full mr-2"></span> Borrando...`;
+
+        try {
+            console.log("Eliminando lección ID:", this.leccionId);
+            
+            // Llamada al servicio
+            await LeccionService.delete(this.leccionId);
+            
+            // ÉXITO: Redirigir al detalle del curso (el padre)
+            window.location.hash = `#/`;
+
+        } catch (error) {
+            console.error(error);
+            alert("Error al eliminar la lección: " + error.message);
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }
     }
 
     mostrarInfoLeccion() {
@@ -204,22 +232,16 @@ class VistaLeccion extends HTMLElement {
         
         const vidUrl = leccion.videoUrl || (leccion.multimedia && leccion.multimedia[0]?.URL);
         let contentHTML = '';
-
         if (vidUrl && (vidUrl.includes('youtube') || vidUrl.includes('youtu.be'))) {
             const id = vidUrl.split('v=')[1] || vidUrl.split('/').pop();
             contentHTML = `<iframe class="w-full h-full aspect-video" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
         } else {
-            contentHTML = `
-                <div class="flex flex-col items-center justify-center h-full bg-slate-900 text-white p-10 text-center min-h-[400px]">
-                    <div class="text-6xl mb-4">📺</div>
-                    <h2 class="text-3xl font-bold mb-2">Video de la Lección</h2>
-                    <p class="opacity-60 max-w-md">Sin video asignado.</p>
-                </div>`;
+            contentHTML = `<div class="flex flex-col items-center justify-center h-full bg-slate-900 text-white p-10 text-center min-h-[400px]"><div class="text-6xl mb-4">📺</div><h2 class="text-3xl font-bold mb-2">Video de la Lección</h2><p class="opacity-60">Sin video asignado.</p></div>`;
         }
         displayArea.innerHTML = contentHTML;
 
-        this.querySelector('#titulo-activo').textContent = `${leccion.titulo}`;
-        this.querySelector('#desc-activa').innerHTML = leccion.descripcion || '<span class="italic text-gray-400">Sin descripción</span>';
+        this.querySelector('#titulo-activo').textContent = leccion.titulo;
+        this.querySelector('#desc-activa').innerHTML = leccion.descripcion || 'Sin descripción.';
     }
 
     mostrarInfoReto(reto, index) {
@@ -247,23 +269,31 @@ class VistaLeccion extends HTMLElement {
                 </div>
                 
                 <div class="flex gap-4 mt-8">
-                    <button class="px-6 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 font-medium transition" onclick="this.getRootNode().host.eliminarReto('${reto._id || reto.id}')">
-                        🗑️ Eliminar
+                    <button id="btn-eliminar-reto-actual" class="px-6 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 font-medium transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Eliminar Reto
                     </button>
                 </div>
             </div>
         `;
 
         this.querySelector('#titulo-activo').textContent = `Detalles del Reto`;
-        this.querySelector('#desc-activa').innerHTML = `Visualizando configuración del reto seleccionado.`;
+        this.querySelector('#desc-activa').innerHTML = `Visualizando configuración.`;
+
+        const btnEliminar = displayArea.querySelector('#btn-eliminar-reto-actual');
+        if (btnEliminar) {
+            btnEliminar.addEventListener('click', () => {
+                const retoId = reto._id || reto.id;
+                this.eliminarReto(retoId);
+            });
+        }
     }
 
     async eliminarReto(retoId) {
         if(!confirm("¿Eliminar este reto permanentemente?")) return;
         try {
-            // Llamada al Back para borrar
             await RetoAPI.eliminarReto(retoId);
-            this.connectedCallback(); // Recargar
+            this.connectedCallback();
         } catch(e) {
             alert("Error al eliminar: " + e.message);
         }
