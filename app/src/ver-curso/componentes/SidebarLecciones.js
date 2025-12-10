@@ -1,5 +1,17 @@
-// Sidebar de lecciones - DERECHA con diseño de las imágenes
+// app/src/ver-curso/componentes/SidebarLecciones.js
 import '../../componentes/ui/LessonCard.js';
+
+// --- Funciones Auxiliares ---
+const getUsuario = () => {
+    try {
+        return JSON.parse(localStorage.getItem('usuario') || '{}');
+    } catch (e) {
+        return {};
+    }
+};
+
+const esMaestro = () => getUsuario().tipo === 'Maestro';
+// ---------------------------
 
 class SidebarLecciones extends HTMLElement {
   constructor() {
@@ -11,7 +23,9 @@ class SidebarLecciones extends HTMLElement {
     try {
       this.modulos = JSON.parse(this.getAttribute('modulos') || '[]');
       this.leccionActual = this.getAttribute('leccionActual') || null;
-      
+      // NUEVO: Obtenemos el ID del curso para el botón de Agregar Lección y para el reto en LessonCard
+      this.cursoId = this.getAttribute('cursoId') || null; 
+
       if (this.leccionActual) {
         const moduloActual = this.modulos.find(m => 
           m.lecciones.some(l => l.id === this.leccionActual)
@@ -31,11 +45,21 @@ class SidebarLecciones extends HTMLElement {
   }
 
   render() {
+    // NUEVO: Verificación de rol para mostrar el botón de agregar lección
+    const teacherActions = esMaestro() ? `
+        <div class="flex-shrink-0 p-4 border-t border-gray-100">
+            <button id="btn-agregar-leccion" 
+                    class="w-full bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-primary-700 transition"
+                    onclick="this.dispatchEvent(new CustomEvent('abrir-modal-agregar-leccion', { bubbles: true, composed: true, detail: { cursoId: '${this.cursoId}' } }))">
+                + Agregar Nueva Lección
+            </button>
+        </div>
+    ` : '';
+
     this.innerHTML = `
       <aside class="sidebar-lecciones w-full lg:w-96 bg-white border-l border-gray-200 
-                    flex flex-col max-h-screen lg:h-screen">
+                     flex flex-col max-h-screen lg:h-screen">
         
-        <!-- Header fijo con scroll up arrow -->
         <div class="flex-shrink-0 bg-white p-6 border-b border-gray-100">
           <div class="flex items-center justify-between mb-2">
             <h2 class="font-normal text-lg text-gray-700">Contenido:</h2>
@@ -48,10 +72,12 @@ class SidebarLecciones extends HTMLElement {
           </div>
         </div>
         
-        <!-- Acordeón scrollable -->
         <div class="accordion-container flex-1 overflow-y-auto">
           ${this.renderModulos()}
         </div>
+        
+        ${teacherActions}
+
       </aside>
     `;
   }
@@ -62,9 +88,8 @@ class SidebarLecciones extends HTMLElement {
       
       return `
         <div class="modulo-item">
-          <!-- Header del acordeón con diseño verde claro -->
           <button class="accordion-header w-full px-6 py-4 flex justify-between items-center 
-                         transition-all text-left
+                         transition-all text-left border-t border-gray-100
                          ${isOpen ? 'bg-primary-100' : 'bg-white hover:bg-gray-50'}"
                   data-modulo-id="${modulo.id}">
             <span class="font-medium ${isOpen ? 'text-primary-700' : 'text-gray-800'} pr-2 line-clamp-2 text-base">
@@ -77,10 +102,9 @@ class SidebarLecciones extends HTMLElement {
             </svg>
           </button>
           
-          <!-- Contenido del acordeón -->
           <div class="accordion-content transition-all duration-300 ease-in-out overflow-hidden
                       ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}" 
-               data-modulo-id="${modulo.id}">
+             data-modulo-id="${modulo.id}">
             <div class="bg-gray-50">
               ${this.renderLecciones(modulo.lecciones)}
             </div>
@@ -91,6 +115,9 @@ class SidebarLecciones extends HTMLElement {
   }
 
   renderLecciones(lecciones) {
+    const isTeacher = esMaestro();
+    const cursoId = this.cursoId;
+    
     return lecciones.map(leccion => `
       <lesson-card
         leccionId="${leccion.id}"
@@ -98,7 +125,7 @@ class SidebarLecciones extends HTMLElement {
         completada="${leccion.completada}"
         tipo="${leccion.tipo}"
         activa="${leccion.id === this.leccionActual}"
-      ></lesson-card>
+        esMaestro="${isTeacher}"  cursoId="${cursoId}"     ></lesson-card>
     `).join('');
   }
 
@@ -128,37 +155,63 @@ class SidebarLecciones extends HTMLElement {
         composed: true
       }));
     });
+    
+    // Captura de eventos de Maestro (desde LessonCard o el propio Sidebar)
+    this.addEventListener('abrir-modal-edicion-leccion', (e) => {
+        // Re-lanza el evento para ser capturado por DetalleCurso.js
+        this.dispatchEvent(new CustomEvent('abrir-modal-edicion-leccion', {
+            detail: e.detail,
+            bubbles: true,
+            composed: true
+        }));
+    });
   }
 
   toggleModulo(moduloId) {
-    if (this.modulosExpandidos.has(moduloId)) {
-      this.modulosExpandidos.delete(moduloId);
-    } else {
+    // Lógica existente para expandir/colapsar el acordeón
+    const shouldExpand = !this.modulosExpandidos.has(moduloId);
+    
+    if (shouldExpand) {
       this.modulosExpandidos.add(moduloId);
+    } else {
+      this.modulosExpandidos.delete(moduloId);
     }
     
     const content = this.querySelector(`[data-modulo-id="${moduloId}"].accordion-content`);
     const header = this.querySelector(`[data-modulo-id="${moduloId}"].accordion-header`);
-    const icon = header.querySelector('svg');
-    
-    if (this.modulosExpandidos.has(moduloId)) {
-      content.classList.remove('max-h-0', 'opacity-0');
-      content.classList.add('max-h-[2000px]', 'opacity-100');
-      header.classList.remove('bg-white', 'hover:bg-gray-50');
-      header.classList.add('bg-primary-100');
-      header.querySelector('span').classList.add('text-primary-700');
-      header.querySelector('span').classList.remove('text-gray-800');
-      icon.classList.add('rotate-180', 'text-primary-600');
-      icon.classList.remove('text-gray-400');
-    } else {
-      content.classList.add('max-h-0', 'opacity-0');
-      content.classList.remove('max-h-[2000px]', 'opacity-100');
-      header.classList.add('bg-white', 'hover:bg-gray-50');
-      header.classList.remove('bg-primary-100');
-      header.querySelector('span').classList.remove('text-primary-700');
-      header.querySelector('span').classList.add('text-gray-800');
-      icon.classList.remove('rotate-180', 'text-primary-600');
-      icon.classList.add('text-gray-400');
+    const icon = header?.querySelector('svg');
+    const titleSpan = header?.querySelector('span');
+
+    if (content && header && icon && titleSpan) {
+        if (shouldExpand) {
+            // Expandir
+            content.classList.remove('max-h-0', 'opacity-0');
+            content.classList.add('max-h-[2000px]', 'opacity-100');
+            
+            // Colores del Header (Verde)
+            header.classList.remove('bg-white', 'hover:bg-gray-50');
+            header.classList.add('bg-primary-100');
+            
+            titleSpan.classList.add('text-primary-700');
+            titleSpan.classList.remove('text-gray-800');
+            
+            icon.classList.add('rotate-180', 'text-primary-600');
+            icon.classList.remove('text-gray-400');
+        } else {
+            // Colapsar
+            content.classList.add('max-h-0', 'opacity-0');
+            content.classList.remove('max-h-[2000px]', 'opacity-100');
+            
+            // Colores del Header (Default)
+            header.classList.add('bg-white', 'hover:bg-gray-50');
+            header.classList.remove('bg-primary-100');
+            
+            titleSpan.classList.remove('text-primary-700');
+            titleSpan.classList.add('text-gray-800');
+            
+            icon.classList.remove('rotate-180', 'text-primary-600');
+            icon.classList.add('text-gray-400');
+        }
     }
   }
 

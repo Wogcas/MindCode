@@ -25,7 +25,7 @@ class RetoMultiple extends HTMLElement {
           <campo-descripcion></campo-descripcion>
           <lista-opciones></lista-opciones>
 
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+          <div class="bg-primary-50 border border-primary-200 rounded-lg p-3 text-sm text-blue-800">
              <strong></strong> Marca el checkbox para indicar la o las respuestas correctas
           </div>
 

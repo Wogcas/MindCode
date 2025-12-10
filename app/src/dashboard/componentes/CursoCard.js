@@ -20,7 +20,7 @@ class CursoCard extends HTMLElement {
           <span>${badgeText}</span>
         </div>
         <div class="p-4">
-          <div class="bg-gradient-to-br from-purple-900 to-red-900 rounded-2xl overflow-hidden h-44 flex items-center justify-center">
+          <div class="bg-gradient-to-br from-primary-900 to-red-900 rounded-2xl overflow-hidden h-44 flex items-center justify-center">
             ${type === 'general' ? `<img src="${image}" alt="${title}" class="w-full h-full object-cover">` : ''}
           </div>
         </div>

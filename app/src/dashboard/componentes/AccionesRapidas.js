@@ -22,7 +22,7 @@ class AccionesRapidas extends HTMLElement {
         `).join('');
 
         this.innerHTML = `
-            <div class="w-full  bg-blue-50/80 p-6 rounded-xl border border-blue-100 mb-6">
+            <div class="w-full  bg-primary-50/80 p-6 rounded-xl border border-primary-100 mb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     ${botonesHtml}
                 </div>

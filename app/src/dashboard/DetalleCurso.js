@@ -11,7 +11,7 @@ export async function loadDetalleCurso(cursoId) {
   // 1. Loader
   mainContent.innerHTML = `
     <div class="flex flex-col items-center justify-center h-[80vh]">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
         <p class="text-gray-500">Sincronizando con el servidor...</p>
     </div>
   `;
@@ -34,13 +34,13 @@ export async function loadDetalleCurso(cursoId) {
         
         <div class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-sm">
            <div class="flex items-center gap-3">
-              <button id="btn-volver" class="text-gray-500 hover:text-purple-600 transition p-2 rounded-full hover:bg-gray-100">
+              <button id="btn-volver" class="text-gray-500 hover:text-primary-600 transition p-2 rounded-full hover:bg-gray-100">
                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
               </button>
               <h1 class="font-bold text-gray-800 text-lg truncate max-w-md hidden md:block">${curso.titulo}</h1>
            </div>
            
-           <button id="btn-nueva-leccion" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+           <button id="btn-nueva-leccion" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
              <span class="hidden sm:inline">Nueva Lección</span>
            </button>
@@ -111,11 +111,11 @@ function renderizarAcordeon(lecciones) {
         item.innerHTML = `
             <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none" id="btn-leccion-${idLeccion}">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">
+                    <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs font-bold">
                         ${index + 1}
                     </div>
                     <div>
-                        <h4 class="font-semibold text-gray-700 text-sm group-hover:text-purple-600 transition">${leccion.titulo}</h4>
+                        <h4 class="font-semibold text-gray-700 text-sm group-hover:text-primary-600 transition">${leccion.titulo}</h4>
                         <p class="text-[10px] text-gray-400">${leccion.videoUrl ? '🎥 Video' : '📄 Lectura'}</p>
                     </div>
                 </div>
@@ -126,7 +126,7 @@ function renderizarAcordeon(lecciones) {
 
             <div id="content-leccion-${idLeccion}" class="hidden bg-gray-50 border-t border-gray-100 animate-slide-down">
                 <div class="p-2 space-y-1">
-                    <button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-purple-50 text-xs text-gray-600 hover:text-purple-700 flex items-center gap-2 transition"
+                    <button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition"
                             onclick="window.verContenidoPrincipal('${idLeccion}')">
                         <span>📺 Ver Clase</span>
                     </button>
@@ -190,7 +190,7 @@ function activarLeccion(leccion, tipo = 'contenido', indiceReto = 0) {
         } else {
             // Vista por defecto (Lectura)
             player.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-10 text-center">
+                <div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-600 to-primary-700 text-white p-10 text-center">
                     <h2 class="text-3xl font-bold mb-4">${leccion.titulo}</h2>
                     <p class="opacity-90 max-w-lg">Esta es una lección de lectura. Revisa la descripción y completa los retos abajo.</p>
                 </div>

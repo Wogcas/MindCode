@@ -10,7 +10,7 @@ class ListaOpciones extends HTMLElement {
         <div id="opcionesContainer" class="space-y-2"></div>
 
         <button id="btnAgregarOpcion"
-          class="mt-2 text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200">
+          class="mt-2 text-xs bg-primary-100 text-blue-800 px-3 py-1 rounded-full hover:bg-primary-200">
           + Agregar opción
         </button>
       </div>

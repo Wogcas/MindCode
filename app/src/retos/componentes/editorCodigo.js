@@ -13,7 +13,7 @@ class EditorCodigo extends HTMLElement {
         <textarea id="editorTextarea"
           class="w-full bg-gray-900 text-gray-200 rounded-lg p-4 shadow-inner 
                  min-h-[180px] font-mono text-sm outline-none resize-none
-                 focus:ring-2 focus:ring-blue-500"
+                 focus:ring-2 focus:ring-primary-500"
           placeholder="// Escribe el código inicial aquí..."></textarea>
       </div>
     `;

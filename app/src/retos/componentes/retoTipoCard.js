@@ -10,7 +10,7 @@ class RetoTipoCard extends HTMLElement {
 
     this.innerHTML = `
       <button class="w-full flex items-center gap-4 p-4 rounded-xl bg-white 
-                     hover:bg-blue-50 shadow-sm hover:shadow-md border border-gray-100 
+                     hover:bg-primary-50 shadow-sm hover:shadow-md border border-gray-100 
                      transition text-left">
 
         <div class="w-12 h-12 rounded-lg" style="background:${color}"></div>

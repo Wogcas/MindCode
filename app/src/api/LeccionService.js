@@ -35,4 +35,16 @@ export class LeccionService {
         body: JSON.stringify(data)
     });
   }
+
+  static async update(leccionId, data) {
+    try {
+        // Usa el nuevo método en apiClient
+        const response = await client.actualizarLeccion(leccionId, data);
+        console.log("Lección actualizada:", response);
+        return response.data;
+    } catch (error) {
+        console.error("Error actualizando lección:", error);
+        throw error;
+    }
+  }
 }

@@ -4,7 +4,7 @@ class CursoImagen extends HTMLElement {
       const alt = this.getAttribute('alt') || 'Curso';
   
       this.innerHTML = `
-        <div class="aspect-video bg-gradient-to-br from-purple-900 to-red-900 relative overflow-hidden rounded-t-xl flex items-center justify-center">
+        <div class="aspect-video bg-gradient-to-br from-primary-900 to-red-900 relative overflow-hidden rounded-t-xl flex items-center justify-center">
           ${src ? `
             <img src="${src}" 
                  alt="${alt}" 

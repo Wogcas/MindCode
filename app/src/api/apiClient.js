@@ -155,6 +155,13 @@ class ApiClient {
         });
     }
 
+    async actualizarLeccion(id, datos) {
+        return this.request(`/lecciones/actualizar/${id}`, { 
+            method: 'PUT',
+            body: JSON.stringify(datos)
+        });
+    }
+
     // ===== RETOS =====
 
     async obtenerRetos(cursoId) {
