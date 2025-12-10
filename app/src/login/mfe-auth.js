@@ -728,11 +728,11 @@ class MfeAuth extends HTMLElement {
     
                 setTimeout(() => {
                     if (usuario.tipo === "Alumno") {
-                        window.location.href = "/app/src/shell/index.html?vista=dashboardAlumno";
+                        window.location.href = "/src/shell/index.html?vista=dashboardAlumno";
                     } else if (usuario.tipo === "Maestro") {
-                        window.location.href = "/app/src/shell/index.html?vista=dashboardMaestro";
+                        window.location.href = "/src/shell/index.html?vista=dashboardMaestro";
                     } else {
-                        window.location.href = "/app/src/shell/index.html";
+                        window.location.href = "/src/shell/index.html";
                     }
                 }, 1500);
             }

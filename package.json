@@ -1,0 +1,17 @@
+{
+  "name": "mindcode",
+  "version": "1.0.0",
+  "description": "MindCode - Plataforma educativa de desarrollo",
+  "scripts": {
+    "start": "concurrently --raw --kill-others-on-fail -p \"\" \"npm run server\" \"npm run client\"",
+    "server": "cd server && node server.js",
+    "client": "http-server ./app -p 5500 -o /src/login/index.html -c-1 --silent",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,green\" \"npm run server\" \"npm run client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "http-server": "^14.1.1"
+  },
+  "author": "Wogcas, Hisamy, Melle, Taquito",
+  "license": "ISC"
+}

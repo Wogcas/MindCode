@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    
+    "start": "http-server . -p 5500 -o /src/shell/index.html -c-1"
   },
   "author": "",
   "license": "ISC",
