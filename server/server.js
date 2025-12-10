@@ -11,10 +11,7 @@ import { errorHandler, notFound } from './auth/errorHandler.js';
 const app = express();
 const PORT = 3000;
 
-app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'],
-    credentials: true
-}));
+app.use(cors());
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -27,7 +24,6 @@ app.use('/api/auth', authRouter);
 app.use('/api/retos', retoRouter);
 app.use('/api/usuarios', usuarioRouter);
 
-app.use(notFound);
 app.use(notFound);
 
 // Middleware centralizado de manejo de errores
