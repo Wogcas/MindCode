@@ -28,6 +28,8 @@ export const UsuarioAdapter = {
       nombre: doc.nombre,
       correo: doc.correo,
       tipo: doc.tipo,
+      sobreMi: doc.sobreMi || '',
+      fotoPerfil: doc.fotoPerfil || '',
       progreso_cursos: progreso_cursos,
       cursos_impartidos: cursos_impartidos,
       createdAt: doc.createdAt,

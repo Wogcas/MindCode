@@ -24,8 +24,11 @@ export default class UsuarioReporsitory{
     }
 
     async actualizarUsuario(idUsuario, usuarioModificado){
-        return await Usuario.findByIdAndUpdate(idUsuario, usuarioModificado, {new: true});
-
+        return await Usuario.findByIdAndUpdate(
+            idUsuario, 
+            { $set: usuarioModificado }, 
+            { new: true, runValidators: true }
+        );
     }
     async eliminarUsuario(idUsuario){
         return await Usuario.findByIdAndDelete(idUsuario);

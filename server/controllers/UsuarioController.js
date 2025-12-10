@@ -91,7 +91,7 @@ export class UsuarioController {
   // Actualizar un usuario
   async actualizarUsuario(req, res) {
     const { id } = req.params;
-    const { nombre, correo, tipo } = req.body;
+    const { nombre, correo, tipo, sobreMi, fotoPerfil } = req.body;
 
     // Verificar si el usuario existe
     const usuarioExistente = await usuarioRepository.obtenerUsuarioPorId(id);
@@ -111,6 +111,8 @@ export class UsuarioController {
     if (nombre) datosActualizados.nombre = nombre;
     if (correo) datosActualizados.correo = correo;
     if (tipo) datosActualizados.tipo = tipo;
+    if (sobreMi !== undefined) datosActualizados.sobreMi = sobreMi;
+    if (fotoPerfil !== undefined) datosActualizados.fotoPerfil = fotoPerfil;
 
     const usuarioActualizado = await usuarioRepository.actualizarUsuario(id, datosActualizados);
     const usuarioDTO = UsuarioAdapter.toDTO(usuarioActualizado);
@@ -118,6 +120,50 @@ export class UsuarioController {
     res.status(200).json({
       success: true,
       message: 'Usuario actualizado exitosamente',
+      data: usuarioDTO
+    });
+  }
+
+  // Obtener perfil del usuario autenticado
+  async obtenerMiPerfil(req, res) {
+    const { id } = req.usuario;
+
+    const usuario = await usuarioRepository.obtenerUsuarioPorId(id);
+    
+    if (!usuario) {
+      throw new NotFoundError('Usuario no encontrado');
+    }
+
+    const usuarioDTO = UsuarioAdapter.toDTO(usuario);
+
+    res.status(200).json({
+      success: true,
+      data: usuarioDTO
+    });
+  }
+
+  // Actualizar perfil del usuario autenticado
+  async actualizarMiPerfil(req, res) {
+    const { id } = req.usuario;
+    const { nombre, sobreMi, fotoPerfil } = req.body;
+
+    // Verificar si el usuario existe
+    const usuarioExistente = await usuarioRepository.obtenerUsuarioPorId(id);
+    if (!usuarioExistente) {
+      throw new NotFoundError('Usuario no encontrado');
+    }
+
+    const datosActualizados = {};
+    if (nombre !== undefined) datosActualizados.nombre = nombre;
+    if (sobreMi !== undefined) datosActualizados.sobreMi = sobreMi;
+    if (fotoPerfil !== undefined) datosActualizados.fotoPerfil = fotoPerfil;
+
+    const usuarioActualizado = await usuarioRepository.actualizarUsuario(id, datosActualizados);
+    const usuarioDTO = UsuarioAdapter.toDTO(usuarioActualizado);
+
+    res.status(200).json({
+      success: true,
+      message: 'Perfil actualizado exitosamente',
       data: usuarioDTO
     });
   }

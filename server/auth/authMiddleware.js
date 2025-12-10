@@ -60,3 +60,19 @@ export const esMentor = (req, res, next) => {
         });
     }
 };
+
+// Middleware para verificar que el usuario edita su propio perfil
+export const esPropietarioOAdmin = (req, res, next) => {
+    const idUsuarioAEditar = req.params.id;
+    const idUsuarioAutenticado = req.usuario.id;
+    
+    // Permitir si es su propio perfil o si es Maestro (admin)
+    if (idUsuarioAEditar === idUsuarioAutenticado || req.usuario.tipo === 'Maestro') {
+        next();
+    } else {
+        return res.status(403).json({
+            success: false,
+            message: 'No tienes permiso para editar este perfil'
+        });
+    }
+};

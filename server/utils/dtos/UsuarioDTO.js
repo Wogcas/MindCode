@@ -32,11 +32,13 @@ export class CursoImpartidoDTO {
 }
 
 export class UsuarioDTO {
-  constructor({ id, nombre, correo, tipo, progreso_cursos, cursos_impartidos, createdAt, updatedAt }) {
+  constructor({ id, nombre, correo, tipo, sobreMi, fotoPerfil, progreso_cursos, cursos_impartidos, createdAt, updatedAt }) {
     this.id = id;
     this.nombre = nombre;
     this.correo = correo;
     this.tipo = tipo;
+    this.sobreMi = sobreMi;
+    this.fotoPerfil = fotoPerfil;
     this.progreso_cursos = progreso_cursos;
     this.cursos_impartidos = cursos_impartidos;
     this.createdAt = createdAt;

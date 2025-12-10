@@ -88,6 +88,9 @@ export const router = new Router({
   '/mis-cursos-alumno': { 
     component: 'mis-cursos-alumno' 
   },
+  '/perfil': {
+    component: 'editar-perfil'
+  },
   '/curso': { 
     component: 'visor-leccion',
     params: ['cursoId', 'leccionId']

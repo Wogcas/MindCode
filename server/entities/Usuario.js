@@ -56,6 +56,15 @@ const usuarioSchema = new mongoose.Schema({
         enum: ['Alumno', 'Maestro'],
         default: 'Alumno'
     },
+    sobreMi: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    fotoPerfil: {
+        type: String,
+        default: ''
+    },
     progreso_cursos: {
         type: [progresoCursoSchema],
         default: undefined
