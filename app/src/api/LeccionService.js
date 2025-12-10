@@ -36,6 +36,11 @@ export class LeccionService {
     });
   }
 
+  static async delete(id) {
+        // Ajusta la URL según tu backend (ej: /lecciones/:id)
+        return await client.delete(`/lecciones/${id}`);
+    }
+
   static async update(leccionId, data) {
     try {
         // Usa el nuevo método en apiClient

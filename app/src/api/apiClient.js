@@ -10,41 +10,29 @@ class ApiClient {
     }
 
     /**
-     * Obtener token del localStorage
+     * Obtener token del localStorage (Maneja JSON o String)
      */
     getToken() {
-        return localStorage.getItem('token');
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        return usuario.token || localStorage.getItem('token');
     }
 
     /**
-     * Guardar token en localStorage
-     */
-    setToken(token) {
-        localStorage.setItem('token', token);
-        this.token = token;
-    }
-
-    /**
-     * Limpiar token
-     */
-    clearToken() {
-        localStorage.removeItem('token');
-        this.token = null;
-    }
-
-    /**
-     * Realizar petición HTTP
+     * Realizar petición HTTP Genérica
      */
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
+        
+        // Headers por defecto
         const headers = {
             'Content-Type': 'application/json',
             ...options.headers
         };
 
-        // Agregar token si existe
-        if (this.token) {
-            headers['Authorization'] = `Bearer ${this.token}`;
+        // Inyectar Token actualizado
+        const token = this.getToken();
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
 
         try {
@@ -53,14 +41,17 @@ class ApiClient {
                 headers
             });
 
-            const data = await response.json();
+            // Si es 204 No Content (común en delete), retornar éxito
+            if (response.status === 204) return true;
+
+            const text = await response.text();
+            const data = text ? JSON.parse(text) : {};
 
             if (!response.ok) {
-                throw {
-                    status: response.status,
-                    message: data.message || 'Error en la petición',
-                    data: data
-                };
+                const error = new Error(data.message || 'Error en la petición');
+                error.status = response.status;
+                error.data = data;
+                throw error;
             }
 
             return data;
@@ -70,119 +61,43 @@ class ApiClient {
         }
     }
 
-    // ===== AUTENTICACIÓN =====
+    // ===== MÉTODOS HTTP GENÉRICOS (ESTO ES LO QUE FALTABA) =====
+
+    get(endpoint) {
+        return this.request(endpoint, { method: 'GET' });
+    }
+
+    post(endpoint, body) {
+        return this.request(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(body)
+        });
+    }
+
+    put(endpoint, body) {
+        return this.request(endpoint, {
+            method: 'PUT',
+            body: JSON.stringify(body)
+        });
+    }
+
+    // 👇 ESTE ES EL QUE CORRIGE TU ERROR
+    delete(endpoint) {
+        return this.request(endpoint, { method: 'DELETE' });
+    }
+
+    // ===== MÉTODOS ESPECÍFICOS (LEGACY) =====
+    // Mantenemos estos para no romper código antiguo que use client.login(), etc.
 
     async login(email, password) {
-        return this.request('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password })
-        });
+        return this.post('/auth/login', { email, password });
     }
 
     async registrar(nombre, email, password, tipo) {
-        return this.request('/auth/registrar', {
-            method: 'POST',
-            body: JSON.stringify({ nombre, email, password, tipo })
-        });
-    }
-
-    async obtenerPerfil() {
-        return this.request('/auth/perfil', {
-            method: 'GET'
-        });
-    }
-
-    // ===== USUARIOS =====
-
-    async obtenerUsuario(id) {
-        return this.request(`/usuarios/${id}`, {
-            method: 'GET'
-        });
-    }
-
-    // ===== CURSOS =====
-
-    async obtenerCursos() {
-        return this.request('/cursos', {
-            method: 'GET'
-        });
-    }
-
-    async obtenerCurso(id) {
-        return this.request(`/cursos/${id}`, {
-            method: 'GET'
-        });
-    }
-
-    async crearCurso(datos) {
-        return this.request('/cursos', {
-            method: 'POST',
-            body: JSON.stringify(datos)
-        });
-    }
-
-    async actualizarCurso(id, datos) {
-        return this.request(`/cursos/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(datos)
-        });
-    }
-
-    async eliminarCurso(id) {
-        return this.request(`/cursos/${id}`, {
-            method: 'DELETE'
-        });
-    }
-
-    async obtenerCursosPorUsuario(usuarioId) {
-        return this.request(`/cursos/${usuarioId}`, {
-            method: 'GET'
-        });
-    }
-
-    // ===== LECCIONES =====
-
-    async obtenerLecciones(cursoId) {
-        return this.request(`/lecciones/curso/${cursoId}`, {
-            method: 'GET'
-        });
-    }
-
-    async crearLeccion(datos) {
-        return this.request('/lecciones', {
-            method: 'POST',
-            body: JSON.stringify(datos)
-        });
-    }
-
-    async actualizarLeccion(id, datos) {
-        return this.request(`/lecciones/actualizar/${id}`, { 
-            method: 'PUT',
-            body: JSON.stringify(datos)
-        });
-    }
-
-    // ===== RETOS =====
-
-    async obtenerRetos(cursoId) {
-        return this.request(`/retos/curso/${cursoId}`, {
-            method: 'GET'
-        });
-    }
-
-    async crearReto(datos) {
-        return this.request('/retos', {
-            method: 'POST',
-            body: JSON.stringify(datos)
-        });
-    }
-
-    // ===== LOGOUT =====
-
-    logout() {
-        this.clearToken();
+        return this.post('/auth/registrar', { nombre, email, password, tipo });
     }
 }
 
-// Instancia global
-export const client = new ApiClient();
+// Exportamos ambas formas para asegurar compatibilidad
+export const apiClient = new ApiClient();
+export const client = apiClient;
