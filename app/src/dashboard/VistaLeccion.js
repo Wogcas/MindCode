@@ -3,7 +3,7 @@ import { LeccionService } from '../api/LeccionService.js';
 class VistaLeccion extends HTMLElement {
     constructor() {
         super();
-        this.leccionActual = null; 
+        this.leccionActual = null;
     }
 
     async connectedCallback() {
@@ -66,7 +66,10 @@ class VistaLeccion extends HTMLElement {
                 </div>
                 
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <button onclick="alert('Próximamente: Modal para crear reto')" class="text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                    // En renderLayout() dentro del HTML string:
+
+                    <button onclick="window.location.hash = '#/crear-reto/${this.cursoId}/${this.leccionId}'" 
+                        class="text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
                         <span>+ Reto</span>
                     </button>
 
@@ -138,32 +141,42 @@ class VistaLeccion extends HTMLElement {
     }
 
     setupListeners(retos) {
-        // 1. Botón "Guardar y Volver"
+        // 1. Botón "Guardar y Volver" (Lógica existente...)
         const btnGuardar = this.querySelector('#btn-guardar');
-        if (btnGuardar) {
-            btnGuardar.addEventListener('click', () => {
-                // AQUÍ AGREGARÍAS LA LLAMADA AL BACKEND PARA GUARDAR
-                // await LeccionService.update(this.leccionId, datosNuevos);
-                
-                // Simulación visual
-                btnGuardar.innerHTML = `
-                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                    <span>Guardando...</span>
-                `;
-                
-                setTimeout(() => {
-                    // Regresar a la pantalla anterior
-                    window.history.back();
-                }, 800);
-            });
-        }
+        if (btnGuardar) { /* ... tu lógica de guardado ... */ }
 
-        // 2. Botón Ver Lección
-        this.querySelector('#btn-ver-leccion').addEventListener('click', () => {
-            this.mostrarInfoLeccion();
+        // 2. Botón "+ Reto" (NUEVO: Abre Modal sin cambiar URL)
+        // Buscamos el botón que tiene el texto "+ Reto" o su clase
+        const btnNuevoReto = this.querySelector('button[onclick*="Próximamente"]'); 
+        // O si ya lo cambiaste antes, busca por clase o agrega un ID al botón en el renderLayout: id="btn-add-reto"
+        
+        // Lo ideal es que en renderLayout le pongas id="btn-add-reto" al botón de "+ Reto"
+        // Si no, búscalo así:
+        const botones = this.querySelectorAll('button');
+        botones.forEach(btn => {
+            if (btn.innerText.includes('+ Reto')) {
+                // Quitamos el onclick antiguo para que no salga el alert
+                btn.removeAttribute('onclick'); 
+                
+                btn.addEventListener('click', () => {
+                    import('../retos/crearRetoMenu.js').then(() => {
+                        const modal = document.createElement('crear-reto-menu');
+                        // Pasamos los IDs como atributos HTML
+                        modal.setAttribute('cursoId', this.cursoId);
+                        modal.setAttribute('leccionId', this.leccionId);
+                        document.body.appendChild(modal);
+                        
+                        // Escuchar cuando se guarde un reto para refrescar la lista
+                        modal.addEventListener('reto-guardado', () => {
+                            // Recargar esta misma vista para ver el nuevo reto
+                            this.connectedCallback(); 
+                        });
+                    });
+                });
+            }
         });
 
-        // 3. Botones de Retos
+        // 3. Botones de Retos existentes
         retos.forEach((reto, index) => {
             const btn = this.querySelector(`#btn-reto-${index}`);
             if (btn) btn.addEventListener('click', () => this.mostrarInfoReto(reto, index));
@@ -173,7 +186,7 @@ class VistaLeccion extends HTMLElement {
     mostrarInfoLeccion() {
         const leccion = this.leccionActual;
         const displayArea = this.querySelector('#main-display-area');
-        
+
         const vidUrl = leccion.videoUrl || (leccion.multimedia && leccion.multimedia[0]?.URL);
         let contentHTML = '';
 

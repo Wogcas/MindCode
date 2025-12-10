@@ -1,6 +1,9 @@
 // Router simple basado en hash para navegación SPA sin frameworks
 import '../dashboard/VistaLeccion.js';
 import '../perfil/editarPerfil.js';
+import '../retos/crearRetoMenu.js';
+import '../retos/retoMultiple.js';
+import '../retos/retoAbierto.js';
 class Router {
   constructor(routes) {
     this.routes = routes;
@@ -104,6 +107,18 @@ export const router = new Router({
   },
   '/perfil': {
     component: 'editar-perfil'
+  },'/crear-reto': {
+    component: 'crear-reto-menu',
+    params: ['cursoId', 'leccionId']
+  },
+  // OJO: Estas rutas deben coincidir con lo que pusimos en CrearRetoMenu.js
+  '/crear-reto/multiple': { 
+    component: 'reto-multiple',
+    params: ['cursoId', 'leccionId']
+  },
+  '/crear-reto/abierto': {
+    component: 'reto-abierto',
+    params: ['cursoId', 'leccionId']
   },
   '/404': {
     component: 'pagina-404'

@@ -13,6 +13,21 @@ class AppHeader extends HTMLElement {
                     <span class="font-Colmeak font-semibold text-xl text-gray-800 hidden md:block tracking-tight">MindCode</span>
                 </a>
 
+                <div class="flex-1 max-w-2xl mx-4 hidden md:block">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="global-search"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-full leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 focus:border-primary-300 sm:text-sm transition-all shadow-sm hover:bg-gray-100 focus:shadow-md"
+                            placeholder="Buscar cursos, lecciones o estudiantes..."
+                        >
+                    </div>
+                </div>
 
                 <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                     
@@ -21,12 +36,16 @@ class AppHeader extends HTMLElement {
                     </button>
 
                     ${esMaestro ? `
-                    <button onclick="document.querySelector('dashboard-maestro').abrirModalCrearCurso()" class="hidden lg:flex bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded-lg text-sm font-medium transition items-center gap-2 shadow-sm">
+                    <button id="btn-crear-global" class="hidden lg:flex bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded-lg text-sm font-medium transition items-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         <span>Crear</span>
                     </button>
                     ` : ''}
 
+                    <button class="relative p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors group">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span class="absolute top-2 right-2 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    </button>
 
                     <div class="h-6 w-px bg-gray-200 mx-1 hidden sm:block"></div>
 
@@ -54,7 +73,7 @@ class AppHeader extends HTMLElement {
     }
 
     setupEventListeners() {
-        // Logout
+        // 1. LOGOUT
         this.querySelector('#btn-logout')?.addEventListener('click', () => {
             if(confirm('¿Cerrar sesión?')) {
                 localStorage.clear();
@@ -62,22 +81,32 @@ class AppHeader extends HTMLElement {
             }
         });
 
-        // Foco en barra con la tecla "/"
-        document.addEventListener('keydown', (e) => {
-            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
-                e.preventDefault();
-                this.querySelector('#global-search')?.focus();
-            }
-        });
-
-        // Listener del input de búsqueda
+        // 2. BUSQUEDA (Enter)
         const searchInput = this.querySelector('#global-search');
         if (searchInput) {
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    // Aquí conectarías con tu lógica de búsqueda
-                    alert('Buscando: ' + searchInput.value);
+                    console.log("Buscando:", searchInput.value);
+                    // Aquí puedes redirigir: window.location.hash = `#/buscar/${searchInput.value}`;
                 }
+            });
+        }
+
+        // 3. BOTÓN CREAR CURSO (NUEVO)
+        const btnCrear = this.querySelector('#btn-crear-global');
+        if (btnCrear) {
+            btnCrear.addEventListener('click', () => {
+                // Importamos dinámicamente el componente CrearCurso para asegurar que exista
+                import('../crear-curso/CrearCurso.js').then(() => {
+                    const modal = document.createElement('crear-curso');
+                    
+                    // Si se crea un curso, recargamos la página para verlo
+                    modal.addEventListener('curso-creado', () => {
+                        window.location.reload();
+                    });
+
+                    document.body.appendChild(modal);
+                }).catch(err => console.error("Error cargando el modal de crear curso:", err));
             });
         }
     }
