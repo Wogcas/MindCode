@@ -74,9 +74,16 @@ class EditarPerfil extends HTMLElement {
                 
                 <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
                     <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Mi Perfil</h2>
-                            <p class="text-sm text-gray-500 mt-1">Administra tu información personal</p>
+                        <div class="flex items-center gap-4">
+                            <button id="back-btn" class="text-gray-500 hover:text-gray-700 transition-colors" title="Volver al dashboard">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                            </button>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Mi Perfil</h2>
+                                <p class="text-sm text-gray-500 mt-1">Administra tu información personal</p>
+                            </div>
                         </div>
                         <div class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
                             ${tipo}
@@ -165,12 +172,14 @@ class EditarPerfil extends HTMLElement {
     attachEventListeners() {
         const saveBtn = this.querySelector('#save-btn');
         const cancelBtn = this.querySelector('#cancel-btn');
+        const backBtn = this.querySelector('#back-btn');
         const fileUpload = this.querySelector('#file-upload');
         const nombreInput = this.querySelector('#input-nombre');
         const sobreMiInput = this.querySelector('#input-sobreMi');
 
         saveBtn?.addEventListener('click', () => this.handleSave());
         cancelBtn?.addEventListener('click', () => this.handleCancel());
+        backBtn?.addEventListener('click', () => this.handleBack());
         fileUpload?.addEventListener('change', (e) => this.handleFileSelect(e));
         
         // Detectar cambios en los inputs
@@ -341,6 +350,19 @@ class EditarPerfil extends HTMLElement {
         this.updateSaveButton();
         
         this.showInfo('Cambios descartados');
+    }
+
+    handleBack() {
+        // Verificar si hay cambios sin guardar
+        if (this.hasChanges) {
+            const confirmar = confirm('Tienes cambios sin guardar. ¿Deseas salir sin guardar?');
+            if (!confirmar) return;
+        }
+
+        // Redirigir según el tipo de usuario
+        const tipo = this.usuarioOriginal?.tipo || 'Alumno';
+        const vista = tipo === 'Maestro' ? 'dashboardMaestro' : 'dashboardAlumno';
+        window.location.href = `?vista=${vista}`;
     }
 
     showFieldError(fieldName, message) {
