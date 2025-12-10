@@ -5,31 +5,36 @@ import { renderModalCrearLeccion } from './componentes/ModalLeccion.js';
 let leccionActualId = null;
 
 export async function loadDetalleCurso(cursoId) {
-  const mainContent = document.getElementById('vista');
-  if (!mainContent) return;
+    const mainContent = document.getElementById('vista');
 
-  // 1. Loader
-  mainContent.innerHTML = `
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const esMaestro = usuario.tipo === 'Maestro';
+
+    if (!mainContent) return;
+
+
+    // 1. Loader
+    mainContent.innerHTML = `
     <div class="flex flex-col items-center justify-center h-[80vh]">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
         <p class="text-gray-500">Sincronizando con el servidor...</p>
     </div>
   `;
 
-  try {
-    // 2. Petición al Backend (Curso + Lecciones)
-    const [cursoResponse, leccionesData] = await Promise.all([
-      cursoService.fetchCourseById(cursoId),
-      LeccionService.getByCursoId(cursoId)
-    ]);
+    try {
+        // 2. Petición al Backend (Curso + Lecciones)
+        const [cursoResponse, leccionesData] = await Promise.all([
+            cursoService.fetchCourseById(cursoId),
+            LeccionService.getByCursoId(cursoId)
+        ]);
 
-    const curso = cursoResponse.curso || cursoResponse;
-    const listaLecciones = leccionesData || [];
+        const curso = cursoResponse.curso || cursoResponse;
+        const listaLecciones = leccionesData || [];
 
-    console.log("Datos recibidos del backend:", listaLecciones);
+        console.log("Datos recibidos del backend:", listaLecciones);
 
-    // 3. Renderizado
-    mainContent.innerHTML = `
+        // 3. Renderizado
+        mainContent.innerHTML = `
       <div class="font-sans min-h-screen bg-gray-50 animate-fade-in pb-10">
         
         <div class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-sm">
@@ -73,25 +78,25 @@ export async function loadDetalleCurso(cursoId) {
       </div>
     `;
 
-    // 4. Listeners
-    document.getElementById('btn-volver').addEventListener('click', () => location.reload());
-    document.getElementById('btn-nueva-leccion').addEventListener('click', () => {
-      renderModalCrearLeccion(cursoId, () => loadDetalleCurso(cursoId));
-    });
+        // 4. Listeners
+        document.getElementById('btn-volver').addEventListener('click', () => location.reload());
+        document.getElementById('btn-nueva-leccion').addEventListener('click', () => {
+            renderModalCrearLeccion(cursoId, () => loadDetalleCurso(cursoId));
+        });
 
-    // 5. Iniciar Vista
-    renderizarAcordeon(listaLecciones);
-    if (listaLecciones.length > 0) activarLeccion(listaLecciones[0]);
+        // 5. Iniciar Vista
+        renderizarAcordeon(listaLecciones, esMaestro);
+        if (listaLecciones.length > 0) activarLeccion(listaLecciones[0]);
 
-  } catch (error) {
-    console.error("Error general:", error);
-    mainContent.innerHTML = `<div class="p-10 text-center text-red-500">Error cargando datos del servidor.</div>`;
-  }
+    } catch (error) {
+        console.error("Error general:", error);
+        mainContent.innerHTML = `<div class="p-10 text-center text-red-500">Error cargando datos del servidor.</div>`;
+    }
 }
 
 // --- FUNCIONES AUXILIARES ---
 
-function renderizarAcordeon(lecciones) {
+function renderizarAcordeon(lecciones, esMaestro) {
     const contenedor = document.getElementById('lista-lecciones');
     contenedor.innerHTML = '';
 
@@ -103,7 +108,7 @@ function renderizarAcordeon(lecciones) {
     lecciones.forEach((leccion, index) => {
         const item = document.createElement('div');
         item.className = "border border-gray-100 rounded-xl overflow-hidden transition-all bg-white group hover:shadow-md";
-        
+
         // Normalizamos IDs (Mongo usa _id, SQL usa id)
         const idLeccion = leccion._id || leccion.id;
         const numRetos = leccion.retos ? leccion.retos.length : 0;
@@ -126,10 +131,17 @@ function renderizarAcordeon(lecciones) {
 
             <div id="content-leccion-${idLeccion}" class="hidden bg-gray-50 border-t border-gray-100 animate-slide-down">
                 <div class="p-2 space-y-1">
-                    <button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition"
-                            onclick="window.verContenidoPrincipal('${idLeccion}')">
-                        <span>📺 Ver Clase</span>
-                    </button>
+                ${!esMaestro
+                ? `<button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition"
+                    onclick="window.verContenidoPrincipal('${idLeccion}')">
+                    <span>📺 Ver Lección</span>
+               </button>`
+                : `<button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition"
+                    onclick="window.verContenidoPrincipal('${idLeccion}')">
+                    <span>✏️ Editar Lección</span>
+               </button>`
+            }
+                    
                     ${numRetos > 0 ? `<div class="px-4 py-1 text-[10px] text-gray-400 font-bold uppercase">Retos</div>` : ''}
                     ${leccion.retos ? leccion.retos.map((reto, i) => `
                         <button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-yellow-50 text-xs text-gray-600 hover:text-yellow-700 flex items-center gap-2"
@@ -149,11 +161,11 @@ function renderizarAcordeon(lecciones) {
         btnHeader.addEventListener('click', () => {
             // Cierra otros
             document.querySelectorAll('[id^="content-leccion-"]').forEach(el => {
-                if(el !== contentDiv) el.classList.add('hidden');
+                if (el !== contentDiv) el.classList.add('hidden');
             });
             contentDiv.classList.toggle('hidden');
             arrow.classList.toggle('rotate-180');
-            if(!contentDiv.classList.contains('hidden')) activarLeccion(leccion);
+            if (!contentDiv.classList.contains('hidden')) activarLeccion(leccion);
         });
 
         contenedor.appendChild(item);
@@ -164,6 +176,7 @@ function renderizarAcordeon(lecciones) {
         const lec = lecciones.find(l => (l._id || l.id) == id);
         activarLeccion(lec, 'contenido');
     };
+
     window.verReto = (id, idx) => {
         const lec = lecciones.find(l => (l._id || l.id) == id);
         activarLeccion(lec, 'reto', idx);
@@ -181,9 +194,10 @@ function activarLeccion(leccion, tipo = 'contenido', indiceReto = 0) {
     info.classList.remove('hidden');
 
     if (tipo === 'contenido') {
+
         // Soporte para URL de video (asegúrate de que tu backend envíe 'videoUrl' o 'video_url')
-        const vidUrl = leccion.videoUrl || leccion.video_url; 
-        
+        const vidUrl = (leccion.multimedia && leccion.multimedia[0]?.URL) || leccion.video_url;
+
         if (vidUrl && (vidUrl.includes('youtube') || vidUrl.includes('youtu.be'))) {
             const id = vidUrl.split('v=')[1] || vidUrl.split('/').pop();
             player.innerHTML = `<iframe class="w-full h-full aspect-video" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
