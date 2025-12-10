@@ -12,24 +12,9 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            DEFAULT: '#64A85F',
-                            50: '#E8F5E6',
-                            100: '#D1EBC9',
-                            200: '#A3D894',
-                            300: '#8BCE7F',
-                            400: '#73C169',
-                            500: '#64A85F',
-                            600: '#508A4C',
-                            700: '#3C6739',
-                            800: '#284426',
-                            900: '#142213',
-                        }
+                        primary: { DEFAULT: '#64A85F', 50: '#E8F5E6', 100: '#D1EBC9', 200: '#A3D894', 300: '#8BCE7F', 400: '#73C169', 500: '#64A85F', 600: '#508A4C', 700: '#3C6739', 800: '#284426', 900: '#142213' },
                     },
-                    fontFamily: {
-                        Colmeak: ['Colmeak', 'sans-serif'],
-                        sans: ['Quicksand', 'system-ui', 'sans-serif'],
-                    }
+                    fontFamily: { Colmeak: ['Colmeak', 'sans-serif'], sans: ['Quicksand', 'system-ui', 'sans-serif'] }
                 }
             }
         }
@@ -37,132 +22,48 @@
 </head>
 
 <body id="app-root" class="font-sans bg-gray-50">
-    <!-- Aquí cargaremos el header DINÁMICO -->
-    <div id="header"></div>
+    
+    <app-header></app-header>
 
-    <!-- Área donde se pintan las vistas -->
-    <main id="vista" class="pt-6"></main>
+    <main id="vista" class="pt-6 min-h-screen"></main>
 
-    <!-- Headers -->
     <script type="module" src="../componentes/header.js"></script>
     <script type="module" src="../componentes/Pagina404.js"></script>
-
-    <!-- Componentes UI reutilizables -->
-    <script type="module" src="../componentes/ui/ProgressBar.js"></script>
-    <script type="module" src="../componentes/ui/LessonCard.js"></script>
-    <script type="module" src="../componentes/ui/QuizOption.js"></script>
-    <script type="module" src="../componentes/ui/VideoPlayer.js"></script>
-
-    <!-- Dashboards -->
+    
     <script type="module" src="../dashboard/dashboardAlumno.js"></script>
     <script type="module" src="../dashboard/DashboardMaestro.js"></script>
-
-    <!-- Módulos de Retos -->
-    <script type="module" src="../retos/crearRetoMenu.js"></script>
-    <script type="module" src="../retos/retoCodigo.js"></script>
-    <script type="module" src="../retos/retoMultiple.js"></script>
-    <script type="module" src="../retos/retoAbierto.js"></script>
-
-    <!-- Mis Cursos -->
+    
     <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
     <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
-    <script type="module" src="../mis-cursos/componentes/CursoCardAlumno.js"></script>
 
-    <!-- Unirse a Cursos -->
-    <script type="module" src="../unirse-cursos/unirseACurso.js"></script>
-
-    <!-- Visualización de Cursos -->
     <script type="module" src="../ver-curso/VisorLeccion.js"></script>
-    <script type="module" src="../ver-curso/componentes/SidebarLecciones.js"></script>
-    <script type="module" src="../ver-curso/componentes/AreaContenido.js"></script>
-    <script type="module" src="../ver-curso/VistaReto.js"></script>
-
-    <!-- Perfil -->
-    <script type="module" src="../perfil/editarPerfil.js"></script>
-
-    <!-- API Services -->
-    <script type="module" src="../api/CursoService.js"></script>
-
+    <script type="module" src="../utils/router.js"></script>
 
 
     <script type="module">
-        // Verificación rápida: Si no hay usuario, mandar al login
-        if (!localStorage.getItem("usuario")) {
-            window.location.href = "../login/index.html";
-        }
-    </script>
-
-    <script type="module">
-        import Header from '../componentes/header.js';
-
-        // 1. Inyectar Header
-        // (Como ya es un web component en el código que me pasaste antes, esto es automático si está importado)
-        // Solo asegúrate de tener <app-header></app-header> en el body o inyectarlo así:
-        const headerDiv = document.getElementById("header");
-        if (headerDiv && !headerDiv.querySelector('app-header')) {
-            headerDiv.innerHTML = "<app-header></app-header>";
+        // Este script solo corre una vez al cargar la página
+        
+        const usuario = JSON.parse(localStorage.getItem("usuario") || 'null');
+        
+        // A. Protección: Si no hay usuario, mandar al login
+        if (!usuario && !window.location.href.includes('login')) {
+             window.location.href = "../login/index.html";
         }
 
-        // 2. Lógica de Navegación (El Router)
-        const root = document.getElementById("vista"); // OJO: Tu div debe tener id="vista"
-        const params = new URLSearchParams(window.location.search);
-        const vista = params.get("vista");
-        const usuario = JSON.parse(localStorage.getItem("usuario") || '{}');
-
-        console.log("Navegando a:", vista); // Esto te ayudará a ver en consola si detecta el cambio
-
-        switch (vista) {
-            // --- RUTAS DE MAESTRO ---
-            case "dashboardMaestro":
-                root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
-                break;
-
-            case "cursos": // href="?vista=cursos"
-                // Asegúrate que MisCursosMaestro.js tenga: customElements.define('mis-cursos-maestro', ...)
-                root.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
-                break;
-
-            case "crear-curso":
-                root.innerHTML = "<crear-curso></crear-curso>";
-                break;
-
-            case "retos": // href="?vista=retos"
-                // Si aun no tienes componente de lista, pon un texto temporal para probar
-                root.innerHTML = "<h1 class='text-2xl p-4'>Aquí va la lista de retos</h1>";
-                // Cuando lo tengas: root.innerHTML = "<lista-retos-maestro></lista-retos-maestro>";
-                break;
-
-            // --- RUTAS DE ALUMNO ---
-            case "dashboardAlumno":
-                root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-                break;
-
-            case "cursosAlumno": // href="?vista=cursosAlumno"
-                root.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
-                break;
-
-            case "explorar": // href="?vista=explorar"
-                // Revisa si usas unirseACurso.js u otro
-                root.innerHTML = "<unirse-a-curso></unirse-a-curso>";
-                break;
-
-            // --- COMUNES ---
-            case "perfil":
-                root.innerHTML = `<editar-perfil tipo="${usuario.tipo}"></editar-perfil>`;
-                break;
-
-            // --- DEFAULT (INICIO) ---
-            default:
-                // Si no hay ?vista=... cargamos el dashboard correspondiente
-                if (usuario.tipo === "Maestro") {
-                    root.innerHTML = "<dashboard-maestro></dashboard-maestro>";
-                } else {
-                    root.innerHTML = "<dashboard-alumno></dashboard-alumno>";
-                }
-                break;
+        // B. Redirección Inicial (Si la URL está vacía)
+        // Si no hay hash (ej: index.html a secas), decidimos a dónde ir
+        if (!window.location.hash || window.location.hash === '#/') {
+            
+            if (usuario.tipo === "Maestro") {
+                // Cambiamos el hash, el Router detectará esto y cargará el componente
+                window.location.hash = "/dashboard-maestro";
+            } else {
+                window.location.hash = "/dashboard-alumno";
+            }
         }
+        
+        // Si ya hay un hash (ej: #/leccion/...), el Router lo manejará solo.
     </script>
 
 </body>
-
 </html>

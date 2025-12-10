@@ -49,11 +49,6 @@ class EditarPerfil extends HTMLElement {
                                    class="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed">
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
-                            <input type="text" value="${usuario.ubicacion || ''}" 
-                                   class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
-                        </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Sobre mí</label>

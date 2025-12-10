@@ -12,7 +12,6 @@ export async function loadDetalleCurso(cursoId) {
 
     if (!mainContent) return;
 
-
     // 1. Loader
     mainContent.innerHTML = `
     <div class="flex flex-col items-center justify-center h-[80vh]">
@@ -35,7 +34,7 @@ export async function loadDetalleCurso(cursoId) {
 
         // 3. Renderizado
         mainContent.innerHTML = `
-      <div class="font-sans min-h-screen bg-gray-50 animate-fade-in pb-10">
+      <div class="font-sans min-h-screen bg-gray-50 animate-fade-in pb-10 relative">
         
         <div class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-sm">
            <div class="flex items-center gap-3">
@@ -45,10 +44,19 @@ export async function loadDetalleCurso(cursoId) {
               <h1 class="font-bold text-gray-800 text-lg truncate max-w-md hidden md:block">${curso.titulo}</h1>
            </div>
            
-           <button id="btn-nueva-leccion" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-             <span class="hidden sm:inline">Nueva Lección</span>
-           </button>
+           <div class="flex gap-2">
+                ${esMaestro ? `
+                <button id="btn-eliminar-curso" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                     <span class="hidden sm:inline">Eliminar Curso</span>
+                </button>
+                ` : ''}
+
+                <button id="btn-nueva-leccion" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span class="hidden sm:inline">Nueva Lección</span>
+                </button>
+           </div>
         </div>
 
         <div class="max-w-[1600px] mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -75,17 +83,94 @@ export async function loadDetalleCurso(cursoId) {
             </div>
 
         </div>
+
+        <div id="modal-eliminar-curso" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4 animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all scale-100">
+                <div class="flex items-center gap-4 mb-4 text-red-600">
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">¿Eliminar Curso?</h3>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    Estás a punto de eliminar <strong>"${curso.titulo}"</strong>. Esta acción borrará todas las lecciones y el progreso de los estudiantes. <br><br>
+                    <span class="font-bold">Esta acción no se puede deshacer.</span>
+                </p>
+                <div class="flex justify-end gap-3">
+                    <button id="btn-cancelar-eliminar" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition font-medium">
+                        Cancelar
+                    </button>
+                    <button id="btn-confirmar-eliminar" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium shadow-lg flex items-center gap-2">
+                        <span>Sí, eliminar definitivamente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
       </div>
     `;
 
-        // 4. Listeners
-        document.getElementById('btn-volver').addEventListener('click', () => location.reload());
+        // 4. Listeners Generales
+        document.getElementById('btn-volver').addEventListener('click', () => location.reload()); // O redirigir a dashboard
+        
         document.getElementById('btn-nueva-leccion').addEventListener('click', () => {
             renderModalCrearLeccion(cursoId, () => loadDetalleCurso(cursoId));
         });
 
-        // 5. Iniciar Vista
-        renderizarAcordeon(listaLecciones, esMaestro);
+        // 5. LÓGICA DEL MODAL ELIMINAR
+        if (esMaestro) {
+            const btnEliminar = document.getElementById('btn-eliminar-curso');
+            const modalEliminar = document.getElementById('modal-eliminar-curso');
+            const btnCancelar = document.getElementById('btn-cancelar-eliminar');
+            const btnConfirmar = document.getElementById('btn-confirmar-eliminar');
+
+            // Abrir modal
+            btnEliminar.addEventListener('click', () => {
+                modalEliminar.classList.remove('hidden');
+            });
+
+            // Cerrar modal
+            btnCancelar.addEventListener('click', () => {
+                modalEliminar.classList.add('hidden');
+            });
+
+            // Cerrar modal al dar clic fuera
+            modalEliminar.addEventListener('click', (e) => {
+                if (e.target === modalEliminar) modalEliminar.classList.add('hidden');
+            });
+
+            // Confirmar eliminación
+            btnConfirmar.addEventListener('click', async () => {
+                try {
+                    // 1. Feedback visual en el botón (Loading)
+                    btnConfirmar.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Eliminando...`;
+                    btnConfirmar.disabled = true;
+
+                    // 2. Llamada al Backend
+                    await cursoService.deleteCourse(cursoId);
+                    
+                    // 3. Cerrar el modal inmediatamente para que se vea limpio
+                    modalEliminar.classList.add('hidden');
+
+                    // 4. Redirección DIRECTA a Mis Cursos (Sin alertas)
+                    window.location.hash = '/mis-cursos'; 
+                    
+                } catch (error) {
+                    console.error('Error eliminando curso:', error);
+                    
+                    // Aquí sí dejamos un alert o mensaje solo si falla, para que sepas qué pasó
+                    alert('No se pudo eliminar el curso. Inténtalo de nuevo.');
+                    
+                    // Restaurar botón por si quiere intentar otra vez
+                    btnConfirmar.innerHTML = 'Sí, eliminar definitivamente';
+                    btnConfirmar.disabled = false;
+                    modalEliminar.classList.add('hidden');
+                }
+            });
+        }
+
+        // 6. Iniciar Vista
+        renderizarAcordeon(listaLecciones, esMaestro, cursoId);
         if (listaLecciones.length > 0) activarLeccion(listaLecciones[0]);
 
     } catch (error) {
@@ -96,7 +181,7 @@ export async function loadDetalleCurso(cursoId) {
 
 // --- FUNCIONES AUXILIARES ---
 
-function renderizarAcordeon(lecciones, esMaestro) {
+function renderizarAcordeon(lecciones, esMaestro, cursoId) {
     const contenedor = document.getElementById('lista-lecciones');
     contenedor.innerHTML = '';
 
@@ -136,10 +221,10 @@ function renderizarAcordeon(lecciones, esMaestro) {
                     onclick="window.verContenidoPrincipal('${idLeccion}')">
                     <span>📺 Ver Lección</span>
                </button>`
-                : `<button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition"
-                    onclick="window.verContenidoPrincipal('${idLeccion}')">
+                : `<a href="#/leccion/${cursoId}/${idLeccion}" 
+                    class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition decoration-transparent">
                     <span>✏️ Editar Lección</span>
-               </button>`
+                    </a>`
             }
                     
                     ${numRetos > 0 ? `<div class="px-4 py-1 text-[10px] text-gray-400 font-bold uppercase">Retos</div>` : ''}
