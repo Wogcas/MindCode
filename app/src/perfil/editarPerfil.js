@@ -7,6 +7,7 @@ class EditarPerfil extends HTMLElement {
         this.isEditing = false;
         this.selectedImage = null;
         this.hasChanges = false;
+        this.listeners = [];
     }
 
     connectedCallback() {
@@ -406,7 +407,24 @@ class EditarPerfil extends HTMLElement {
 
         setTimeout(() => {
             container.classList.add('hidden');
-        }, 3000);
+        }, 500);
+    }
+
+    disconnectedCallback() {
+        // Limpiar todos los event listeners
+        this.listeners.forEach(({ element, event, handler }) => {
+            if (element && element.removeEventListener) {
+                element.removeEventListener(event, handler);
+            }
+        });
+        this.listeners = [];
+    }
+
+    addListener(element, event, handler) {
+        if (element && element.addEventListener) {
+            element.addEventListener(event, handler);
+            this.listeners.push({ element, event, handler });
+        }
     }
 }
 

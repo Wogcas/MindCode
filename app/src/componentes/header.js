@@ -1,4 +1,9 @@
 class AppHeader extends HTMLElement {
+    constructor() {
+        super();
+        this.listeners = [];
+    }
+
     connectedCallback() {
         const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
         const esMaestro = usuario.tipo === 'Maestro';
@@ -98,6 +103,22 @@ class AppHeader extends HTMLElement {
                     document.body.appendChild(modal);
                 }).catch(err => console.error("Error cargando el modal de crear curso:", err));
             });
+        }
+    }
+
+    disconnectedCallback() {
+        this.listeners.forEach(({ element, event, handler }) => {
+            if (element && element.removeEventListener) {
+                element.removeEventListener(event, handler);
+            }
+        });
+        this.listeners = [];
+    }
+
+    addListener(element, event, handler) {
+        if (element && element.addEventListener) {
+            element.addEventListener(event, handler);
+            this.listeners.push({ element, event, handler });
         }
     }
 }

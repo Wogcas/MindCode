@@ -38,10 +38,15 @@ class Router {
     if (!this.rootElement) return;
 
     // IMPORTANTE: Si hay parámetro ?vista=, NO usar hash routing
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('vista')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('vista')) {
       console.log('Sistema de vistas activo, router hash desactivado');
       return; // Dejar que el sistema de vistas maneje la navegación
+    }
+
+    // Limpiar componente anterior si existe
+    if (this.currentComponent && typeof this.currentComponent.cleanup === 'function') {
+      this.currentComponent.cleanup();
     }
 
     const hash = window.location.hash.slice(1) || '/';
@@ -52,8 +57,10 @@ class Router {
     const routePath = path ? `/${path}` : '/';
     const route = this.routes[routePath] || this.routes['/404'];
     if (route) {
-      // Limpiar el contenedor
-      this.rootElement.innerHTML = '';
+      // Limpiar el contenedor de forma segura
+      while (this.rootElement.firstChild) {
+        this.rootElement.removeChild(this.rootElement.firstChild);
+      }
 
       // Crear el nuevo componente
       const component = route.component;

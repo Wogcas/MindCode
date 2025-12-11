@@ -4,9 +4,20 @@ import './componentes/SugerenciasCard.js';
 import { cursoService } from '../api/CursoService.js'; 
 
 class DashboardAlumno extends HTMLElement {
+  constructor() {
+    super();
+    this.listeners = [];
+    this.abortController = null;
+    console.log('[DashboardAlumno] Constructor ejecutado');
+  }
+
   async connectedCallback() {
+    console.log('[DashboardAlumno] connectedCallback ejecutado - COMPONENTE MONTADO');
+    
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
     const nombreUsuario = usuario.nombre || 'Estudiante';
+
+    console.log('[DashboardAlumno] Iniciando carga...', { usuario: usuario.nombre, tipo: usuario.tipo });
 
     // 1. Render inicial con loader
     this.innerHTML = `
@@ -17,11 +28,24 @@ class DashboardAlumno extends HTMLElement {
     `;
 
     try {
+      console.log('[DashboardAlumno] Obteniendo cursos...');
+      
       // 2. Obtener cursos inscritos y disponibles
       const [cursosInscritos, todosLosCursos] = await Promise.all([
-        cursoService.fetchStudentCourses().catch(() => ({ cursos: [] })),
-        cursoService.fetchAllCourses().catch(() => ({ cursos: [] }))
+        cursoService.fetchStudentCourses().catch(err => {
+          console.error('[DashboardAlumno] Error fetchStudentCourses:', err);
+          return { cursos: [] };
+        }),
+        cursoService.fetchAllCourses().catch(err => {
+          console.error('[DashboardAlumno] Error fetchAllCourses:', err);
+          return { cursos: [] };
+        })
       ]);
+
+      console.log('[DashboardAlumno] Datos recibidos:', { 
+        cursosInscritos: cursosInscritos.cursos?.length || 0, 
+        todosLosCursos: todosLosCursos.cursos?.length || 0 
+      });
 
       const misCursos = cursosInscritos.cursos || [];
       const cursos = todosLosCursos.cursos || [];
@@ -45,6 +69,15 @@ class DashboardAlumno extends HTMLElement {
       const imagenSugerido = cursoSugerido && cursoSugerido.imagen ? cursoSugerido.imagen : 'https://assets.pluhe.com/blog/small/JqxsAtj7G5bc4D8vfE5LKrGjLhm2dgYi7aRtEXBd.jpg';
       const descSugerido = cursoSugerido ? cursoSugerido.descripcion : 'Descubre contenido increíble para potenciar tus habilidades.';
 
+      console.log('[DashboardAlumno] Preparando render final con:', { 
+        misCursos: misCursos.length, 
+        cursosDisponibles: cursosDisponibles.length,
+        cursoSugerido: !!cursoSugerido 
+      });
+
+      // Escapar el JSON para evitar problemas con comillas
+      const cursosJSON = JSON.stringify(misCursos).replace(/'/g, "\\'");
+
       // 5. Render final con datos reales
       this.innerHTML = `
         <div class="min-h-screen bg-gray-50 px-10 pt-8 pb-10 font-sans sm:px-20 sm:pt-10">
@@ -57,7 +90,7 @@ class DashboardAlumno extends HTMLElement {
           
           ${misCursos.length > 0 ? `
             <h2 class="text-xl font-light text-primary-text mb-6">Continúa aprendiendo</h2>
-            <curso-carrousel cursos='${JSON.stringify(misCursos)}'></curso-carrousel>
+            <curso-carrousel cursos='${cursosJSON}'></curso-carrousel>
           ` : ''}
           
           ${cursosDisponibles.length > 0 ? `
@@ -116,14 +149,23 @@ class DashboardAlumno extends HTMLElement {
         </style>
       `;
 
+      console.log('[DashboardAlumno] Render completado. Configurando eventos...');
+
       // Agregar eventos a las tarjetas de cursos disponibles
       const cardsDisponibles = this.querySelectorAll('.curso-card-disponible');
+      console.log('[DashboardAlumno] Tarjetas encontradas:', cardsDisponibles.length);
+      
       cardsDisponibles.forEach(card => {
-        card.addEventListener('click', () => {
+        const handler = () => {
           const cursoId = card.dataset.id;
+          console.log('[DashboardAlumno] Click en curso:', cursoId);
           window.location.href = `?vista=unirseACurso&id=${cursoId}`;
-        });
+        };
+        card.addEventListener('click', handler);
+        this.addListener(card, 'click', handler);
       });
+
+      console.log('[DashboardAlumno] ✅ Dashboard cargado exitosamente');
 
     } catch (error) {
       console.error("Error cargando dashboard:", error);
@@ -139,6 +181,28 @@ class DashboardAlumno extends HTMLElement {
           </button>
         </div>
       `;
+    }
+  }
+
+  disconnectedCallback() {
+    // Cancelar peticiones pendientes
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    
+    // Limpiar listeners
+    this.listeners.forEach(({ element, event, handler }) => {
+      if (element && element.removeEventListener) {
+        element.removeEventListener(event, handler);
+      }
+    });
+    this.listeners = [];
+  }
+
+  addListener(element, event, handler) {
+    if (element && element.addEventListener) {
+      element.addEventListener(event, handler);
+      this.listeners.push({ element, event, handler });
     }
   }
 }

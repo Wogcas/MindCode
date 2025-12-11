@@ -50,8 +50,36 @@ export default class CursoService {
         if (!curso) {
             throw new NotFoundError(`Curso con ID ${idCurso} no encontrado`);
         }
-        const cursoEliminado = await this.cursoRepo.eliminarCurso(idCurso);
-        return CursoAdapter.toDTO(cursoEliminado);
+
+        // 1. Importar repositorios necesarios
+        const { Leccion } = await import('../entities/Leccion.js');
+        const { Reto } = await import('../entities/Reto.js');
+
+        try {
+            // 2. Obtener todas las lecciones del curso
+            const lecciones = await Leccion.find({ id_curso: idCurso });
+            const leccionIds = lecciones.map(l => l._id);
+
+            // 3. Eliminar todos los retos asociados a esas lecciones
+            if (leccionIds.length > 0) {
+                await Reto.deleteMany({ lecciones: { $in: leccionIds } });
+                console.log(`Eliminados retos asociados a ${leccionIds.length} lecciones`);
+            }
+
+            // 4. Eliminar todas las lecciones del curso
+            await Leccion.deleteMany({ id_curso: idCurso });
+            console.log(`Eliminadas ${lecciones.length} lecciones del curso ${idCurso}`);
+
+            // 5. Eliminar el curso
+            const cursoEliminado = await this.cursoRepo.eliminarCurso(idCurso);
+            
+            console.log(`✅ Curso ${idCurso} eliminado con integridad referencial`);
+            return CursoAdapter.toDTO(cursoEliminado);
+
+        } catch (error) {
+            console.error('Error al eliminar curso con integridad referencial:', error);
+            throw error;
+        }
     }
 
     /**

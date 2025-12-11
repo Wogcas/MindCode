@@ -43,10 +43,9 @@ export class LeccionService {
 
   static async update(leccionId, data) {
     try {
-        // Usa el nuevo método en apiClient
-        const response = await client.actualizarLeccion(leccionId, data);
+        const response = await client.put(`/lecciones/${leccionId}`, data);
         console.log("Lección actualizada:", response);
-        return response.data;
+        return response;
     } catch (error) {
         console.error("Error actualizando lección:", error);
         throw error;

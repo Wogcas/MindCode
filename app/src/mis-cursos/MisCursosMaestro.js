@@ -176,6 +176,26 @@ class MisCursosMaestro extends HTMLElement {
         });
     }
 
+    disconnectedCallback() {
+        // Limpiar listeners
+        this.listeners.forEach(({ element, event, handler }) => {
+            if (element && element.removeEventListener) {
+                element.removeEventListener(event, handler);
+            }
+        });
+        this.listeners = [];
+
+        // Remover listener de documento
+        document.removeEventListener('curso-creado', this.handleCursoCreado);
+    }
+
+    addListener(element, event, handler) {
+        if (element && element.addEventListener) {
+            element.addEventListener(event, handler);
+            this.listeners.push({ element, event, handler });
+        }
+    }
+
     abrirModalCrearCurso() {
         const modal = document.createElement('crear-curso');
         document.body.appendChild(modal);

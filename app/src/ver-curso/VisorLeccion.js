@@ -1,11 +1,15 @@
 import { LeccionService } from '../api/LeccionService.js';
 import RetoAPI from '../api/RetoAPI.js';
+import { UsuarioService } from '../api/UsuarioService.js';
+import CursoService from '../api/CursoService.js';
 
 class VisorLeccion extends HTMLElement {
     constructor() {
         super();
         this.leccion = null;
         this.retos = [];
+        this.totalLecciones = 0;
+        this.leccionCompletada = false;
     }
 
     async connectedCallback() {
@@ -25,6 +29,7 @@ class VisorLeccion extends HTMLElement {
             ]);
 
             const lista = resLeccion.data || resLeccion || [];
+            this.totalLecciones = lista.length;
             this.leccion = lista.find(l => (l._id || l.id).toString() === this.leccionId.toString());
             this.retos = resRetos.data || resRetos || [];
 
@@ -254,6 +259,9 @@ class VisorLeccion extends HTMLElement {
                         btnValidar.disabled = true;
                         btnValidar.textContent = "Completado";
                         btnValidar.classList.add('opacity-50', 'cursor-not-allowed');
+                        
+                        // Actualizar progreso del alumno
+                        this.actualizarProgresoLeccion();
                     } else {
                         const labelIncorrecto = pantalla.querySelector(`#label-opcion-${indexSeleccionado}`);
                         labelIncorrecto.classList.add('border-red-500', 'bg-red-50');
@@ -285,17 +293,114 @@ class VisorLeccion extends HTMLElement {
                                     <span class="bg-gray-200 text-gray-700 w-8 h-8 flex items-center justify-center rounded-full text-sm shrink-0">${i+1}</span>
                                     <span>${preg.contenido || 'Pregunta...'}</span>
                                 </p>
-                                <textarea class="w-full p-4 border border-gray-300 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50 outline-none resize-none bg-white transition-all text-gray-700 text-lg shadow-sm" rows="3" placeholder="Escribe tu respuesta aquí..."></textarea>
+                                <textarea class="respuesta-textarea w-full p-4 border border-gray-300 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50 outline-none resize-none bg-white transition-all text-gray-700 text-lg shadow-sm" rows="3" placeholder="Escribe tu respuesta aquí..."></textarea>
                             </div>
                         `).join('')}
                     </div>
 
-                    <button class="w-full sm:w-auto bg-green-600 text-white py-3 px-8 rounded-xl font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center gap-2 self-start" onclick="alert('¡Tarea enviada!')">
-                        Enviar Tarea
+                    <button id="btn-enviar-tarea" class="w-full sm:w-auto bg-green-600 text-white py-3 px-8 rounded-xl font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition shadow-lg flex items-center justify-center gap-2 self-start">
+                        <span id="btn-text">Enviar Tarea</span>
+                        <svg class="w-5 h-5 hidden" id="btn-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     </button>
                 </div>
             `;
             pantalla.innerHTML = html;
+            
+            // Agregar listener al botón de enviar tarea
+            const btnEnviarTarea = pantalla.querySelector('#btn-enviar-tarea');
+            if (btnEnviarTarea) {
+                btnEnviarTarea.addEventListener('click', () => {
+                    // Validar que todas las respuestas tengan contenido
+                    const textareas = pantalla.querySelectorAll('.respuesta-textarea');
+                    let todasRespondidas = true;
+                    
+                    textareas.forEach(textarea => {
+                        if (!textarea.value.trim()) {
+                            todasRespondidas = false;
+                            textarea.classList.add('border-red-500');
+                        } else {
+                            textarea.classList.remove('border-red-500');
+                        }
+                    });
+                    
+                    if (!todasRespondidas) {
+                        alert('Por favor responde todas las preguntas antes de enviar.');
+                        return;
+                    }
+                    
+                    // Deshabilitar botón y cambiar texto
+                    btnEnviarTarea.disabled = true;
+                    btnEnviarTarea.classList.remove('hover:bg-green-700');
+                    btnEnviarTarea.querySelector('#btn-text').textContent = 'Tarea Enviada';
+                    btnEnviarTarea.querySelector('#btn-check').classList.remove('hidden');
+                    
+                    // Deshabilitar textareas
+                    textareas.forEach(textarea => {
+                        textarea.disabled = true;
+                        textarea.classList.add('bg-gray-100', 'cursor-not-allowed');
+                    });
+                    
+                    // Actualizar progreso del alumno
+                    this.actualizarProgresoLeccion();
+                    
+                    // Mostrar confirmación
+                    alert('¡Tarea enviada! El maestro la revisará pronto.');
+                });
+            }
+        }
+    }
+
+    /**
+     * Actualizar progreso del alumno al completar una lección
+     */
+    async actualizarProgresoLeccion() {
+        // Evitar actualizar múltiples veces
+        if (this.leccionCompletada) {
+            return;
+        }
+
+        try {
+            const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+            
+            // Solo actualizar progreso para alumnos
+            if (!usuario || usuario.tipo !== 'Alumno') {
+                return;
+            }
+
+            const idUsuario = usuario.id || usuario._id;
+            
+            // Marcar lección como completada
+            await UsuarioService.marcarLeccionCompletada(
+                idUsuario,
+                this.cursoId,
+                this.leccionId
+            );
+
+            // Obtener progreso actual para calcular el porcentaje
+            const progresoResponse = await UsuarioService.obtenerProgresoCursos(idUsuario);
+            const progresoCurso = (progresoResponse.data || []).find(
+                p => p.id_curso.toString() === this.cursoId.toString()
+            );
+
+            if (progresoCurso) {
+                const leccionesCompletadas = progresoCurso.lecciones_completadas.length;
+                const porcentaje = Math.round((leccionesCompletadas / this.totalLecciones) * 100);
+
+                // Actualizar porcentaje
+                await UsuarioService.actualizarPorcentajeProgreso(
+                    idUsuario,
+                    this.cursoId,
+                    porcentaje
+                );
+
+                console.log(`✅ Progreso actualizado: ${leccionesCompletadas}/${this.totalLecciones} lecciones (${porcentaje}%)`);
+            }
+
+            this.leccionCompletada = true;
+
+        } catch (error) {
+            console.error('Error al actualizar progreso:', error);
+            // No interrumpir la experiencia del usuario si falla la actualización
         }
     }
 }

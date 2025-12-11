@@ -6,6 +6,11 @@ import './componentes/AccionesRapidas.js';
 import '../crear-curso/CrearCurso.js'; 
 
 class DashboardMaestro extends HTMLElement {
+    constructor() {
+        super();
+        this.listeners = []; // Array para rastrear event listeners
+    }
+
     connectedCallback() {
         // 1. Obtener usuario real
         const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -25,6 +30,24 @@ class DashboardMaestro extends HTMLElement {
       </div>
     `;
 
+    }
+
+    disconnectedCallback() {
+        // Limpiar todos los event listeners registrados
+        this.listeners.forEach(({ element, event, handler }) => {
+            if (element && element.removeEventListener) {
+                element.removeEventListener(event, handler);
+            }
+        });
+        this.listeners = [];
+    }
+
+    // Método helper para agregar listeners con tracking automático
+    addListener(element, event, handler) {
+        if (element && element.addEventListener) {
+            element.addEventListener(event, handler);
+            this.listeners.push({ element, event, handler });
+        }
     }
 
     abrirModalCrearCurso() {

@@ -52,7 +52,24 @@ export default class LeccionService {
         if (!leccion) {
             throw new NotFoundError(`Lección con ID ${idLeccion} no encontrada`);
         }
-        const leccionEliminada = await this.leccionRepo.eliminarLeccion(idLeccion);
-        return leccionAdapter.toDTO(leccionEliminada);
+
+        try {
+            // 1. Importar modelo de Reto
+            const { Reto } = await import('../entities/Reto.js');
+
+            // 2. Eliminar todos los retos asociados a esta lección
+            const result = await Reto.deleteMany({ lecciones: idLeccion });
+            console.log(`Eliminados ${result.deletedCount} retos asociados a la lección ${idLeccion}`);
+
+            // 3. Eliminar la lección
+            const leccionEliminada = await this.leccionRepo.eliminarLeccion(idLeccion);
+            
+            console.log(`✅ Lección ${idLeccion} eliminada con integridad referencial`);
+            return leccionAdapter.toDTO(leccionEliminada);
+
+        } catch (error) {
+            console.error('Error al eliminar lección con integridad referencial:', error);
+            throw error;
+        }
     }
 }

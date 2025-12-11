@@ -6,6 +6,7 @@ class CrearCurso extends HTMLElement {
         this.visibilidad = 'Público';
         this.imagenPreview = null;
         this.isLoading = false;
+        this.listeners = [];
     }
 
     connectedCallback() {
@@ -323,6 +324,22 @@ class CrearCurso extends HTMLElement {
 
     cerrarModal() {
         this.remove();
+    }
+
+    disconnectedCallback() {
+        this.listeners.forEach(({ element, event, handler }) => {
+            if (element && element.removeEventListener) {
+                element.removeEventListener(event, handler);
+            }
+        });
+        this.listeners = [];
+    }
+
+    addListener(element, event, handler) {
+        if (element && element.addEventListener) {
+            element.addEventListener(event, handler);
+            this.listeners.push({ element, event, handler });
+        }
     }
 }
 

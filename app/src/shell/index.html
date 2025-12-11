@@ -32,6 +32,7 @@
     
     <script type="module" src="../dashboard/dashboardAlumno.js"></script>
     <script type="module" src="../dashboard/DashboardMaestro.js"></script>
+    <script type="module" src="../dashboard/VistaLeccion.js"></script>
     
     <script type="module" src="../mis-cursos/MisCursosMaestro.js"></script>
     <script type="module" src="../mis-cursos/MisCursosAlumno.js"></script>
@@ -62,39 +63,66 @@
             // Si hay parámetro vista, usarlo
             if (vista) {
                 console.log("Cargando vista:", vista);
-                mainContent.innerHTML = '';
+                
+                // Limpiar contenedor de forma segura (sin innerHTML)
+                while (mainContent.firstChild) {
+                    // Llamar cleanup si el componente lo tiene
+                    const child = mainContent.firstChild;
+                    if (child.cleanup && typeof child.cleanup === 'function') {
+                        child.cleanup();
+                    }
+                    mainContent.removeChild(child);
+                }
+                
+                let componentHTML = '';
                 
                 switch (vista) {
                     case "dashboardMaestro":
-                        mainContent.innerHTML = "<dashboard-maestro></dashboard-maestro>";
+                        componentHTML = "<dashboard-maestro></dashboard-maestro>";
                         break;
                     
                     case "dashboardAlumno":
-                        mainContent.innerHTML = "<dashboard-alumno></dashboard-alumno>";
+                        componentHTML = "<dashboard-alumno></dashboard-alumno>";
                         break;
                     
                     case "cursosMaestro":
-                        mainContent.innerHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
+                        componentHTML = "<mis-cursos-maestro></mis-cursos-maestro>";
                         break;
                     
                     case "cursosAlumno":
-                        mainContent.innerHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
+                        componentHTML = "<mis-cursos-alumno></mis-cursos-alumno>";
                         break;
                     
                     case "perfil":
-                        mainContent.innerHTML = "<editar-perfil></editar-perfil>";
+                        componentHTML = "<editar-perfil></editar-perfil>";
                         break;
                     
                     case "unirseACurso":
                         const cursoId = params.get("id");
-                        mainContent.innerHTML = `<unirse-a-curso cursoId="${cursoId || ''}"></unirse-a-curso>`;
+                        componentHTML = `<unirse-a-curso cursoId="${cursoId || ''}"></unirse-a-curso>`;
+                        break;
+                    
+                    case "editarLeccion":
+                        const cursoIdLeccion = params.get("cursoId");
+                        const leccionId = params.get("leccionId");
+                        componentHTML = `<vista-leccion cursoId="${cursoIdLeccion || ''}" leccionId="${leccionId || ''}"></vista-leccion>`;
+                        break;
+                    
+                    case "verLeccion":
+                        const cursoIdVer = params.get("cursoId");
+                        const leccionIdVer = params.get("leccionId");
+                        componentHTML = `<visor-leccion cursoId="${cursoIdVer || ''}" leccionId="${leccionIdVer || ''}"></visor-leccion>`;
                         break;
                     
                     default:
                         // Vista no reconocida, ir al dashboard según tipo
                         const dashboardVista = usuario.tipo === "Maestro" ? "dashboardMaestro" : "dashboardAlumno";
                         window.location.href = `?vista=${dashboardVista}`;
+                        return;
                 }
+                
+                // Insertar el nuevo componente
+                mainContent.innerHTML = componentHTML;
                 return;
             }
             

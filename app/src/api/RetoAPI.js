@@ -70,6 +70,13 @@ class RetoAPI {
     });
   }
 
+  async actualizarReto(retoId, retoData) {
+    return this.request(`/retos/actualizar/${retoId}`, {
+        method: 'PUT',
+        body: JSON.stringify(retoData)
+    });
+  }
+
   async eliminarReto(retoId) {
     return this.request(`/retos/eliminar/${retoId}`, {
         method: 'DELETE'

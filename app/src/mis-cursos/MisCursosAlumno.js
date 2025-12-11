@@ -2,6 +2,11 @@ import './componentes/CursoCardAlumno.js';
 import { cursoService } from '../api/CursoService.js';
 
 class MisCursosAlumno extends HTMLElement {
+  constructor() {
+    super();
+    this.listeners = [];
+  }
+
   async connectedCallback() {
     await this.render();
   }
@@ -119,6 +124,22 @@ class MisCursosAlumno extends HTMLElement {
         }
       });
     });
+  }
+
+  disconnectedCallback() {
+    this.listeners.forEach(({ element, event, handler }) => {
+      if (element && element.removeEventListener) {
+        element.removeEventListener(event, handler);
+      }
+    });
+    this.listeners = [];
+  }
+
+  addListener(element, event, handler) {
+    if (element && element.addEventListener) {
+      element.addEventListener(event, handler);
+      this.listeners.push({ element, event, handler });
+    }
   }
 }
 

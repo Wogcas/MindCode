@@ -12,7 +12,16 @@ export async function loadDetalleCurso(cursoId) {
 
     if (!mainContent) return;
 
-    // 1. Loader
+    // 1. Limpiar contenido previo de forma segura
+    while (mainContent.firstChild) {
+        const child = mainContent.firstChild;
+        if (child.cleanup && typeof child.cleanup === 'function') {
+            child.cleanup();
+        }
+        mainContent.removeChild(child);
+    }
+
+    // 2. Loader
     mainContent.innerHTML = `
     <div class="flex flex-col items-center justify-center h-[80vh]">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
@@ -21,7 +30,7 @@ export async function loadDetalleCurso(cursoId) {
   `;
 
     try {
-        // 2. Petición al Backend (Curso + Lecciones)
+        // 3. Petición al Backend (Curso + Lecciones)
         const [cursoResponse, leccionesData] = await Promise.all([
             cursoService.fetchCourseById(cursoId),
             LeccionService.getByCursoId(cursoId)
@@ -215,10 +224,10 @@ function renderizarAcordeon(lecciones, esMaestro, cursoId) {
                 <div class="p-2 space-y-1">
                 ${!esMaestro
                 ? `<button class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition"
-                    onclick="window.location.hash = '#/curso/${cursoId}/${idLeccion}'">
+                    onclick="window.location.href = '?vista=verLeccion&cursoId=${cursoId}&leccionId=${idLeccion}'">
                     <span>📺 Ver Lección</span>
                </button>`
-                : `<a href="#/leccion/${cursoId}/${idLeccion}" 
+                : `<a href="?vista=editarLeccion&cursoId=${cursoId}&leccionId=${idLeccion}" 
                     class="w-full text-left p-2 pl-4 rounded-lg hover:bg-primary-50 text-xs text-gray-600 hover:text-primary-700 flex items-center gap-2 transition decoration-transparent">
                     <span>✏️ Editar Lección</span>
                     </a>`
